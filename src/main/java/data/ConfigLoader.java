@@ -33,4 +33,7 @@ public class ConfigLoader {
 
     @Value("${sql.password}")
     private String sqlPassword;
+
+    @Value("${curseforge.api.token}")
+    private String curseforgeApiToken;
 }
