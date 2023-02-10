@@ -1,6 +1,7 @@
 package bot;
 
 import application.App;
+import bot.listener.Atlassian.JiraForumBot;
 import bot.listener.CurseForgeBot;
 import data.ConfigLoader;
 import data.database.curseforge.CurseforgeRepository;
@@ -21,7 +22,8 @@ public class Bot {
     @Autowired
     private CurseforgeRepository curseforgeRepository;
 
-    private CurseForgeBot CFB;
+    private CurseForgeBot curseForgeBot;
+    private JiraForumBot jiraForumBot;
 
     private JDA bot;
 
@@ -34,9 +36,10 @@ public class Bot {
         bot.enableIntents(GatewayIntent.MESSAGE_CONTENT);
         bot.setEventPassthrough(true);
 
-        CFB = new CurseForgeBot(curseforgeRepository);
+        curseForgeBot = new CurseForgeBot(curseforgeRepository);
+        jiraForumBot = new JiraForumBot();
 
-        bot.addEventListeners(CFB);
+        bot.addEventListeners(curseForgeBot, jiraForumBot);
 
         this.bot = bot.build();
 
@@ -50,6 +53,6 @@ public class Bot {
 
     @Scheduled(cron = "0 */5 * * * *")
     private void fiveMinuteTask() {
-        CFB.update();
+        curseForgeBot.update();
     }
 }
