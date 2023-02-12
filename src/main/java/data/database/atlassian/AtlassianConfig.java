@@ -17,7 +17,7 @@ public class AtlassianConfig {
 
     @Id
     private long id;
-    private Long threadChannelId;
+    private Long forumChannelId;
 
     public AtlassianConfig(long id){
         this.id = id;

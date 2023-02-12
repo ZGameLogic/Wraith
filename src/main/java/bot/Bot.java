@@ -28,11 +28,10 @@ public class Bot {
 
     @Autowired
     private CurseforgeRepository curseforgeRepository;
-
     @Autowired
     private AtlassianRepository atlassianRepository;
 
-    private CurseForgeBot CFB;
+    private CurseForgeBot curseForgeBot;
     private JiraBot jiraBot;
     private BitbucketBot bitbucketBot;
     private BambooBot bambooBot;
@@ -48,12 +47,12 @@ public class Bot {
         bot.enableIntents(GatewayIntent.MESSAGE_CONTENT);
         bot.setEventPassthrough(true);
 
-        CFB = new CurseForgeBot(curseforgeRepository);
+        curseForgeBot = new CurseForgeBot(curseforgeRepository);
         jiraBot = new JiraBot(atlassianRepository);
         bitbucketBot = new BitbucketBot();
         bambooBot = new BambooBot();
 
-        bot.addEventListeners(CFB, jiraBot, bitbucketBot, bambooBot);
+        bot.addEventListeners(curseForgeBot, jiraBot, bitbucketBot, bambooBot);
 
         this.bot = bot.build();
 
@@ -85,6 +84,6 @@ public class Bot {
 
     @Scheduled(cron = "0 */5 * * * *")
     private void fiveMinuteTask() {
-        CFB.update();
+        curseForgeBot.update();
     }
 }
