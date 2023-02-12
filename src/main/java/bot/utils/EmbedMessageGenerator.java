@@ -1,8 +1,10 @@
 package bot.utils;
 
 import bot.listener.CurseForgeBot;
+import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.awt.*;
 import java.util.LinkedList;
@@ -11,6 +13,15 @@ public abstract class EmbedMessageGenerator {
 
     private final static Color GENERAL_COLOR = new Color(99, 42, 129);
     private final static Color CURSEFORGE_COLOR = new Color(239, 99, 54);
+
+    public static MessageEmbed curseforgeUpdated(CurseforgeRecord record){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(CURSEFORGE_COLOR);
+        eb.setTitle("Update status for: " + record.getName());
+        eb.setDescription("This project was last updated: " + TimeFormat.DATE_TIME_SHORT.format(record.getLastUpdated().getTime()) + "\n" +
+                "This project was last checked: " + TimeFormat.DATE_TIME_SHORT.format(record.getLastChecked().getTime()));
+        return eb.build();
+    }
 
     public static MessageEmbed curseforgeList(LinkedList<CurseForgeBot.CurseforgeProject> projects){
         EmbedBuilder eb = new EmbedBuilder();

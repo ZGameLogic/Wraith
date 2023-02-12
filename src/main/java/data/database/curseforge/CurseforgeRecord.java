@@ -30,4 +30,5 @@ public class CurseforgeRecord {
     private String projectVersionId;
     private Date lastChecked;
     private Date lastUpdated;
+    private String name;
 }
