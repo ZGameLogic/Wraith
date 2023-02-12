@@ -6,6 +6,6 @@ import org.json.JSONObject;
 public class BitbucketBot extends AdvancedListenerAdapter {
 
     public void handleWebhook(JSONObject body){
-
+        System.out.println(body);
     }
 }

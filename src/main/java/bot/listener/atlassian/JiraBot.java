@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.json.JSONObject;
@@ -45,8 +46,13 @@ public class JiraBot extends AdvancedListenerAdapter {
         }, "On-Ready").start();
     }
 
-    public void handleWebhook(JSONObject body){
+    @Override
+    public void onMessageReceived(MessageReceivedEvent event) {
 
+    }
+
+    public void handleWebhook(JSONObject body){
+        System.out.println(body);
     }
 
     public void createPost(long guildId, String title, String content){
@@ -58,6 +64,4 @@ public class JiraBot extends AdvancedListenerAdapter {
     public void addToPost(long guildId, String issue, String message){
 
     }
-
-
 }
