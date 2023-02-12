@@ -16,4 +16,7 @@ public interface CurseforgeRepository extends JpaRepository<CurseforgeRecord, Lo
 
     @Query(value = "select * from curseforge c where c.guild_id = :guild AND c.channel_id = :channel", nativeQuery = true)
     List<CurseforgeRecord> getProjectsByGuildAndChannel(@Param("guild") Long guild, @Param("channel") Long channel);
+
+    @Query(value = "select * from curseforge c where c.name = :name", nativeQuery = true)
+    Optional<CurseforgeRecord> getProjectByName(@Param("name") String name);
 }

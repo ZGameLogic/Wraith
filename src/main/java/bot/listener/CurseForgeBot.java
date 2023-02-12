@@ -10,11 +10,14 @@ import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.utils.TimeFormat;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -28,7 +31,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 public class CurseForgeBot extends AdvancedListenerAdapter {
@@ -51,12 +57,28 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
                                         .addOption(OptionType.STRING, "project", "Project to watch", true),
                                 new SubcommandData("forget", "Stops listening to a project")
                                         .addOption(OptionType.STRING, "project", "Project to watch", true),
-                                new SubcommandData("list", "Lists all the projects currently followed in this channel")
+                                new SubcommandData("list", "Lists all the projects currently followed in this channel"),
+                                new SubcommandData("updated", "Shows when the project was last updated")
+                                        .addOption(OptionType.STRING, "project", "Project to check", true, true)
                         )
                 ).queue();
-                log.info("Adding curforge command to " + guild.getName());
+                log.info("Adding curseforge command to " + guild.getName());
             }
         }, "Upsert command thread").start();
+    }
+
+    @AutoCompleteResponse(slashSubCommandId = "updated", slashCommandId = "curseforge", focusedOption = "project")
+    private void autoCompleteProject(CommandAutoCompleteInteractionEvent event){
+        LinkedList<String> projects = new LinkedList<>();
+        for(CurseforgeRecord record: checks.getProjectsByGuildAndChannel(event.getGuild().getIdLong(), event.getChannel().getIdLong())){
+            projects.add(record.getName());
+        }
+        String[] words = projects.toArray(new String[0]);
+        List<Command.Choice> options = Stream.of(words)
+                .filter(word -> word.startsWith(event.getFocusedOption().getValue()))
+                .map(word -> new Command.Choice(word, word))
+                .collect(Collectors.toList());
+        event.replyChoices(options).queue();
     }
 
     @SlashResponse(value = "curseforge", subCommandName = "list")
@@ -69,6 +91,17 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
         event.getHook().sendMessageEmbeds(EmbedMessageGenerator.curseforgeList(projects)).queue();
     }
 
+    @SlashResponse(value = "curseforge", subCommandName = "updated")
+    private void updated(SlashCommandInteractionEvent event){
+        String projectName = event.getOption("project").getAsString();
+        Optional<CurseforgeRecord> project = checks.getProjectByName(projectName);
+        if(project.isPresent()){
+            event.replyEmbeds(EmbedMessageGenerator.curseforgeUpdated(project.get())).queue();
+        } else {
+            event.reply("Cannot find a project with that name").setEphemeral(true).queue();
+        }
+    }
+
     @SlashResponse(value = "curseforge", subCommandName = "listen")
     private void follow(SlashCommandInteractionEvent event){
         event.deferReply().queue();
@@ -77,12 +110,14 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
         cfr.setChannelId(event.getChannel().getIdLong());
         cfr.setGuildId(event.getGuild().getIdLong());
         cfr.setLastChecked(new Date());
+        cfr.setLastUpdated(new Date());
         cfr.setProjectId(project);
         CurseforgeProject response = new CurseforgeProject(project);
         if(!response.isValid()){
             event.getHook().sendMessage("No project with that ID found").queue();
             return;
         }
+        cfr.setName(response.name);
         cfr.setProjectVersionId(response.fileId);
         event.getHook().sendMessageEmbeds(EmbedMessageGenerator.curseforgeInitial(response)).queue();
         checks.save(cfr);
@@ -109,9 +144,11 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
                 ).queue();
                 check.setProjectVersionId(current.getFileId());
                 check.setLastUpdated(new Date());
+                check.setName(current.getName());
                 log.info("Project: " + check.getProjectId() + "\tOld file: " + check.getProjectVersionId() + "\tNew file: " + current.fileId);
             }
             check.setLastChecked(new Date());
+            check.setName(current.getName());
             checks.save(check);
         }
     }
