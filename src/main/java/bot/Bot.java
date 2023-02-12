@@ -2,14 +2,22 @@ package bot;
 
 import application.App;
 import bot.listener.CurseForgeBot;
+import bot.listener.atlassian.BambooBot;
+import bot.listener.atlassian.BitbucketBot;
+import bot.listener.atlassian.JiraBot;
 import data.ConfigLoader;
+import data.database.atlassian.AtlassianRepository;
 import data.database.curseforge.CurseforgeRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.PostConstruct;
@@ -21,7 +29,13 @@ public class Bot {
     @Autowired
     private CurseforgeRepository curseforgeRepository;
 
+    @Autowired
+    private AtlassianRepository atlassianRepository;
+
     private CurseForgeBot CFB;
+    private JiraBot jiraBot;
+    private BitbucketBot bitbucketBot;
+    private BambooBot bambooBot;
 
     private JDA bot;
 
@@ -35,8 +49,11 @@ public class Bot {
         bot.setEventPassthrough(true);
 
         CFB = new CurseForgeBot(curseforgeRepository);
+        jiraBot = new JiraBot(atlassianRepository);
+        bitbucketBot = new BitbucketBot();
+        bambooBot = new BambooBot();
 
-        bot.addEventListeners(CFB);
+        bot.addEventListeners(CFB, jiraBot, bitbucketBot, bambooBot);
 
         this.bot = bot.build();
 
@@ -46,6 +63,24 @@ public class Bot {
         } catch (InterruptedException e) {
             log.error("Unable to launch bot");
         }
+    }
+
+    @PostMapping("webhooks/jira")
+    private void jiraWebhook(@RequestBody String body) throws JSONException {
+        JSONObject jsonBody = new JSONObject(body);
+        jiraBot.handleWebhook(jsonBody);
+    }
+
+    @PostMapping("webhooks/bitbucket")
+    private void bitbucketWebhook(@RequestBody String body) throws JSONException {
+        JSONObject jsonBody = new JSONObject(body);
+        bitbucketBot.handleWebhook(jsonBody);
+    }
+
+    @PostMapping("webhooks/bamboo")
+    private void bambooWebhook(@RequestBody String body) throws JSONException {
+        JSONObject jsonBody = new JSONObject(body);
+        bambooBot.handleWebhook(jsonBody);
     }
 
     @Scheduled(cron = "0 */5 * * * *")

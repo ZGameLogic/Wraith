@@ -36,4 +36,20 @@ public class ConfigLoader {
 
     @Value("${curseforge.api.token}")
     private String curseforgeApiToken;
+
+    @Value("${jira.PAT}")
+    private String jiraPAT;
+    @Value("${bitbucket.PAT}")
+    private String bitbucketPAT;
+    @Value("${bamboo.PAT}")
+    private String bambooPAT;
+
+    @Value("${jira.URL}")
+    private String jiraURL;
+    @Value("${bitbucket.URL}")
+    private String bitbucketURL;
+    @Value("${bamboo.URL}")
+    private String bambooURL;
+
+
 }
