@@ -1,7 +1,6 @@
 package bot;
 
 import application.App;
-import bot.listener.Atlassian.JiraForumBot;
 import bot.listener.CurseForgeBot;
 import bot.listener.atlassian.BambooBot;
 import bot.listener.atlassian.BitbucketBot;
@@ -29,13 +28,10 @@ public class Bot {
 
     @Autowired
     private CurseforgeRepository curseforgeRepository;
-
-    private CurseForgeBot curseForgeBot;
-    private JiraForumBot jiraForumBot;
     @Autowired
     private AtlassianRepository atlassianRepository;
 
-    private CurseForgeBot CFB;
+    private CurseForgeBot curseForgeBot;
     private JiraBot jiraBot;
     private BitbucketBot bitbucketBot;
     private BambooBot bambooBot;
@@ -51,9 +47,12 @@ public class Bot {
         bot.enableIntents(GatewayIntent.MESSAGE_CONTENT);
         bot.setEventPassthrough(true);
 
-        CFB = new CurseForgeBot(curseforgeRepository);
+        curseForgeBot = new CurseForgeBot(curseforgeRepository);
+        jiraBot = new JiraBot(atlassianRepository);
+        bitbucketBot = new BitbucketBot();
+        bambooBot = new BambooBot();
 
-        bot.addEventListeners(CFB);
+        bot.addEventListeners(curseForgeBot, jiraBot, bitbucketBot, bambooBot);
 
         this.bot = bot.build();
 
