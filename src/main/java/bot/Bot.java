@@ -2,11 +2,9 @@ package bot;
 
 import application.App;
 import bot.listener.CurseForgeBot;
-import bot.listener.atlassian.BambooBot;
-import bot.listener.atlassian.BitbucketBot;
-import bot.listener.atlassian.JiraBot;
+import bot.listener.AtlassianBot;
 import data.ConfigLoader;
-import data.database.atlassian.AtlassianRepository;
+import data.database.atlassian.jira.ProjectRepository;
 import data.database.curseforge.CurseforgeRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
@@ -29,12 +27,10 @@ public class Bot {
     @Autowired
     private CurseforgeRepository curseforgeRepository;
     @Autowired
-    private AtlassianRepository atlassianRepository;
+    private ProjectRepository projectRepository;
 
     private CurseForgeBot curseForgeBot;
-    private JiraBot jiraBot;
-    private BitbucketBot bitbucketBot;
-    private BambooBot bambooBot;
+    private AtlassianBot atlassianBot;
 
     private JDA bot;
 
@@ -48,11 +44,9 @@ public class Bot {
         bot.setEventPassthrough(true);
 
         curseForgeBot = new CurseForgeBot(curseforgeRepository);
-        jiraBot = new JiraBot(atlassianRepository);
-        bitbucketBot = new BitbucketBot();
-        bambooBot = new BambooBot();
+        atlassianBot = new AtlassianBot(projectRepository);
 
-        bot.addEventListeners(curseForgeBot, jiraBot, bitbucketBot, bambooBot);
+        bot.addEventListeners(curseForgeBot, atlassianBot);
 
         this.bot = bot.build();
 
@@ -67,19 +61,19 @@ public class Bot {
     @PostMapping("webhooks/jira")
     private void jiraWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
-        jiraBot.handleWebhook(jsonBody);
+        atlassianBot.handleJiraWebhook(jsonBody);
     }
 
     @PostMapping("webhooks/bitbucket")
     private void bitbucketWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
-        bitbucketBot.handleWebhook(jsonBody);
+        atlassianBot.handleBitbucketWebhook(jsonBody);
     }
 
     @PostMapping("webhooks/bamboo")
     private void bambooWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
-        bambooBot.handleWebhook(jsonBody);
+        atlassianBot.handleBambooWebhook(jsonBody);
     }
 
     @Scheduled(cron = "0 */5 * * * *")

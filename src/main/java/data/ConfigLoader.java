@@ -1,5 +1,6 @@
 package data;
 
+import com.sun.xml.internal.ws.api.FeatureListValidatorAnnotation;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,9 @@ public class ConfigLoader {
 
     @Value("${bot.token}")
     private String botToken;
+
+    @Value("${guild.id}")
+    private String guildId;
 
     @Value("${use.ssl:false}")
     private boolean useSSL;
@@ -50,6 +54,4 @@ public class ConfigLoader {
     private String bitbucketURL;
     @Value("${bamboo.URL}")
     private String bambooURL;
-
-
 }

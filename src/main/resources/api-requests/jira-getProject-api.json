@@ -1,0 +1,104 @@
+{
+  "components": [],
+  "avatarUrls": {
+    "48x48": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?pid=10000&avatarId=10601",
+    "24x24": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?size=small&pid=10000&avatarId=10601",
+    "16x16": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?size=xsmall&pid=10000&avatarId=10601",
+    "32x32": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?size=medium&pid=10000&avatarId=10601"
+  },
+  "roles": {
+    "Administrators": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/project\/10000\/role\/10002"
+  },
+  "description": "Project for the discord bot",
+  "lead": {
+    "avatarUrls": {
+      "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+      "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+      "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+      "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+    },
+    "displayName": "Ben Shabowski",
+    "name": "BShabowski",
+    "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+    "active": true,
+    "key": "JIRAUSER10000"
+  },
+  "issueTypes": [
+    {
+      "avatarId": 10318,
+      "name": "Task",
+      "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issuetype\/10002",
+      "description": "A task that needs to be done.",
+      "id": "10002",
+      "iconUrl": "https:\/\/zgamelogic.com:8080\/secure\/viewavatar?size=xsmall&avatarId=10318&avatarType=issuetype",
+      "subtask": false
+    },
+    {
+      "avatarId": 10316,
+      "name": "Sub-task",
+      "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issuetype\/10003",
+      "description": "The sub-task of the issue",
+      "id": "10003",
+      "iconUrl": "https:\/\/zgamelogic.com:8080\/secure\/viewavatar?size=xsmall&avatarId=10316&avatarType=issuetype",
+      "subtask": true
+    },
+    {
+      "name": "Story",
+      "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issuetype\/10001",
+      "description": "Created by Jira Software - do not edit or delete. Issue type for a user story.",
+      "id": "10001",
+      "iconUrl": "https:\/\/zgamelogic.com:8080\/images\/icons\/issuetypes\/story.svg",
+      "subtask": false
+    },
+    {
+      "avatarId": 10303,
+      "name": "Bug",
+      "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issuetype\/10004",
+      "description": "A problem which impairs or prevents the functions of the product.",
+      "id": "10004",
+      "iconUrl": "https:\/\/zgamelogic.com:8080\/secure\/viewavatar?size=xsmall&avatarId=10303&avatarType=issuetype",
+      "subtask": false
+    },
+    {
+      "name": "Epic",
+      "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issuetype\/10000",
+      "description": "Created by Jira Software - do not edit or delete. Issue type for a big user story that needs to be broken down.",
+      "id": "10000",
+      "iconUrl": "https:\/\/zgamelogic.com:8080\/images\/icons\/issuetypes\/epic.svg",
+      "subtask": false
+    }
+  ],
+  "archived": false,
+  "expand": "description,lead,url,projectKeys",
+  "versions": [
+    {
+      "archived": false,
+      "releaseDate": "2022-03-15",
+      "name": "1.0",
+      "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/version\/10000",
+      "description": "This is the previous version of the bot",
+      "userReleaseDate": "15\/Mar\/22",
+      "id": "10000",
+      "projectId": 10000,
+      "released": true
+    },
+    {
+      "archived": true,
+      "overdue": false,
+      "releaseDate": "2022-12-31",
+      "name": "Guilds and Tournaments",
+      "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/version\/10001",
+      "description": "Adds Guilds you can join and raid dungeons with! Adds Tournaments which you can join and fight in every week!",
+      "userReleaseDate": "31\/Dec\/22",
+      "id": "10001",
+      "projectId": 10000,
+      "released": false
+    }
+  ],
+  "name": "Discord Bot",
+  "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/project\/10000",
+  "id": "10000",
+  "assigneeType": "UNASSIGNED",
+  "projectTypeKey": "software",
+  "key": "DB"
+}

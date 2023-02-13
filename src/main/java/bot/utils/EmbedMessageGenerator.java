@@ -1,18 +1,40 @@
 package bot.utils;
 
+import application.App;
 import bot.listener.CurseForgeBot;
 import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.utils.TimeFormat;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.awt.*;
+import java.time.Instant;
 import java.util.LinkedList;
 
 public abstract class EmbedMessageGenerator {
 
     private final static Color GENERAL_COLOR = new Color(99, 42, 129);
     private final static Color CURSEFORGE_COLOR = new Color(239, 99, 54);
+    private final static Color ATLASSIAN_COLOR = new Color(13, 71, 161);
+
+    public static MessageEmbed jiraIssueCreated(JSONObject json) throws JSONException {
+        String summary = json.getJSONObject("issue").getJSONObject("fields").getString("summary");
+        String key = json.getJSONObject("issue").getString("key");
+        String issueUrl = App.config.getJiraURL() + "browse/" + key;
+        String desc = json.getJSONObject("issue").getJSONObject("fields").getString("description");
+        String createdBy = json.getJSONObject("user").getString("name");
+        String type = json.getJSONObject("issue").getJSONObject("fields").getJSONObject("issuetype").getString("name");
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(ATLASSIAN_COLOR);
+        eb.setTitle("Issue created: " + key, issueUrl);
+        eb.setDescription(
+                "**" + summary + "**\nDescription: " + desc + "\nCreated by: " + createdBy
+        );
+        eb.setTimestamp(Instant.now());
+        return eb.build();
+    }
 
     public static MessageEmbed curseforgeUpdated(CurseforgeRecord record){
         EmbedBuilder eb = new EmbedBuilder();

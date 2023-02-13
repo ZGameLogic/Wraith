@@ -1,0 +1,41 @@
+{
+  "comment": {
+    "author": {
+      "emailAddress": "benshabowski@gmail.com",
+      "avatarUrls": {
+        "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+        "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+        "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+        "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+      },
+      "displayName": "Ben Shabowski",
+      "name": "BShabowski",
+      "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+      "active": true,
+      "timeZone": "America\/Chicago",
+      "key": "JIRAUSER10000"
+    },
+    "created": "2023-02-13T12:45:56.145-0600",
+    "updateAuthor": {
+      "emailAddress": "benshabowski@gmail.com",
+      "avatarUrls": {
+        "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+        "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+        "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+        "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+      },
+      "displayName": "Ben Shabowski",
+      "name": "BShabowski",
+      "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+      "active": true,
+      "timeZone": "America\/Chicago",
+      "key": "JIRAUSER10000"
+    },
+    "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issue\/11203\/comment\/10500",
+    "id": "10500",
+    "body": "This is me adding a comment",
+    "updated": "2023-02-13T12:45:56.145-0600"
+  },
+  "webhookEvent": "comment_created",
+  "timestamp": 1676313956145
+}
