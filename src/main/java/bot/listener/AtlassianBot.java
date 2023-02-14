@@ -172,6 +172,7 @@ public class AtlassianBot extends AdvancedListenerAdapter {
         String inputLabels = event.getValue("labels").getAsString();
         String[] labels = inputLabels.split(" ");
         JSONObject result = JiraInterfacer.createTask(projectKey, summary, description, labels, event.getUser().getName(), event.getUser().getId());
+        event.reply("Issue has been created: " + App.config.getJiraURL() + "browse/" + result.getString("key")).queue();
     }
 
     @SlashResponse(value = "devops", subCommandName = "create_bug")
