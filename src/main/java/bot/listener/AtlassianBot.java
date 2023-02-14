@@ -3,14 +3,18 @@ package bot.listener;
 import application.App;
 import bot.utils.EmbedMessageGenerator;
 import com.zgamelogic.AdvancedListenerAdapter;
-import data.database.atlassian.jira.Project;
-import data.database.atlassian.jira.ProjectRepository;
+import data.database.atlassian.jira.issues.Issue;
+import data.database.atlassian.jira.issues.IssueRepository;
+import data.database.atlassian.jira.projects.Project;
+import data.database.atlassian.jira.projects.ProjectRepository;
 import interfaces.atlassian.JiraInterfacer;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.forums.ForumPost;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,6 +25,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.Optional;
@@ -30,8 +35,10 @@ public class AtlassianBot extends AdvancedListenerAdapter {
 
     private JDA bot;
     private final ProjectRepository projectRepository;
+    private final IssueRepository issueRepository;
 
-    public AtlassianBot(ProjectRepository projectRepository){
+    public AtlassianBot(ProjectRepository projectRepository, IssueRepository issueRepository){
+        this.issueRepository = issueRepository;
         this.projectRepository = projectRepository;
     }
 
@@ -51,7 +58,7 @@ public class AtlassianBot extends AdvancedListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-
+        // TODO reply to tickets on jira when a message is sent in a ThreadChannel
     }
 
     public void handleJiraWebhook(JSONObject body) throws JSONException {
@@ -73,7 +80,7 @@ public class AtlassianBot extends AdvancedListenerAdapter {
                 commentCreated(body);
                 break;
             case "comment_created":
-                // Will probably use this for forum stuff instead. We shall see
+                // TODO if comment exists in the issues databate, send the message on discord
                 break;
             default:
                 System.out.println(body);
@@ -117,9 +124,28 @@ public class AtlassianBot extends AdvancedListenerAdapter {
     }
 
     @ModalResponse("create_bug")
-    private void createBugModal(ModalInteractionEvent event){
-        System.out.println(event.getChannel().getName());
-        // TODO implement
+    private void createBugModal(ModalInteractionEvent event) throws JSONException {
+        String projectKey = event.getChannel().getName().split("-")[0].toUpperCase();
+        String summary = event.getValue("summary").getAsString();
+        String description = event.getValue("description").getAsString();
+        JSONObject result = JiraInterfacer.createBug(projectKey, summary, description, event.getUser().getName(), event.getUser().getId());
+        String key = result.getString("key");
+        long id = Long.parseLong(result.getString("id"));
+        Optional<Project> project = projectRepository.getProjectByKey(projectKey);
+        if(!project.isPresent()){
+            event.reply("Unable to find project key").setEphemeral(true).queue();
+            return;
+        }
+        ForumChannel forumChannel = event.getGuild().getForumChannelById(project.get().getForumChannelId());
+        ForumPost post = forumChannel.createForumPost(key, MessageCreateData.fromContent(
+                App.config.getJiraURL() + "browse/" + key + "\n" +
+                        "Summary: " + summary + "\n" +
+                        "Description: " + description + "\n" +
+                        "Discord name: " + event.getUser().getName())
+        ).complete();
+        Issue issue = new Issue(id, key, post.getThreadChannel().getIdLong());
+        issueRepository.save(issue);
+        event.reply("Bug has been submitted").setEphemeral(true).queue();
     }
 
     @SlashResponse(value = "devops", subCommandName = "create_bug")
@@ -159,7 +185,7 @@ public class AtlassianBot extends AdvancedListenerAdapter {
     @SlashResponse(value = "devops", subCommandName = "add_bitbucket")
     private void addBitbucket(SlashCommandInteractionEvent event){
         // cat.createTextChannel(projectKey + "-prod-pull-requests").queue(textChannel -> textChannel.getManager().setTopic("Pull requests into master for project " + projectName + " will show up here.").queue());
-        //  cat.createTextChannel(projectKey + "-bitbucket").queue(textChannel -> textChannel.getManager().setTopic("Bitbucket channel for project " + projectName + ". This is a log of all Bitbucket events that happen for this project.").queue());
+        // cat.createTextChannel(projectKey + "-bitbucket").queue(textChannel -> textChannel.getManager().setTopic("Bitbucket channel for project " + projectName + ". This is a log of all Bitbucket events that happen for this project.").queue());
     }
 
     private void projectUpdate(JSONObject body) throws JSONException {
@@ -207,10 +233,11 @@ public class AtlassianBot extends AdvancedListenerAdapter {
         Guild guild = bot.getGuildById(App.config.getGuildId());
         Category cat = guild.createCategory(project.getProjectName()).complete();
         cat.createTextChannel(project.getProjectKey() + "-general").queue(textChannel -> textChannel.getManager().setTopic("General channel for project " + project.getProjectName() + ".").queue());
-        cat.createForumChannel(project.getProjectKey() + "-tickets").complete();
+        ForumChannel forumChannel = cat.createForumChannel(project.getProjectKey() + "-tickets").complete();
         TextChannel jira = cat.createTextChannel(project.getProjectKey() + "-jira").complete();
         jira.getManager().setTopic("Jira channel for project " + project.getProjectName() + ". This is a log of all Jira events that happen for this project.").queue();
         project.setCategoryId(cat.getIdLong());
+        project.setForumChannelId(forumChannel.getIdLong());
         project.setJiraChannelId(jira.getIdLong());
     }
 }

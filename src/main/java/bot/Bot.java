@@ -4,7 +4,8 @@ import application.App;
 import bot.listener.CurseForgeBot;
 import bot.listener.AtlassianBot;
 import data.ConfigLoader;
-import data.database.atlassian.jira.ProjectRepository;
+import data.database.atlassian.jira.issues.IssueRepository;
+import data.database.atlassian.jira.projects.ProjectRepository;
 import data.database.curseforge.CurseforgeRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
@@ -28,6 +29,8 @@ public class Bot {
     private CurseforgeRepository curseforgeRepository;
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private IssueRepository issueRepository;
 
     private CurseForgeBot curseForgeBot;
     private AtlassianBot atlassianBot;
@@ -44,7 +47,7 @@ public class Bot {
         bot.setEventPassthrough(true);
 
         curseForgeBot = new CurseForgeBot(curseforgeRepository);
-        atlassianBot = new AtlassianBot(projectRepository);
+        atlassianBot = new AtlassianBot(projectRepository, issueRepository);
 
         bot.addEventListeners(curseForgeBot, atlassianBot);
 

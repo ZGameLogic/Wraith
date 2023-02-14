@@ -1,5 +1,4 @@
-package data.database.atlassian.jira;
-
+package data.database.atlassian.jira.projects;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +25,7 @@ public class Project {
     private String projectName;
     private Long categoryId;
     private Long jiraChannelId;
+    private Long forumChannelId;
 
     public Project(JSONObject json) throws JSONException {
         if(json.has("project")) {
