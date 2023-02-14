@@ -1,0 +1,165 @@
+{
+  "issue": {
+    "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issue\/11202",
+    "id": "11202",
+    "fields": {
+      "issuetype": {
+        "avatarId": 10318,
+        "name": "Task",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issuetype\/10002",
+        "description": "A task that needs to be done.",
+        "id": "10002",
+        "iconUrl": "https:\/\/zgamelogic.com:8080\/secure\/viewavatar?size=xsmall&avatarId=10318&avatarType=issuetype",
+        "subtask": false
+      },
+      "components": [],
+      "timespent": null,
+      "timeoriginalestimate": null,
+      "description": "test description",
+      "project": {
+        "avatarUrls": {
+          "48x48": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?pid=10100&avatarId=10700",
+          "24x24": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?size=small&pid=10100&avatarId=10700",
+          "16x16": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?size=xsmall&pid=10100&avatarId=10700",
+          "32x32": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?size=medium&pid=10100&avatarId=10700"
+        },
+        "name": "ZBook",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/project\/10100",
+        "id": "10100",
+        "projectTypeKey": "software",
+        "key": "ZBOOK"
+      },
+      "fixVersions": [],
+      "customfield_10110": null,
+      "aggregatetimespent": null,
+      "resolution": null,
+      "timetracking": {},
+      "customfield_10104": null,
+      "attachment": [],
+      "customfield_10108": "0|i000i7:",
+      "aggregatetimeestimate": null,
+      "customfield_10109": null,
+      "resolutiondate": null,
+      "workratio": -1,
+      "summary": "Test summary",
+      "lastViewed": null,
+      "watches": {
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issue\/ZBOOK-7\/watchers",
+        "isWatching": false,
+        "watchCount": 0
+      },
+      "creator": {
+        "emailAddress": "benshabowski@gmail.com",
+        "avatarUrls": {
+          "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+          "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+          "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+          "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+        },
+        "displayName": "Ben Shabowski",
+        "name": "BShabowski",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+        "active": true,
+        "timeZone": "America\/Chicago",
+        "key": "JIRAUSER10000"
+      },
+      "subtasks": [],
+      "created": "2023-02-13T12:06:11.992-0600",
+      "reporter": {
+        "emailAddress": "benshabowski@gmail.com",
+        "avatarUrls": {
+          "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+          "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+          "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+          "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+        },
+        "displayName": "Ben Shabowski",
+        "name": "BShabowski",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+        "active": true,
+        "timeZone": "America\/Chicago",
+        "key": "JIRAUSER10000"
+      },
+      "customfield_10000": "{summaryBean=com.atlassian.jira.plugin.devstatus.rest.SummaryBean@51cbd426[summary={pullrequest=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@8cdca95[overall=PullRequestOverallBean{stateCount=0, state='OPEN', details=PullRequestOverallDetails{openCount=0, mergedCount=0, declinedCount=0}},byInstanceType={}], build=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@ed5ecf2[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BuildOverallBean@682a16df[failedBuildCount=0,successfulBuildCount=0,unknownBuildCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], review=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@7601320b[overall=com.atlassian.jira.plugin.devstatus.summary.beans.ReviewsOverallBean@74a34e1f[stateCount=0,state=<null>,dueDate=<null>,overDue=false,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], deployment-environment=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@55b09e05[overall=com.atlassian.jira.plugin.devstatus.summary.beans.DeploymentOverallBean@6d14e682[topEnvironments=[],showProjects=false,successfulCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], repository=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@127a1041[overall=com.atlassian.jira.plugin.devstatus.summary.beans.CommitOverallBean@7c4767a7[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], branch=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@2dd69e9c[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BranchOverallBean@673c5d52[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}]},errors=[],configErrors=[]], devSummaryJson={\"cachedValue\":{\"errors\":[],\"configErrors\":[],\"summary\":{\"pullrequest\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":\"OPEN\",\"details\":{\"openCount\":0,\"mergedCount\":0,\"declinedCount\":0,\"total\":0},\"open\":true},\"byInstanceType\":{}},\"build\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"failedBuildCount\":0,\"successfulBuildCount\":0,\"unknownBuildCount\":0},\"byInstanceType\":{}},\"review\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":null,\"dueDate\":null,\"overDue\":false,\"completed\":false},\"byInstanceType\":{}},\"deployment-environment\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"topEnvironments\":[],\"showProjects\":false,\"successfulCount\":0},\"byInstanceType\":{}},\"repository\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}},\"branch\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}}}},\"isStale\":true}}",
+      "aggregateprogress": {
+        "total": 0,
+        "progress": 0
+      },
+      "priority": {
+        "name": "Medium",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/priority\/3",
+        "iconUrl": "https:\/\/zgamelogic.com:8080\/images\/icons\/priorities\/medium.svg",
+        "id": "3"
+      },
+      "customfield_10100": null,
+      "customfield_10101": null,
+      "customfield_10102": null,
+      "labels": [
+        "oof"
+      ],
+      "customfield_10103": null,
+      "environment": null,
+      "timeestimate": null,
+      "aggregatetimeoriginalestimate": null,
+      "versions": [],
+      "duedate": null,
+      "progress": {
+        "total": 0,
+        "progress": 0
+      },
+      "comment": {
+        "total": 0,
+        "comments": [],
+        "maxResults": 0,
+        "startAt": 0
+      },
+      "issuelinks": [],
+      "votes": {
+        "hasVoted": false,
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issue\/ZBOOK-7\/votes",
+        "votes": 0
+      },
+      "worklog": {
+        "total": 0,
+        "maxResults": 20,
+        "startAt": 0,
+        "worklogs": []
+      },
+      "assignee": null,
+      "updated": "2023-02-13T12:06:11.992-0600",
+      "status": {
+        "name": "Backlog",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/status\/10000",
+        "description": "",
+        "iconUrl": "https:\/\/zgamelogic.com:8080\/",
+        "id": "10000",
+        "statusCategory": {
+          "colorName": "default",
+          "name": "To Do",
+          "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/statuscategory\/2",
+          "id": 2,
+          "key": "new"
+        }
+      }
+    },
+    "key": "ZBOOK-7"
+  },
+  "issue_event_type_name": "issue_created",
+  "webhookEvent": "jira:issue_created",
+  "user": {
+    "emailAddress": "benshabowski@gmail.com",
+    "avatarUrls": {
+      "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+      "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+      "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+      "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+    },
+    "displayName": "Ben Shabowski",
+    "name": "BShabowski",
+    "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+    "active": true,
+    "timeZone": "America\/Chicago",
+    "key": "JIRAUSER10000"
+  },
+  "timestamp": 1676311572006
+}

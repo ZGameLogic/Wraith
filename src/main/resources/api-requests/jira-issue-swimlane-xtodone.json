@@ -1,0 +1,227 @@
+{
+  "issue": {
+    "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issue\/11203",
+    "id": "11203",
+    "fields": {
+      "issuetype": {
+        "avatarId": 10318,
+        "name": "Task",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issuetype\/10002",
+        "description": "A task that needs to be done.",
+        "id": "10002",
+        "iconUrl": "https:\/\/zgamelogic.com:8080\/secure\/viewavatar?size=xsmall&avatarId=10318&avatarType=issuetype",
+        "subtask": false
+      },
+      "components": [],
+      "timespent": null,
+      "timeoriginalestimate": null,
+      "description": "Wow I can believe I found this issue. I added a period",
+      "project": {
+        "avatarUrls": {
+          "48x48": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?avatarId=10324",
+          "24x24": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?size=small&avatarId=10324",
+          "16x16": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?size=xsmall&avatarId=10324",
+          "32x32": "https:\/\/zgamelogic.com:8080\/secure\/projectavatar?size=medium&avatarId=10324"
+        },
+        "name": "Test",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/project\/10313",
+        "id": "10313",
+        "projectTypeKey": "software",
+        "key": "TE"
+      },
+      "fixVersions": [],
+      "customfield_10110": null,
+      "aggregatetimespent": null,
+      "resolution": {
+        "name": "Done",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/resolution\/10000",
+        "description": "Work has been completed on this issue.",
+        "id": "10000"
+      },
+      "timetracking": {},
+      "customfield_10104": null,
+      "attachment": [],
+      "customfield_10108": "0|i000if:",
+      "aggregatetimeestimate": null,
+      "customfield_10109": null,
+      "resolutiondate": "2023-02-13T16:46:01.304-0600",
+      "workratio": -1,
+      "summary": "Test issue",
+      "lastViewed": "2023-02-13T16:46:01.303-0600",
+      "watches": {
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issue\/TE-1\/watchers",
+        "isWatching": true,
+        "watchCount": 1
+      },
+      "creator": {
+        "emailAddress": "benshabowski@gmail.com",
+        "avatarUrls": {
+          "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+          "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+          "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+          "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+        },
+        "displayName": "Ben Shabowski",
+        "name": "BShabowski",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+        "active": true,
+        "timeZone": "America\/Chicago",
+        "key": "JIRAUSER10000"
+      },
+      "subtasks": [],
+      "created": "2023-02-13T12:32:36.152-0600",
+      "reporter": {
+        "emailAddress": "benshabowski@gmail.com",
+        "avatarUrls": {
+          "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+          "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+          "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+          "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+        },
+        "displayName": "Ben Shabowski",
+        "name": "BShabowski",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+        "active": true,
+        "timeZone": "America\/Chicago",
+        "key": "JIRAUSER10000"
+      },
+      "customfield_10000": "{summaryBean=com.atlassian.jira.plugin.devstatus.rest.SummaryBean@33571349[summary={pullrequest=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@60485fe1[overall=PullRequestOverallBean{stateCount=0, state='OPEN', details=PullRequestOverallDetails{openCount=0, mergedCount=0, declinedCount=0}},byInstanceType={}], build=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@2e637002[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BuildOverallBean@cf69578[failedBuildCount=0,successfulBuildCount=0,unknownBuildCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], review=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@1c5c7e49[overall=com.atlassian.jira.plugin.devstatus.summary.beans.ReviewsOverallBean@16e61fa4[stateCount=0,state=<null>,dueDate=<null>,overDue=false,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], deployment-environment=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@23308e1a[overall=com.atlassian.jira.plugin.devstatus.summary.beans.DeploymentOverallBean@1bd59251[topEnvironments=[],showProjects=false,successfulCount=0,count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], repository=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@64040954[overall=com.atlassian.jira.plugin.devstatus.summary.beans.CommitOverallBean@42b9214f[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}], branch=com.atlassian.jira.plugin.devstatus.rest.SummaryItemBean@65de275c[overall=com.atlassian.jira.plugin.devstatus.summary.beans.BranchOverallBean@522e66ac[count=0,lastUpdated=<null>,lastUpdatedTimestamp=<null>],byInstanceType={}]},errors=[],configErrors=[]], devSummaryJson={\"cachedValue\":{\"errors\":[],\"configErrors\":[],\"summary\":{\"pullrequest\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":\"OPEN\",\"details\":{\"openCount\":0,\"mergedCount\":0,\"declinedCount\":0,\"total\":0},\"open\":true},\"byInstanceType\":{}},\"build\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"failedBuildCount\":0,\"successfulBuildCount\":0,\"unknownBuildCount\":0},\"byInstanceType\":{}},\"review\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"stateCount\":0,\"state\":null,\"dueDate\":null,\"overDue\":false,\"completed\":false},\"byInstanceType\":{}},\"deployment-environment\":{\"overall\":{\"count\":0,\"lastUpdated\":null,\"topEnvironments\":[],\"showProjects\":false,\"successfulCount\":0},\"byInstanceType\":{}},\"repository\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}},\"branch\":{\"overall\":{\"count\":0,\"lastUpdated\":null},\"byInstanceType\":{}}}},\"isStale\":false}}",
+      "aggregateprogress": {
+        "total": 0,
+        "progress": 0
+      },
+      "priority": {
+        "name": "Medium",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/priority\/3",
+        "iconUrl": "https:\/\/zgamelogic.com:8080\/images\/icons\/priorities\/medium.svg",
+        "id": "3"
+      },
+      "customfield_10100": null,
+      "customfield_10101": null,
+      "customfield_10102": null,
+      "labels": [],
+      "customfield_10103": null,
+      "environment": null,
+      "timeestimate": null,
+      "aggregatetimeoriginalestimate": null,
+      "versions": [],
+      "duedate": null,
+      "progress": {
+        "total": 0,
+        "progress": 0
+      },
+      "comment": {
+        "total": 1,
+        "comments": [
+          {
+            "author": {
+              "emailAddress": "benshabowski@gmail.com",
+              "avatarUrls": {
+                "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+                "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+                "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+                "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+              },
+              "displayName": "Ben Shabowski",
+              "name": "BShabowski",
+              "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+              "active": true,
+              "timeZone": "America\/Chicago",
+              "key": "JIRAUSER10000"
+            },
+            "created": "2023-02-13T12:45:56.145-0600",
+            "updateAuthor": {
+              "emailAddress": "benshabowski@gmail.com",
+              "avatarUrls": {
+                "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+                "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+                "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+                "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+              },
+              "displayName": "Ben Shabowski",
+              "name": "BShabowski",
+              "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+              "active": true,
+              "timeZone": "America\/Chicago",
+              "key": "JIRAUSER10000"
+            },
+            "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issue\/11203\/comment\/10500",
+            "id": "10500",
+            "body": "This is me adding a comment",
+            "updated": "2023-02-13T12:45:56.145-0600"
+          }
+        ],
+        "maxResults": 1,
+        "startAt": 0
+      },
+      "issuelinks": [],
+      "votes": {
+        "hasVoted": false,
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/issue\/TE-1\/votes",
+        "votes": 0
+      },
+      "worklog": {
+        "total": 0,
+        "maxResults": 20,
+        "startAt": 0,
+        "worklogs": []
+      },
+      "assignee": null,
+      "updated": "2023-02-13T16:46:01.304-0600",
+      "status": {
+        "name": "Done",
+        "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/status\/10002",
+        "description": "",
+        "iconUrl": "https:\/\/zgamelogic.com:8080\/",
+        "id": "10002",
+        "statusCategory": {
+          "colorName": "success",
+          "name": "Done",
+          "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/statuscategory\/3",
+          "id": 3,
+          "key": "done"
+        }
+      }
+    },
+    "key": "TE-1"
+  },
+  "issue_event_type_name": "issue_generic",
+  "changelog": {
+    "id": "11412",
+    "items": [
+      {
+        "field": "resolution",
+        "from": null,
+        "toString": "Done",
+        "fromString": null,
+        "to": "10000",
+        "fieldtype": "jira"
+      },
+      {
+        "field": "status",
+        "from": "3",
+        "toString": "Done",
+        "fromString": "In Progress",
+        "to": "10002",
+        "fieldtype": "jira"
+      }
+    ]
+  },
+  "webhookEvent": "jira:issue_updated",
+  "user": {
+    "emailAddress": "benshabowski@gmail.com",
+    "avatarUrls": {
+      "48x48": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?ownerId=JIRAUSER10000&avatarId=10600",
+      "24x24": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=small&ownerId=JIRAUSER10000&avatarId=10600",
+      "16x16": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=xsmall&ownerId=JIRAUSER10000&avatarId=10600",
+      "32x32": "https:\/\/zgamelogic.com:8080\/secure\/useravatar?size=medium&ownerId=JIRAUSER10000&avatarId=10600"
+    },
+    "displayName": "Ben Shabowski",
+    "name": "BShabowski",
+    "self": "https:\/\/zgamelogic.com:8080\/rest\/api\/2\/user?username=BShabowski",
+    "active": true,
+    "timeZone": "America\/Chicago",
+    "key": "JIRAUSER10000"
+  },
+  "timestamp": 1676328361304
+}
