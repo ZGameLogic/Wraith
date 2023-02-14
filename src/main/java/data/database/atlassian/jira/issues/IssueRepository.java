@@ -9,6 +9,9 @@ import java.util.Optional;
 
 @Component
 public interface IssueRepository extends JpaRepository<Issue, Long> {
-    @Query(value = "select * from jira_issues p where p.issue_key = :issueKey", nativeQuery = true)
+    @Query(value = "select * from jira_issues i where i.issue_key = :issueKey", nativeQuery = true)
     Optional<Issue> getIssueByKey(@Param("issueKey") String issueKey);
+
+    @Query(value = "select * from jira_issues i where i.thread_channel_id = :threadId", nativeQuery = true)
+    Optional<Issue> getIssueByThreadId(@Param("threadId") long threadId);
 }

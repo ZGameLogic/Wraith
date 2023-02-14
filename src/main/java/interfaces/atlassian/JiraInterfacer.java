@@ -19,6 +19,11 @@ import java.io.InputStreamReader;
 
 public abstract class JiraInterfacer {
 
+    public static JSONObject sendCommentToIssue(String issueKey, String message, String username){
+        // TODO implement
+        return null;
+    }
+
     /**
      * Gets the details of a project by project key
      * @param projectKey Key of the project

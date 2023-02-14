@@ -58,7 +58,13 @@ public class AtlassianBot extends AdvancedListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        // TODO reply to tickets on jira when a message is sent in a ThreadChannel
+        if(event.getAuthor().isBot()) return;
+        Optional<Issue> issue = issueRepository.getIssueByThreadId(event.getChannel().getIdLong());
+        if(!issue.isPresent()) return;
+        String message = event.getMessage().getContentRaw();
+        String user = event.getAuthor().getName();
+        JSONObject returnJson = JiraInterfacer.sendCommentToIssue(issue.get().getIssueKey(), message, user);
+        // TODO do something with this
     }
 
     public void handleJiraWebhook(JSONObject body) throws JSONException {
@@ -75,7 +81,7 @@ public class AtlassianBot extends AdvancedListenerAdapter {
             case "jira:issue_created":
                 issueCreated(body);
                 break;
-            case "jira:issue_updated": // only want to know if the issue moves swim-lanes
+            case "jira:issue_updated":
                 issueUpdate(body);
                 commentCreated(body);
                 break;
@@ -83,7 +89,7 @@ public class AtlassianBot extends AdvancedListenerAdapter {
                 // TODO if comment exists in the issues databate, send the message on discord
                 break;
             default:
-                System.out.println(body);
+                log.info(body.toString());
                 break;
         }
     }
@@ -112,6 +118,13 @@ public class AtlassianBot extends AdvancedListenerAdapter {
         bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
                 EmbedMessageGenerator.jiraIssueUpdated(body)
         ).queue();
+        String key = body.getJSONObject("issue").getString("key");
+        Optional<Issue> issue = issueRepository.getIssueByKey(key);
+        if(issue.isPresent()){
+            bot.getGuildById(App.config.getGuildId()).getThreadChannelById(issue.get().getThreadChannelId()).sendMessageEmbeds(
+                    EmbedMessageGenerator.jiraIssueUpdated(body)
+            ).queue();
+        }
     }
 
     private void issueCreated(JSONObject body) throws JSONException {
@@ -126,16 +139,16 @@ public class AtlassianBot extends AdvancedListenerAdapter {
     @ModalResponse("create_bug")
     private void createBugModal(ModalInteractionEvent event) throws JSONException {
         String projectKey = event.getChannel().getName().split("-")[0].toUpperCase();
-        String summary = event.getValue("summary").getAsString();
-        String description = event.getValue("description").getAsString();
-        JSONObject result = JiraInterfacer.createBug(projectKey, summary, description, event.getUser().getName(), event.getUser().getId());
-        String key = result.getString("key");
-        long id = Long.parseLong(result.getString("id"));
         Optional<Project> project = projectRepository.getProjectByKey(projectKey);
         if(!project.isPresent()){
             event.reply("Unable to find project key").setEphemeral(true).queue();
             return;
         }
+        String summary = event.getValue("summary").getAsString();
+        String description = event.getValue("description").getAsString();
+        JSONObject result = JiraInterfacer.createBug(projectKey, summary, description, event.getUser().getName(), event.getUser().getId());
+        String key = result.getString("key");
+        long id = Long.parseLong(result.getString("id"));
         ForumChannel forumChannel = event.getGuild().getForumChannelById(project.get().getForumChannelId());
         ForumPost post = forumChannel.createForumPost(key, MessageCreateData.fromContent(
                 App.config.getJiraURL() + "browse/" + key + "\n" +
