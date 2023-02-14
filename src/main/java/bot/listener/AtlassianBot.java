@@ -99,6 +99,8 @@ public class AtlassianBot extends AdvancedListenerAdapter {
     private void commentCreated(JSONObject body) throws JSONException {
         String event = body.getString("issue_event_type_name");
         if(!event.equals("issue_commented")) return;
+        String author = body.getJSONObject("comment").getJSONObject("author").getString("name");
+        if(author.equals("Wraith")) return;
         long projectId = Long.parseLong(body.getJSONObject("issue").getJSONObject("fields").getJSONObject("project").getString("id"));
         Optional<Project> project = projectRepository.findById(projectId);
         if(!project.isPresent()) return;
