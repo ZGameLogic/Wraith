@@ -125,6 +125,13 @@ public class AtlassianBot extends AdvancedListenerAdapter {
         bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
                 EmbedMessageGenerator.jiraIssueUpdated(body)
         ).queue();
+        String key = body.getJSONObject("issue").getString("key");
+        Optional<Issue> issue = issueRepository.getIssueByKey(key);
+        if(issue.isPresent()){
+            bot.getGuildById(App.config.getGuildId()).getThreadChannelById(issue.get().getThreadChannelId()).sendMessageEmbeds(
+                    EmbedMessageGenerator.jiraIssueUpdated(body)
+            ).queue();
+        }
     }
 
     private void issueCreated(JSONObject body) throws JSONException {
