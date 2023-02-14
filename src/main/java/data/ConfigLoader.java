@@ -1,6 +1,5 @@
 package data;
 
-import com.sun.xml.internal.ws.api.FeatureListValidatorAnnotation;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
