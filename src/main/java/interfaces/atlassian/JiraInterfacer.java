@@ -74,7 +74,6 @@ public abstract class JiraInterfacer {
             fields.put("issuetype", new JSONObject("{\"name\": \"Bug\"}"));
             JSONArray labels = new JSONArray();
             labels.put("Discord");
-            labels.put("Notify-User");
             fields.put("labels", labels);
             body.put("fields", fields);
         } catch (JSONException e) {
@@ -86,6 +85,48 @@ public abstract class JiraInterfacer {
 
         try {
            return new JSONObject(restTemplate.postForObject(link, request, String.class));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @param projectKey
+     * @param title
+     * @param description
+     * @param username
+     * @param userId
+     * @return
+     */
+    public static JSONObject createTask(String projectKey, String title, String description, String[] inputLabels, String username, String userId){
+        String link = App.config.getJiraURL() + "/rest/api/2/issue";
+        RestTemplate restTemplate = new RestTemplate();
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        JSONObject body = new JSONObject();
+        try {
+            JSONObject fields = new JSONObject();
+            fields.put("project", new JSONObject("{\"key\": \"" + projectKey + "\"}"));
+            fields.put("summary", title);
+            fields.put("description", description + "\n" +
+                    "Discord username: " + username + "\n" +
+                    "Discord user ID: " + userId);
+            fields.put("issuetype", new JSONObject("{\"name\": \"Task\"}"));
+            JSONArray labels = new JSONArray();
+            labels.put("Discord");
+            for(String label: inputLabels) labels.put(label);
+            fields.put("labels", labels);
+            body.put("fields", fields);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+        headers.add("Authorization", "Bearer " + App.config.getJiraPAT());
+        HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
+
+        try {
+            return new JSONObject(restTemplate.postForObject(link, request, String.class));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }

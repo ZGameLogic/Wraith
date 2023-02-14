@@ -63,8 +63,7 @@ public class AtlassianBot extends AdvancedListenerAdapter {
         if(!issue.isPresent()) return;
         String message = event.getMessage().getContentRaw();
         String user = event.getAuthor().getName();
-        JSONObject returnJson = JiraInterfacer.sendCommentToIssue(issue.get().getIssueKey(), message, user);
-        // TODO do something with this
+        JiraInterfacer.sendCommentToIssue(issue.get().getIssueKey(), message, user);
     }
 
     public void handleJiraWebhook(JSONObject body) throws JSONException {
@@ -161,18 +160,54 @@ public class AtlassianBot extends AdvancedListenerAdapter {
         event.reply("Bug has been submitted").setEphemeral(true).queue();
     }
 
+    @ModalResponse("create_issue")
+    private void createIssueModal(ModalInteractionEvent event) throws JSONException {
+        String projectKey = event.getChannel().getName().split("-")[0].toUpperCase();
+        Optional<Project> project = projectRepository.getProjectByKey(projectKey);
+        if(!project.isPresent()){
+            event.reply("Unable to find project key").setEphemeral(true).queue();
+            return;
+        }
+        String summary = event.getValue("summary").getAsString();
+        String description = event.getValue("description").getAsString();
+        String inputLabels = event.getValue("labels").getAsString();
+        String[] labels = inputLabels.split(" ");
+        JSONObject result = JiraInterfacer.createTask(projectKey, summary, description, labels, event.getUser().getName(), event.getUser().getId());
+    }
+
     @SlashResponse(value = "devops", subCommandName = "create_bug")
     private void createBug(SlashCommandInteractionEvent event){
+        String projectKey = event.getChannel().getName().split("-")[0].toUpperCase();
+        Optional<Project> project = projectRepository.getProjectByKey(projectKey);
+        if(!project.isPresent()){
+            event.reply("Unable to find project key").setEphemeral(true).queue();
+            return;
+        }
         TextInput summary = TextInput.create("summary", "Summary", TextInputStyle.SHORT).setRequired(true).build();
         TextInput description = TextInput.create("description", "Description", TextInputStyle.PARAGRAPH).setRequired(false).build();
         event.replyModal(Modal.create("create_bug", "Create bug report")
                 .addActionRow(summary)
-                .addActionRow(description).build()).queue();
+                .addActionRow(description)
+                .build()).queue();
     }
 
     @SlashResponse(value = "devops", subCommandName = "create_issue")
     private void createIssue(SlashCommandInteractionEvent event) throws JSONException {
-        // TODO implement
+        String projectKey = event.getChannel().getName().split("-")[0].toUpperCase();
+        Optional<Project> project = projectRepository.getProjectByKey(projectKey);
+        if(!project.isPresent()){
+            event.reply("Unable to find project key").setEphemeral(true).queue();
+            return;
+        }
+        TextInput summary = TextInput.create("summary", "Summary", TextInputStyle.SHORT).setRequired(true).build();
+        TextInput description = TextInput.create("description", "Description", TextInputStyle.PARAGRAPH).setRequired(false).build();
+        TextInput labels = TextInput.create("labels", "Labels", TextInputStyle.SHORT)
+                .setPlaceholder("spaced delimited").setRequired(false).build();
+        event.replyModal(Modal.create("create_issue", "Create issue")
+                .addActionRow(summary)
+                .addActionRow(description)
+                .addActionRow(labels)
+                .build()).queue();
     }
 
     @SlashResponse(value = "devops", subCommandName = "add_project")
