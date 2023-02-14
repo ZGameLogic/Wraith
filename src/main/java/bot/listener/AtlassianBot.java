@@ -12,22 +12,24 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import javax.xml.soap.Text;
 import java.util.Optional;
 
 @Slf4j
 public class AtlassianBot extends AdvancedListenerAdapter {
 
     private JDA bot;
-    private ProjectRepository projectRepository;
+    private final ProjectRepository projectRepository;
 
     public AtlassianBot(ProjectRepository projectRepository){
         this.projectRepository = projectRepository;
@@ -66,16 +68,43 @@ public class AtlassianBot extends AdvancedListenerAdapter {
             case "jira:issue_created":
                 issueCreated(body);
                 break;
-            case "jira:issue_updated":
-
+            case "jira:issue_updated": // only want to know if the issue moves swim-lanes
+                issueUpdate(body);
+                commentCreated(body);
                 break;
             case "comment_created":
-
+                // Will probably use this for forum stuff instead. We shall see
                 break;
             default:
                 System.out.println(body);
                 break;
         }
+    }
+
+    public void handleBitbucketWebhook(JSONObject jsonBody) {}
+
+    public void handleBambooWebhook(JSONObject jsonBody) {}
+
+    private void commentCreated(JSONObject body) throws JSONException {
+        String event = body.getString("issue_event_type_name");
+        if(!event.equals("issue_commented")) return;
+        long projectId = Long.parseLong(body.getJSONObject("issue").getJSONObject("fields").getJSONObject("project").getString("id"));
+        Optional<Project> project = projectRepository.findById(projectId);
+        if(!project.isPresent()) return;
+        bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
+                EmbedMessageGenerator.jiraIssueCommented(body)
+        ).queue();
+    }
+
+    private void issueUpdate(JSONObject body) throws JSONException {
+        String event = body.getString("issue_event_type_name");
+        if(!event.equals("issue_generic")) return;
+        long projectId = Long.parseLong(body.getJSONObject("issue").getJSONObject("fields").getJSONObject("project").getString("id"));
+        Optional<Project> project = projectRepository.findById(projectId);
+        if(!project.isPresent()) return;
+        bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
+                EmbedMessageGenerator.jiraIssueUpdated(body)
+        ).queue();
     }
 
     private void issueCreated(JSONObject body) throws JSONException {
@@ -87,9 +116,25 @@ public class AtlassianBot extends AdvancedListenerAdapter {
         ).queue();
     }
 
-    public void handleBitbucketWebhook(JSONObject jsonBody) {}
+    @ModalResponse("create_bug")
+    private void createBugModal(ModalInteractionEvent event){
+        System.out.println(event.getChannel().getName());
+        // TODO implement
+    }
 
-    public void handleBambooWebhook(JSONObject jsonBody) {}
+    @SlashResponse(value = "devops", subCommandName = "create_bug")
+    private void createBug(SlashCommandInteractionEvent event){
+        TextInput summary = TextInput.create("summary", "Summary", TextInputStyle.SHORT).setRequired(true).build();
+        TextInput description = TextInput.create("description", "Description", TextInputStyle.PARAGRAPH).setRequired(false).build();
+        event.replyModal(Modal.create("create_bug", "Create bug report")
+                .addActionRow(summary)
+                .addActionRow(description).build()).queue();
+    }
+
+    @SlashResponse(value = "devops", subCommandName = "create_issue")
+    private void createIssue(SlashCommandInteractionEvent event) throws JSONException {
+        // TODO implement
+    }
 
     @SlashResponse(value = "devops", subCommandName = "add_project")
     private void addProject(SlashCommandInteractionEvent event) throws JSONException {
@@ -140,9 +185,6 @@ public class AtlassianBot extends AdvancedListenerAdapter {
     }
 
     private void projectCreated(JSONObject body) throws JSONException {
-        String projectName = body.getJSONObject("project").getString("name");
-        String projectKey = body.getJSONObject("project").getString("key");
-        long projectId = body.getJSONObject("project").getLong("id");
         Project project = new Project(body);
         createDiscordProject(project);
         projectRepository.save(project);

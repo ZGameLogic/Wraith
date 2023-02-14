@@ -6,6 +6,7 @@ import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.utils.TimeFormat;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,18 +20,54 @@ public abstract class EmbedMessageGenerator {
     private final static Color CURSEFORGE_COLOR = new Color(239, 99, 54);
     private final static Color ATLASSIAN_COLOR = new Color(13, 71, 161);
 
+    public static MessageEmbed jiraIssueCommented(JSONObject json) throws JSONException {
+        String key = json.getJSONObject("issue").getString("key");
+        String issueUrl = App.config.getJiraURL() + "browse/" + key;
+        String message = json.getJSONObject("comment").getString("body");
+        String author = json.getJSONObject("comment").getJSONObject("author").getString("name");
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(ATLASSIAN_COLOR);
+        eb.setTitle("Issue commented on: " + key, issueUrl);
+        eb.setDescription(
+                message  + "\nBy user: " + author
+        );
+        eb.setTimestamp(Instant.now());
+        return eb.build();
+    }
+
     public static MessageEmbed jiraIssueCreated(JSONObject json) throws JSONException {
         String summary = json.getJSONObject("issue").getJSONObject("fields").getString("summary");
         String key = json.getJSONObject("issue").getString("key");
         String issueUrl = App.config.getJiraURL() + "browse/" + key;
         String desc = json.getJSONObject("issue").getJSONObject("fields").getString("description");
         String createdBy = json.getJSONObject("user").getString("name");
-        String type = json.getJSONObject("issue").getJSONObject("fields").getJSONObject("issuetype").getString("name");
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(ATLASSIAN_COLOR);
         eb.setTitle("Issue created: " + key, issueUrl);
         eb.setDescription(
                 "**" + summary + "**\nDescription: " + desc + "\nCreated by: " + createdBy
+        );
+        eb.setTimestamp(Instant.now());
+        return eb.build();
+    }
+
+    public static MessageEmbed jiraIssueUpdated(JSONObject json) throws JSONException {
+        String key = json.getJSONObject("issue").getString("key");
+        String issueUrl = App.config.getJiraURL() + "browse/" + key;
+        JSONArray items = json.getJSONObject("changelog").getJSONArray("items");
+        String from = "";
+        String to = "";
+        for(int i = 0; i < items.length(); i++){
+            JSONObject item = items.getJSONObject(i);
+            if(!item.getString("field").equals("status")) continue;
+            from = item.getString("fromString");
+            to = item.getString("toString");
+        }
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(ATLASSIAN_COLOR);
+        eb.setTitle("Issue updated: " + key, issueUrl);
+        eb.setDescription(
+                "Issue was moved from **" + from + "** to **" + to + "**."
         );
         eb.setTimestamp(Instant.now());
         return eb.build();
@@ -78,6 +115,4 @@ public abstract class EmbedMessageGenerator {
         eb.setThumbnail(project.getLogoUrl());
         return eb.build();
     }
-
-
 }
