@@ -20,8 +20,23 @@ import java.io.InputStreamReader;
 public abstract class JiraInterfacer {
 
     public static JSONObject sendCommentToIssue(String issueKey, String message, String username){
-        // TODO implement
-        return null;
+        String url = App.config.getJiraURL() + "rest/api/2/issue/" + issueKey + "/comment";
+        RestTemplate restTemplate = new RestTemplate();
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        JSONObject body = new JSONObject();
+        try {
+            body.put("body", "Discord user " + username + " added a comment\n" + message);
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+        headers.add("Authorization", "Bearer " + App.config.getJiraPAT());
+        HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
+        try {
+            return new JSONObject(restTemplate.postForObject(url, request, String.class));
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**

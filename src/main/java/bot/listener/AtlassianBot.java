@@ -85,7 +85,6 @@ public class AtlassianBot extends AdvancedListenerAdapter {
                 commentCreated(body);
                 break;
             case "comment_created":
-                // TODO if comment exists in the issues databate, send the message on discord
                 break;
             default:
                 log.info(body.toString());
@@ -106,6 +105,13 @@ public class AtlassianBot extends AdvancedListenerAdapter {
         bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
                 EmbedMessageGenerator.jiraIssueCommented(body)
         ).queue();
+        String key = body.getJSONObject("issue").getString("key");
+        Optional<Issue> issue = issueRepository.getIssueByKey(key);
+        if(issue.isPresent()){
+            bot.getGuildById(App.config.getGuildId()).getThreadChannelById(issue.get().getThreadChannelId()).sendMessageEmbeds(
+                    EmbedMessageGenerator.jiraIssueCommented(body)
+            ).queue();
+        }
     }
 
     private void issueUpdate(JSONObject body) throws JSONException {
@@ -117,13 +123,6 @@ public class AtlassianBot extends AdvancedListenerAdapter {
         bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
                 EmbedMessageGenerator.jiraIssueUpdated(body)
         ).queue();
-        String key = body.getJSONObject("issue").getString("key");
-        Optional<Issue> issue = issueRepository.getIssueByKey(key);
-        if(issue.isPresent()){
-            bot.getGuildById(App.config.getGuildId()).getThreadChannelById(issue.get().getThreadChannelId()).sendMessageEmbeds(
-                    EmbedMessageGenerator.jiraIssueUpdated(body)
-            ).queue();
-        }
     }
 
     private void issueCreated(JSONObject body) throws JSONException {
