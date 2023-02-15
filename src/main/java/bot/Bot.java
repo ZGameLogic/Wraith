@@ -2,7 +2,7 @@ package bot;
 
 import application.App;
 import bot.listener.CurseForgeBot;
-import bot.listener.AtlassianBot;
+import bot.listener.JiraBot;
 import data.ConfigLoader;
 import data.database.atlassian.jira.issues.IssueRepository;
 import data.database.atlassian.jira.projects.ProjectRepository;
@@ -33,7 +33,7 @@ public class Bot {
     private IssueRepository issueRepository;
 
     private CurseForgeBot curseForgeBot;
-    private AtlassianBot atlassianBot;
+    private JiraBot jiraBot;
 
     private JDA bot;
 
@@ -47,9 +47,9 @@ public class Bot {
         bot.setEventPassthrough(true);
 
         curseForgeBot = new CurseForgeBot(curseforgeRepository);
-        atlassianBot = new AtlassianBot(projectRepository, issueRepository);
+        jiraBot = new JiraBot(projectRepository, issueRepository);
 
-        bot.addEventListeners(curseForgeBot, atlassianBot);
+        bot.addEventListeners(curseForgeBot, jiraBot);
 
         this.bot = bot.build();
 
@@ -64,19 +64,17 @@ public class Bot {
     @PostMapping("webhooks/jira")
     private void jiraWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
-        atlassianBot.handleJiraWebhook(jsonBody);
+        jiraBot.handleJiraWebhook(jsonBody);
     }
 
     @PostMapping("webhooks/bitbucket")
     private void bitbucketWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
-        atlassianBot.handleBitbucketWebhook(jsonBody);
     }
 
     @PostMapping("webhooks/bamboo")
     private void bambooWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
-        atlassianBot.handleBambooWebhook(jsonBody);
     }
 
     @Scheduled(cron = "0 */5 * * * *")
