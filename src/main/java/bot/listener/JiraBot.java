@@ -31,13 +31,13 @@ import org.json.JSONObject;
 import java.util.Optional;
 
 @Slf4j
-public class AtlassianBot extends AdvancedListenerAdapter {
+public class JiraBot extends AdvancedListenerAdapter {
 
     private JDA bot;
     private final ProjectRepository projectRepository;
     private final IssueRepository issueRepository;
 
-    public AtlassianBot(ProjectRepository projectRepository, IssueRepository issueRepository){
+    public JiraBot(ProjectRepository projectRepository, IssueRepository issueRepository){
         this.issueRepository = issueRepository;
         this.projectRepository = projectRepository;
     }
@@ -91,10 +91,6 @@ public class AtlassianBot extends AdvancedListenerAdapter {
                 break;
         }
     }
-
-    public void handleBitbucketWebhook(JSONObject jsonBody) {}
-
-    public void handleBambooWebhook(JSONObject jsonBody) {}
 
     private void commentCreated(JSONObject body) throws JSONException {
         String event = body.getString("issue_event_type_name");
@@ -201,7 +197,7 @@ public class AtlassianBot extends AdvancedListenerAdapter {
     }
 
     @SlashResponse(value = "devops", subCommandName = "create_issue")
-    private void createIssue(SlashCommandInteractionEvent event) throws JSONException {
+    private void createIssue(SlashCommandInteractionEvent event) {
         String projectKey = event.getChannel().getName().split("-")[0].toUpperCase();
         Optional<Project> project = projectRepository.getProjectByKey(projectKey);
         if(!project.isPresent()){
