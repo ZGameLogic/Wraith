@@ -27,6 +27,10 @@ public class Project {
     private Long jiraChannelId;
     private Long forumChannelId;
 
+    private Long bitbucketChannelId;
+    private Long bitbucketPrChannelId;
+    private Long bitbucketRepoId;
+
     public Project(JSONObject json) throws JSONException {
         if(json.has("project")) {
             JSONObject project = json.getJSONObject("project");

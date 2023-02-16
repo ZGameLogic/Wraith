@@ -1,0 +1,62 @@
+{
+  "id": "165b657d42199bba1e6db1f6cad31885ed6e22c1",
+  "displayId": "165b657d421",
+  "author": {
+    "name": "BShabowski",
+    "emailAddress": "benshabowski@gmail.com",
+    "id": 1,
+    "displayName": "Ben Shabowski",
+    "active": true,
+    "slug": "bshabowski",
+    "type": "NORMAL",
+    "links": {
+      "self": [
+        {
+          "href": "https://zgamelogic.com:7990/users/bshabowski"
+        }
+      ]
+    }
+  },
+  "authorTimestamp": 1676568105000,
+  "committer": {
+    "name": "BShabowski",
+    "emailAddress": "benshabowski@gmail.com",
+    "id": 1,
+    "displayName": "Ben Shabowski",
+    "active": true,
+    "slug": "bshabowski",
+    "type": "NORMAL",
+    "links": {
+      "self": [
+        {
+          "href": "https://zgamelogic.com:7990/users/bshabowski"
+        }
+      ]
+    }
+  },
+  "committerTimestamp": 1676568105000,
+  "message": "Removing comments",
+  "parents": [
+    {
+      "id": "ed69ac49e245fbe1d9930fa1b8e80995c9c29359",
+      "displayId": "ed69ac49e24",
+      "author": {
+        "name": "Ben Shabowski",
+        "emailAddress": "benshabowski@gmail.com"
+      },
+      "authorTimestamp": 1676566794000,
+      "committer": {
+        "name": "Ben Shabowski",
+        "emailAddress": "benshabowski@gmail.com"
+      },
+      "committerTimestamp": 1676566794000,
+      "message": "Here is another commit",
+      "parents": [
+        {
+          "id": "0aaa8a40e41ba07b468d0915cff64508b0b53181",
+          "displayId": "0aaa8a40e41"
+        }
+      ]
+    }
+  ]
+}

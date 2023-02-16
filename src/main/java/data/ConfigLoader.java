@@ -53,4 +53,7 @@ public class ConfigLoader {
     private String bitbucketURL;
     @Value("${bamboo.URL}")
     private String bambooURL;
+
+    @Value("${base.url}")
+    private String baseUrl;
 }
