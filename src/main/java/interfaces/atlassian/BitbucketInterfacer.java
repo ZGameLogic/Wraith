@@ -21,6 +21,48 @@ import java.io.InputStreamReader;
 @Slf4j
 public abstract class BitbucketInterfacer {
 
+    public static JSONObject createPullRequest(String project, String repo){
+        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/pull-requests";
+        RestTemplate restTemplate = new RestTemplate();
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        JSONObject body = new JSONObject();
+        try {
+            body.put("title", "Pull request created from discord.");
+            body.put("description", "This pull request was created by the wraith discord bot.");
+            body.put("state", "OPEN");
+            body.put("open", true);
+            body.put("closed", false);
+            body.put("locked", false);
+            JSONObject repository = new JSONObject();
+            repository.put("slug", repo);
+            repository.put("project", new JSONObject("{\"key\": \"" + project + "\"}"));
+            JSONObject fromRef = new JSONObject();
+            fromRef.put("id", "refs/heads/development");
+            fromRef.put("repository", repository);
+            body.put("fromRef", fromRef);
+            JSONObject toRef = new JSONObject();
+            toRef.put("id", "refs/heads/master");
+            toRef.put("repository", repository);
+            body.put("toRef", toRef);
+        } catch (JSONException e){
+            log.error("Error when creating JSON object", e);
+        }
+
+        headers.add("Authorization", "Bearer " + App.config.getBitbucketPAT());
+        HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
+        try {
+            return new JSONObject(restTemplate.postForObject(url, request, String.class));
+        } catch (JSONException e) {
+            log.error("Error when posting webhook request", e);
+            return null;
+        }
+    }
+
+    public static JSONObject mergePullRequest(String project, String repo, long prId){
+        return null;
+    }
+
     public static JSONObject getBitbucketRepository(String project, String repo){
         String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo;
         CloseableHttpClient httpclient = HttpClients.createDefault();
