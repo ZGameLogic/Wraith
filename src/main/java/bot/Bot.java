@@ -74,7 +74,7 @@ public class Bot {
     @PostMapping("webhooks/bitbucket")
     private void bitbucketWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
-        bitbucketBot.handleBitbucketWebhook(jsonBody);
+        if(jsonBody.has("eventKey")) bitbucketBot.handleBitbucketWebhook(jsonBody);
     }
 
     @PostMapping("webhooks/bamboo")

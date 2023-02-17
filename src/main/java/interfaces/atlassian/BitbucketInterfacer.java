@@ -50,11 +50,8 @@ public abstract class BitbucketInterfacer {
             if (httpresponse.getStatusLine().getStatusCode() != 200) return null;
             BufferedReader in = new BufferedReader(new InputStreamReader(httpresponse.getEntity().getContent()));
             return new JSONObject(in.readLine());
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } catch (JSONException e) {
-            e.printStackTrace();
+        } catch (IOException | JSONException e) {
+            log.error("Error when getting bitbucket commit", e);
             return null;
         }
     }
@@ -72,12 +69,8 @@ public abstract class BitbucketInterfacer {
             body.put("active", true);
             JSONArray events = new JSONArray();
             events.put("repo:refs_changed");
-            events.put("repo:modified");
             events.put("pr:opened");
-            events.put("pr:from_ref_updated"); // this ones for source branch
-            events.put("pr:reviewer:approved");
             events.put("pr:merged");
-            events.put("pr:declined");
             body.put("events", events);
         } catch (JSONException e){
             log.error("Error when creating JSON object", e);

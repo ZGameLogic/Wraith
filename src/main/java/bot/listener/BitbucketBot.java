@@ -68,19 +68,20 @@ public class BitbucketBot extends AdvancedListenerAdapter {
     public void handleBitbucketWebhook(JSONObject body) throws JSONException {
         switch(body.getString("eventKey")) {
             case "repo:refs_changed": // push was made
-                refsChanged(body);
-                break;
-            case "repo:modified":
+                switch(body.getJSONArray("changes").getJSONObject(0).getString("type")){
+                    case "ADD":
+                        branchCreated(body);
+                        break;
+                    case "UPDATE":
+                        branchPushedTo(body);
+                        break;
+                }
                 break;
             case "pr:opened":
-                break;
-            case "pr:from_ref_updated": // this one is for the source branch
-                break;
-            case "pr:reviewer:approved":
+                prCreated(body);
                 break;
             case "pr:merged":
-                break;
-            case "pr:declined":
+                prMerged(body);
                 break;
             default:
                 System.out.println(body);
@@ -88,15 +89,15 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         }
     }
 
-    private void refsChanged(JSONObject body) throws JSONException {
-        switch(body.getJSONArray("changes").getJSONObject(0).getString("type")){
-            case "ADD":
-                branchCreated(body);
-                break;
-            case "UPDATE":
-                branchPushedTo(body);
-                break;
-        }
+    private void prMerged(JSONObject body) {
+        // TODO post message in BB general
+        // TODO update message in BB PR
+    }
+
+    private void prCreated(JSONObject body) {
+        // TODO post message in BB general (if it wasn't made by a button)
+        // TODO if PR is into master branch, post message to BB PR
+        // TODO     Add buttons to auto merge it
     }
 
     private void branchCreated(JSONObject body) throws JSONException {
@@ -117,5 +118,7 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         String repoKey = body.getJSONObject("repository").getString("slug");
         JSONObject commit = BitbucketInterfacer.getBitbucketCommit(projectKey, repoKey, commitId);
         bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketPushMade(body, commit)).queue();
+        // TODO if branch is development, add message to PR channel
+        // TODO     Add buttons to create PR and merge
     }
 }
