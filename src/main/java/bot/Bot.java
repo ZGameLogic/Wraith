@@ -1,7 +1,9 @@
 package bot;
 
 import application.App;
+import bot.listener.BitbucketBot;
 import bot.listener.CurseForgeBot;
+import bot.listener.DevopsBot;
 import bot.listener.JiraBot;
 import data.ConfigLoader;
 import data.database.atlassian.jira.issues.IssueRepository;
@@ -34,6 +36,7 @@ public class Bot {
 
     private CurseForgeBot curseForgeBot;
     private JiraBot jiraBot;
+    private BitbucketBot bitbucketBot;
 
     private JDA bot;
 
@@ -48,8 +51,9 @@ public class Bot {
 
         curseForgeBot = new CurseForgeBot(curseforgeRepository);
         jiraBot = new JiraBot(projectRepository, issueRepository);
+        bitbucketBot = new BitbucketBot(projectRepository);
 
-        bot.addEventListeners(curseForgeBot, jiraBot);
+        bot.addEventListeners(curseForgeBot, new DevopsBot(), jiraBot, bitbucketBot);
 
         this.bot = bot.build();
 
@@ -70,6 +74,7 @@ public class Bot {
     @PostMapping("webhooks/bitbucket")
     private void bitbucketWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
+        if(jsonBody.has("eventKey")) bitbucketBot.handleBitbucketWebhook(jsonBody);
     }
 
     @PostMapping("webhooks/bamboo")

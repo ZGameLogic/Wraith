@@ -11,7 +11,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Properties;
 
-@SpringBootApplication(scanBasePackages = {"bot", "controllers"})
+@SpringBootApplication(scanBasePackages = {"bot"})
 @EnableJpaRepositories({"data.database"})
 @EntityScan({"data.database"})
 @EnableScheduling

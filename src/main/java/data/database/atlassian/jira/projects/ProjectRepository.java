@@ -11,4 +11,7 @@ import java.util.Optional;
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query(value = "select * from jira_projects p where p.project_key = :projectKey", nativeQuery = true)
     Optional<Project> getProjectByKey(@Param("projectKey") String projectKey);
+
+    @Query(value = "select * from jira_projects p where p.bitbucket_repo_id = :bitbucketKey", nativeQuery = true)
+    Optional<Project> getProjectByBitbucketKey(@Param("bitbucketKey") long bitbucketKey);
 }

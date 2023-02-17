@@ -19,9 +19,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.session.ReadyEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
@@ -40,20 +37,6 @@ public class JiraBot extends AdvancedListenerAdapter {
     public JiraBot(ProjectRepository projectRepository, IssueRepository issueRepository){
         this.issueRepository = issueRepository;
         this.projectRepository = projectRepository;
-    }
-
-    @Override
-    public void onReady(ReadyEvent event) {
-        bot = event.getJDA();
-        Guild guild = bot.getGuildById(App.config.getGuildId());
-        guild.upsertCommand("devops", "All commands having to do with devops")
-                .addSubcommands(
-                        new SubcommandData("add_project", "Add a jira project to this discord")
-                                .addOption(OptionType.STRING, "key", "Key of the project on jira", true),
-                        new SubcommandData("create_issue", "Creates a jira issue"),
-                        new SubcommandData("create_bug", "Creates a jira bug")
-                )
-            .queue();
     }
 
     @Override
@@ -228,17 +211,6 @@ public class JiraBot extends AdvancedListenerAdapter {
         createDiscordProject(project);
         event.getHook().sendMessage(project.getProjectName() + " was added to the discord server").queue();
         projectRepository.save(project);
-    }
-
-    @SlashResponse(value = "devops", subCommandName = "add_bamboo")
-    private void addBamboo(SlashCommandInteractionEvent event){
-        // cat.createTextChannel(projectKey + "-bamboo").queue(textChannel -> textChannel.getManager().setTopic("Bamboo channel for project " + projectName + ". This is a log of all Bamboo events that happen for this project.").queue());
-    }
-
-    @SlashResponse(value = "devops", subCommandName = "add_bitbucket")
-    private void addBitbucket(SlashCommandInteractionEvent event){
-        // cat.createTextChannel(projectKey + "-prod-pull-requests").queue(textChannel -> textChannel.getManager().setTopic("Pull requests into master for project " + projectName + " will show up here.").queue());
-        // cat.createTextChannel(projectKey + "-bitbucket").queue(textChannel -> textChannel.getManager().setTopic("Bitbucket channel for project " + projectName + ". This is a log of all Bitbucket events that happen for this project.").queue());
     }
 
     private void projectUpdate(JSONObject body) throws JSONException {
