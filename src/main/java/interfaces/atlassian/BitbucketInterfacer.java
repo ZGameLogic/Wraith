@@ -48,7 +48,6 @@ public abstract class BitbucketInterfacer {
         } catch (JSONException e){
             log.error("Error when creating JSON object", e);
         }
-
         headers.add("Authorization", "Bearer " + App.config.getBitbucketPAT());
         HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
         try {
@@ -59,8 +58,26 @@ public abstract class BitbucketInterfacer {
         }
     }
 
-    public static JSONObject mergePullRequest(String project, String repo, long prId){
-        return null;
+    public static JSONObject mergePullRequest(String project, String repo, long prId, long version){
+        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/pull-requests/" + prId + "/merge";
+        RestTemplate restTemplate = new RestTemplate();
+        org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        JSONObject body = new JSONObject();
+        String baseUrl = App.config.getBaseUrl() + ":" + App.config.getWebHookPort() + "/webhooks/bitbucket";
+        try {
+            body.put("version", version);
+        } catch (JSONException e){
+            log.error("Error when creating JSON object", e);
+        }
+        headers.add("Authorization", "Bearer " + App.config.getBitbucketPAT());
+        HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
+        try {
+            return new JSONObject(restTemplate.postForObject(url, request, String.class));
+        } catch (JSONException e) {
+            log.error("Error when posting webhook request", e);
+            return null;
+        }
     }
 
     public static JSONObject getBitbucketRepository(String project, String repo){

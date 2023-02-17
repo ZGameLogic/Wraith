@@ -71,15 +71,24 @@ public class BitbucketBot extends AdvancedListenerAdapter {
     }
 
     @ButtonResponse("merge")
-    private void merge(ButtonInteractionEvent event){
+    private void merge(ButtonInteractionEvent event) throws JSONException {
+        event.deferReply().queue();
         String projectId = event.getChannel().getName().split("-")[0];
         Optional<Project> project = projectRepository.getProjectByKey(projectId);
         if(!project.isPresent()){
-            event.reply("Unable to find project").setEphemeral(true).queue();
+            event.getHook().sendMessage("Unable to find project").setEphemeral(true).queue();
             return;
         }
-        JSONObject pullRequest = BitbucketInterfacer.createPullRequest(project.get().getBitbucketProjectSlug(), project.get().getBitbucketRepoSlug());
-        // TODO approve and merge
+        String projectSlug = project.get().getBitbucketProjectSlug();
+        String repoSlug = project.get().getBitbucketRepoSlug();
+        JSONObject pullRequest = BitbucketInterfacer.createPullRequest(projectSlug, repoSlug);
+        long version = pullRequest.getLong("version");
+        long prId = pullRequest.getLong("id");
+        JSONObject merge = BitbucketInterfacer.mergePullRequest(projectSlug, repoSlug, prId, version);
+        event.getMessage().editMessageComponents(
+                event.getMessage().getComponents().get(0).asDisabled()
+        ).queue();
+        event.getHook().sendMessage("Created a pull request and merged into master").queue();
     }
 
     public void handleBitbucketWebhook(JSONObject body) throws JSONException {
