@@ -1,0 +1,140 @@
+{
+  "id": 3,
+  "version": 0,
+  "title": "Talking Nerdy",
+  "description": "It’s a kludge, but put the tuple from the database in the cache.",
+  "state": "OPEN",
+  "open": true,
+  "closed": false,
+  "createdDate": 1676656796375,
+  "updatedDate": 1676656796375,
+  "fromRef": {
+    "id": "refs/heads/development",
+    "displayId": "development",
+    "latestCommit": "27ba420967da7dd63218950557e43b8db05f9ccf",
+    "type": "BRANCH",
+    "repository": {
+      "slug": "test-repo",
+      "id": 272,
+      "name": "Test Repo",
+      "hierarchyId": "6b75c561b3d3f1e93c6a",
+      "scmId": "git",
+      "state": "AVAILABLE",
+      "statusMessage": "Available",
+      "forkable": true,
+      "project": {
+        "key": "BSPR",
+        "id": 43,
+        "name": "Public Repository",
+        "description": "A public repository for Ben Shabowski",
+        "public": true,
+        "type": "NORMAL",
+        "links": {
+          "self": [
+            {
+              "href": "https://zgamelogic.com:7990/projects/BSPR"
+            }
+          ]
+        }
+      },
+      "public": false,
+      "links": {
+        "clone": [
+          {
+            "href": "https://zgamelogic.com:7990/scm/bspr/test-repo.git",
+            "name": "http"
+          },
+          {
+            "href": "ssh://git@zgamelogic.com:7999/bspr/test-repo.git",
+            "name": "ssh"
+          }
+        ],
+        "self": [
+          {
+            "href": "https://zgamelogic.com:7990/projects/BSPR/repos/test-repo/browse"
+          }
+        ]
+      }
+    }
+  },
+  "toRef": {
+    "id": "refs/heads/master",
+    "displayId": "master",
+    "latestCommit": "5b8207ead8d825865015a74d9af0dc4e3454bd19",
+    "type": "BRANCH",
+    "repository": {
+      "slug": "test-repo",
+      "id": 272,
+      "name": "Test Repo",
+      "hierarchyId": "6b75c561b3d3f1e93c6a",
+      "scmId": "git",
+      "state": "AVAILABLE",
+      "statusMessage": "Available",
+      "forkable": true,
+      "project": {
+        "key": "BSPR",
+        "id": 43,
+        "name": "Public Repository",
+        "description": "A public repository for Ben Shabowski",
+        "public": true,
+        "type": "NORMAL",
+        "links": {
+          "self": [
+            {
+              "href": "https://zgamelogic.com:7990/projects/BSPR"
+            }
+          ]
+        }
+      },
+      "public": false,
+      "links": {
+        "clone": [
+          {
+            "href": "https://zgamelogic.com:7990/scm/bspr/test-repo.git",
+            "name": "http"
+          },
+          {
+            "href": "ssh://git@zgamelogic.com:7999/bspr/test-repo.git",
+            "name": "ssh"
+          }
+        ],
+        "self": [
+          {
+            "href": "https://zgamelogic.com:7990/projects/BSPR/repos/test-repo/browse"
+          }
+        ]
+      }
+    }
+  },
+  "locked": false,
+  "author": {
+    "user": {
+      "name": "Wraith",
+      "emailAddress": "zabory64@no.com",
+      "id": 752,
+      "displayName": "Wraith Discord Bot",
+      "active": true,
+      "slug": "wraith",
+      "type": "NORMAL",
+      "links": {
+        "self": [
+          {
+            "href": "https://zgamelogic.com:7990/users/wraith"
+          }
+        ]
+      }
+    },
+    "role": "AUTHOR",
+    "approved": false,
+    "status": "UNAPPROVED"
+  },
+  "reviewers": [],
+  "participants": [],
+  "links": {
+    "self": [
+      {
+        "href": "https://zgamelogic.com:7990/projects/BSPR/repos/test-repo/pull-requests/3"
+      }
+    ]
+  }
+}

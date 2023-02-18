@@ -8,10 +8,13 @@ import data.database.atlassian.jira.projects.ProjectRepository;
 import interfaces.atlassian.BitbucketInterfacer;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -60,9 +63,32 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         project.get().setBitbucketPrChannelId(bbpr.getIdLong());
         JSONObject bbProject = BitbucketInterfacer.getBitbucketRepository(projectSlug, repoSlug);
         project.get().setBitbucketRepoId(bbProject.getLong("id"));
+        project.get().setBitbucketProjectSlug(bbProject.getJSONObject("project").getString("key"));
+        project.get().setBitbucketRepoSlug(bbProject.getString("slug"));
         projectRepository.save(project.get());
         event.reply("Adding bitbucket repository to this project category.\n" +
                 App.config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/browse/").queue();
+    }
+
+    @ButtonResponse("merge")
+    private void merge(ButtonInteractionEvent event) throws JSONException {
+        event.deferReply().queue();
+        String projectId = event.getChannel().getName().split("-")[0];
+        Optional<Project> project = projectRepository.getProjectByKey(projectId);
+        if(!project.isPresent()){
+            event.getHook().sendMessage("Unable to find project").setEphemeral(true).queue();
+            return;
+        }
+        String projectSlug = project.get().getBitbucketProjectSlug();
+        String repoSlug = project.get().getBitbucketRepoSlug();
+        JSONObject pullRequest = BitbucketInterfacer.createPullRequest(projectSlug, repoSlug);
+        long version = pullRequest.getLong("version");
+        long prId = pullRequest.getLong("id");
+        JSONObject merge = BitbucketInterfacer.mergePullRequest(projectSlug, repoSlug, prId, version);
+        event.getMessage().editMessageComponents(
+                event.getMessage().getComponents().get(0).asDisabled()
+        ).queue();
+        event.getHook().sendMessage("Created a pull request and merged into master").queue();
     }
 
     public void handleBitbucketWebhook(JSONObject body) throws JSONException {
@@ -89,15 +115,20 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         }
     }
 
-    private void prMerged(JSONObject body) {
-        // TODO post message in BB general
-        // TODO update message in BB PR
+    private void prMerged(JSONObject body) throws JSONException {
+        long id = body.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getLong("id");
+        Optional<Project> project = projectRepository.getProjectByBitbucketKey(id);
+        if(!project.isPresent()) return;
+        TextChannel bbUpdates = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getBitbucketChannelId());
+        bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketPrMerged(body)).queue();
     }
 
-    private void prCreated(JSONObject body) {
-        // TODO post message in BB general (if it wasn't made by a button)
-        // TODO if PR is into master branch, post message to BB PR
-        // TODO     Add buttons to auto merge it
+    private void prCreated(JSONObject body) throws JSONException {
+        long id = body.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getLong("id");
+        Optional<Project> project = projectRepository.getProjectByBitbucketKey(id);
+        if(!project.isPresent()) return;
+        TextChannel bbUpdates = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getBitbucketChannelId());
+        bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketPrCreate(body)).queue();
     }
 
     private void branchCreated(JSONObject body) throws JSONException {
@@ -117,8 +148,14 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         String projectKey = body.getJSONObject("repository").getJSONObject("project").getString("key");
         String repoKey = body.getJSONObject("repository").getString("slug");
         JSONObject commit = BitbucketInterfacer.getBitbucketCommit(projectKey, repoKey, commitId);
-        bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketPushMade(body, commit)).queue();
-        // TODO if branch is development, add message to PR channel
-        // TODO     Add buttons to create PR and merge
+        MessageEmbed push = EmbedMessageGenerator.bitbucketPushMade(body, commit);
+        bbUpdates.sendMessageEmbeds(push).queue();
+        boolean devlBranch = body.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId").equals("development");
+        if(devlBranch){
+            TextChannel bbPr = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getBitbucketPrChannelId());
+            bbPr.sendMessageEmbeds(push).addActionRow(
+                    Button.primary("merge", "Merge into master")
+            ).queue();
+        }
     }
 }
