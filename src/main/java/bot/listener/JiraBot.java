@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
@@ -37,6 +38,11 @@ public class JiraBot extends AdvancedListenerAdapter {
     public JiraBot(ProjectRepository projectRepository, IssueRepository issueRepository){
         this.issueRepository = issueRepository;
         this.projectRepository = projectRepository;
+    }
+
+    @Override
+    public void onReady(ReadyEvent event) {
+        bot = event.getJDA();
     }
 
     @Override
