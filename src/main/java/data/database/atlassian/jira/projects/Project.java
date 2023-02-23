@@ -33,6 +33,8 @@ public class Project {
     private String bitbucketProjectSlug;
     private String bitbucketRepoSlug;
 
+    private String bambooPlanSlug;
+
     public Project(JSONObject json) throws JSONException {
         if(json.has("project")) {
             JSONObject project = json.getJSONObject("project");

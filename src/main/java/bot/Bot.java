@@ -1,10 +1,7 @@
 package bot;
 
 import application.App;
-import bot.listener.BitbucketBot;
-import bot.listener.CurseForgeBot;
-import bot.listener.DevopsBot;
-import bot.listener.JiraBot;
+import bot.listener.*;
 import data.ConfigLoader;
 import data.database.atlassian.jira.issues.IssueRepository;
 import data.database.atlassian.jira.projects.ProjectRepository;
@@ -37,6 +34,7 @@ public class Bot {
     private CurseForgeBot curseForgeBot;
     private JiraBot jiraBot;
     private BitbucketBot bitbucketBot;
+    private BambooBot bambooBot;
 
     private JDA bot;
 
@@ -52,6 +50,7 @@ public class Bot {
         curseForgeBot = new CurseForgeBot(curseforgeRepository);
         jiraBot = new JiraBot(projectRepository, issueRepository);
         bitbucketBot = new BitbucketBot(projectRepository);
+        bambooBot = new BambooBot(projectRepository);
 
         bot.addEventListeners(curseForgeBot, new DevopsBot(), jiraBot, bitbucketBot);
 
@@ -80,6 +79,7 @@ public class Bot {
     @PostMapping("webhooks/bamboo")
     private void bambooWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
+        bambooBot.handleBambooWebhook(jsonBody);
     }
 
     @Scheduled(cron = "0 */5 * * * *")
