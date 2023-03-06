@@ -120,6 +120,7 @@ public abstract class EmbedMessageGenerator {
 
     public static MessageEmbed jiraIssueUpdated(JSONObject json) throws JSONException {
         String key = json.getJSONObject("issue").getString("key");
+        String summary = json.getJSONObject("issue").getJSONObject("fields").getString("summary");
         String issueUrl = App.config.getJiraURL() + "browse/" + key;
         JSONArray items = json.getJSONObject("changelog").getJSONArray("items");
         String from = "";
@@ -134,7 +135,7 @@ public abstract class EmbedMessageGenerator {
         eb.setColor(ATLASSIAN_COLOR);
         eb.setTitle("Issue updated: " + key, issueUrl);
         eb.setDescription(
-                "Issue was moved from **" + from + "** to **" + to + "**."
+                "**" + summary + "**\nIssue was moved from **" + from + "** to **" + to + "**."
         );
         eb.setTimestamp(Instant.now());
         return eb.build();

@@ -1,0 +1,18 @@
+{
+  "notification": "Completed Plan Notification",
+  "webhook": {
+    "webhookTemplatedName": "Build webhook",
+    "webhookTemplatedId": "458753"
+  },
+  "build": {
+    "buildPlanName": "Test - Test plan",
+    "triggerSentence": "was manually triggered by BShabowski",
+    "triggerReason": "Manual build",
+    "startedAt": "2023-02-23 09:24:10 -0600",
+    "buildResultKey": "TEST-TP-2",
+    "status": "SUCCESS",
+    "finishedAt": "2023-02-23 09:24:11 -0600"
+  },
+  "uuid": "cf285151-bf34-47cc-a300-724f32fb91b0",
+  "timestamp": "2023-02-23 09:24:11 -0600"
+}
