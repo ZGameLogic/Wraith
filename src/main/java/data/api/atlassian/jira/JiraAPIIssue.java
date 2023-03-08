@@ -13,7 +13,6 @@ public class JiraAPIIssue {
     @JsonProperty("issue_event_type_name")
     private String issueEventTypeName;
 
-
     @Getter
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Issue {
@@ -24,6 +23,7 @@ public class JiraAPIIssue {
         @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Fields {
             private Project project;
+            private String summary;
 
             @Getter
             @JsonIgnoreProperties(ignoreUnknown = true)

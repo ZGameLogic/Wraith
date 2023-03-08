@@ -2,11 +2,11 @@ package bot.utils;
 
 import application.App;
 import bot.listener.CurseForgeBot;
+import data.api.atlassian.jira.JiraAPIIssue;
 import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.utils.TimeFormat;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -118,18 +118,16 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed jiraIssueUpdated(JSONObject json) throws JSONException {
-        String key = json.getJSONObject("issue").getString("key");
-        String summary = json.getJSONObject("issue").getJSONObject("fields").getString("summary");
+    public static MessageEmbed jiraIssueUpdated(JiraAPIIssue issue) {
+        String key = issue.getIssue().getKey();
+        String summary = issue.getIssue().getFields().getSummary();
         String issueUrl = App.config.getJiraURL() + "browse/" + key;
-        JSONArray items = json.getJSONObject("changelog").getJSONArray("items");
         String from = "";
         String to = "";
-        for(int i = 0; i < items.length(); i++){
-            JSONObject item = items.getJSONObject(i);
-            if(!item.getString("field").equals("status")) continue;
-            from = item.getString("fromString");
-            to = item.getString("toString");
+        for(JiraAPIIssue.Changelog.Item item: issue.getChangelog().getItems()){
+            if(!item.getField().equals("status")) continue;
+            from = item.getFromString();
+            to = item.getToString();
         }
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(ATLASSIAN_COLOR);
