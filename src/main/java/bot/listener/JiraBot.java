@@ -107,19 +107,18 @@ public class JiraBot extends AdvancedListenerAdapter {
     private void issueUpdate(JSONObject body) throws JSONException {
         try {
             JiraAPIIssue jiraIssue = new ObjectMapper().readValue(body.toString(), JiraAPIIssue.class);
-            System.out.println(jiraIssue);
             if(!jiraIssue.getIssueEventTypeName().equals("issue_generic")) return;
             long projectId = Long.parseLong(jiraIssue.getIssue().getFields().getProject().getId());
             Optional<Project> project = projectRepository.findById(projectId);
             if(!project.isPresent()) return;
             bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
-                    EmbedMessageGenerator.jiraIssueUpdated(body)
+                    EmbedMessageGenerator.jiraIssueUpdated(jiraIssue)
             ).queue();
             String key = jiraIssue.getIssue().getKey();
             Optional<Issue> issue = issueRepository.getIssueByKey(key);
             if(issue.isPresent()){
                 bot.getGuildById(App.config.getGuildId()).getThreadChannelById(issue.get().getThreadChannelId()).sendMessageEmbeds(
-                        EmbedMessageGenerator.jiraIssueUpdated(body)
+                        EmbedMessageGenerator.jiraIssueUpdated(jiraIssue)
                 ).queue();
             }
         } catch (JsonProcessingException e) {
