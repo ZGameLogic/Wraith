@@ -28,7 +28,7 @@ public abstract class BitbucketInterfacer {
         headers.setContentType(MediaType.APPLICATION_JSON);
         JSONObject body = new JSONObject();
         try {
-            body.put("title", "Pull request created from discord.");
+            body.put("title", "Automatic pull request from discord");
             body.put("description", "This pull request was created by the wraith discord bot.");
             body.put("state", "OPEN");
             body.put("open", true);
