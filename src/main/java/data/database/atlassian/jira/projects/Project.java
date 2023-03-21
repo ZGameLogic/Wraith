@@ -29,6 +29,7 @@ public class Project {
 
     private Long bitbucketChannelId;
     private Long bitbucketPrChannelId;
+    private Long bitbucketRecentPrMessageId;
     private Long bitbucketRepoId;
     private String bitbucketProjectSlug;
     private String bitbucketRepoSlug;
