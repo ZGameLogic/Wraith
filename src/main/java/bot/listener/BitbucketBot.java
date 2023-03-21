@@ -8,6 +8,7 @@ import data.database.atlassian.jira.projects.ProjectRepository;
 import interfaces.atlassian.BitbucketInterfacer;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -153,9 +154,17 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         boolean devlBranch = body.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId").equals("development");
         if(devlBranch){
             TextChannel bbPr = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getBitbucketPrChannelId());
-            bbPr.sendMessageEmbeds(push).addActionRow(
+            if(project.get().getBitbucketRecentPrMessageId() != null){ // Remove stuff if it exists
+                Message message = bbPr.retrieveMessageById(project.get().getBitbucketRecentPrMessageId()).complete();
+                if(!((Button)(message.getActionRows().get(0).getComponents().get(0))).isDisabled()){
+                    message.editMessageComponents().queue();
+                }
+            }
+            Message message = bbPr.sendMessageEmbeds(push).addActionRow(
                     Button.primary("merge", "Merge into master")
-            ).queue();
+            ).complete();
+            project.get().setBitbucketRecentPrMessageId(message.getIdLong());
+            projectRepository.save(project.get());
         }
     }
 }
