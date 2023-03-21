@@ -16,7 +16,7 @@ import java.util.LinkedList;
 
 public abstract class EmbedMessageGenerator {
 
-    private final static Color GENERAL_COLOR = new Color(99, 42, 129);
+    // private final static Color GENERAL_COLOR = new Color(99, 42, 129);
     private final static Color CURSEFORGE_COLOR = new Color(239, 99, 54);
     private final static Color ATLASSIAN_COLOR = new Color(13, 71, 161);
 
