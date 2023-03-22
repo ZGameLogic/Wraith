@@ -155,6 +155,7 @@ public class JiraBot extends AdvancedListenerAdapter {
                         "Description: " + description + "\n" +
                         "Discord name: " + event.getUser().getName())
         ).complete();
+        post.getThreadChannel().addThreadMember(event.getMember()).queue();
         Issue issue = new Issue(id, key, post.getThreadChannel().getIdLong());
         issueRepository.save(issue);
         event.reply("Bug has been submitted").setEphemeral(true).queue();
