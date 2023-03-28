@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -80,6 +81,11 @@ public class Bot {
     private void bambooWebhook(@RequestBody String body) throws JSONException {
         JSONObject jsonBody = new JSONObject(body);
         bambooBot.handleBambooWebhook(jsonBody);
+    }
+
+    @GetMapping("health")
+    private String healthCheck(){
+        return "Healthy";
     }
 
     @Scheduled(cron = "0 */5 * * * *")
