@@ -4,6 +4,8 @@ import application.App;
 import bot.listener.*;
 import data.ConfigLoader;
 import data.database.atlassian.jira.issues.IssueRepository;
+import data.database.atlassian.jira.projects.BitbucketProject;
+import data.database.atlassian.jira.projects.Project;
 import data.database.atlassian.jira.projects.ProjectRepository;
 import data.database.curseforge.CurseforgeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -63,6 +65,28 @@ public class Bot {
         } catch (InterruptedException e) {
             log.error("Unable to launch bot");
         }
+//        Project test = new Project();
+//        test.setProjectId(15);
+//        test.setProjectKey("BSPR");
+//        test.setProjectName("Test Project 2");
+//        test.setCategoryId(2L);
+//        test.setJiraChannelId(2L);
+//        test.setForumChannelId(2L);
+//        BitbucketProject project1 = new BitbucketProject();
+//        project1.setChannelId(3L);
+//        project1.setPullRequestChannelId(3L);
+//        project1.setRepositoryId(3L);
+//        project1.setProjectSlug("BSPR");
+//        project1.setRepoSlug("test-repo-3");
+//        BitbucketProject project2 = new BitbucketProject();
+//        project2.setChannelId(4L);
+//        project2.setPullRequestChannelId(4L);
+//        project2.setRepositoryId(4L);
+//        project2.setProjectSlug("BSPR");
+//        project2.setRepoSlug("test-repo-4");
+//        test.getBitbucketProjects().add(project1);
+//        test.getBitbucketProjects().add(project2);
+//        projectRepository.save(test);
     }
 
     @PostMapping("webhooks/jira")

@@ -1,19 +1,15 @@
 package data.database.atlassian.jira.projects;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
+import java.util.LinkedList;
+import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @Entity
 @ToString
 @Table(name = "jira_projects")
@@ -27,16 +23,24 @@ public class Project {
     private Long jiraChannelId;
     private Long forumChannelId;
 
-    private Long bitbucketChannelId;
-    private Long bitbucketPrChannelId;
-    private Long bitbucketRecentPrMessageId;
-    private Long bitbucketRepoId;
-    private String bitbucketProjectSlug;
-    private String bitbucketRepoSlug;
+//    private Long bitbucketChannelId;
+//    private Long bitbucketPrChannelId;
+//    private Long bitbucketRecentPrMessageId;
+//    private Long bitbucketRepoId;
+//    private String bitbucketProjectSlug;
+//    private String bitbucketRepoSlug;
 
-    private String bambooPlanSlug;
+    @Column
+    @CollectionTable(name = "project_repositories", joinColumns = @JoinColumn(name = "project_id"))
+    @ElementCollection
+    private List<BitbucketProject> bitbucketProjects;
+
+    public Project(){
+        bitbucketProjects = new LinkedList<>();
+    }
 
     public Project(JSONObject json) throws JSONException {
+        super();
         if(json.has("project")) {
             JSONObject project = json.getJSONObject("project");
             projectId = project.getLong("id");

@@ -14,4 +14,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query(value = "select * from jira_projects p where p.bitbucket_repo_id = :bitbucketKey", nativeQuery = true)
     Optional<Project> getProjectByBitbucketKey(@Param("bitbucketKey") long bitbucketKey);
+
+    //@Query(value = "select * from project_bitbucket_projects p where ")
 }
