@@ -15,6 +15,8 @@ public class DevopsBot extends AdvancedListenerAdapter {
                 .addSubcommands(
                         new SubcommandData("add_project", "Add a jira project to this discord")
                                 .addOption(OptionType.STRING, "key", "Key of the project on jira", true),
+                        new SubcommandData("remove_project", "Remove a jira project from this discord")
+                                .addOption(OptionType.STRING, "key", "Key of the project on jira", true),
                         new SubcommandData("create_issue", "Creates a jira issue"),
                         new SubcommandData("create_bug", "Creates a jira bug"),
                         new SubcommandData("bb_link", "Links a bitbucket repository to this category")

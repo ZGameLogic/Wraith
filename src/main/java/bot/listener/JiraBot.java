@@ -227,6 +227,14 @@ public class JiraBot extends AdvancedListenerAdapter {
         projectRepository.save(project);
     }
 
+    @SlashResponse(value = "devops", subCommandName = "remove_project")
+    private void removeProject(SlashCommandInteractionEvent event){
+        event.deferReply().queue();
+        String key = event.getOption("key").getAsString();
+        projectDeleted(key);
+        event.getHook().sendMessage("Project was removed from the server").queue();
+    }
+
     private void projectUpdate(JSONObject body) throws JSONException {
         String projectName = body.getJSONObject("project").getString("name");
         String projectKey = body.getJSONObject("project").getString("key");
@@ -253,6 +261,18 @@ public class JiraBot extends AdvancedListenerAdapter {
         Project project = new Project(body);
         createDiscordProject(project);
         projectRepository.save(project);
+    }
+
+    private void projectDeleted(String key) {
+        Optional<Project> project = projectRepository.getProjectByKey(key);
+        if(!project.isPresent()) return;
+        Guild guild = bot.getGuildById(App.config.getGuildId());
+        Category cat = guild.getCategoryById(project.get().getCategoryId());
+        for(GuildChannel channel: cat.getChannels()){
+            channel.delete().queue();
+        }
+        cat.delete().queue();
+        projectRepository.deleteById(project.get().getProjectId());
     }
 
     private void projectDeleted(JSONObject body) throws JSONException {
