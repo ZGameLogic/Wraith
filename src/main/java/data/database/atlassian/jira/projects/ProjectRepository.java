@@ -15,12 +15,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query(value = "Select * FROM jira_projects INNER JOIN project_repositories pr on jira_projects.project_id = pr.project_id where pr.repository_id = :repoId", nativeQuery = true)
     Optional<Project> getJiraProjectByBitbucketRepoId(@Param("repoId") long repoId);
 
-    @Query(value = "Select * FROM jira_projects INNER JOIN project_repositories pr on jira_projects.project_id = pr.project_id where pr.repo_slug = :repoSlug", nativeQuery = true)
-    Optional<Project> getJiraProjectByBitbucketRepoSlug(@Param("repoSlug") String repoId);
+    @Query(value = "Select * FROM jira_projects INNER JOIN project_repositories pr on jira_projects.project_id = pr.project_id where pr.pull_request_channel_id = :channelId", nativeQuery = true)
+    Optional<Project> getJiraProjectByBitbucketPrChannelId(@Param("channelId") long channelId);
 
-//    @Query(value = "select * from project_repositories p where p.repo_slug = :repoSlug", nativeQuery = true)
-//    Optional<BitbucketProject> getBitbucketProjectByRepoSlug(@Param("repoSlug") String repoSlug);
-//
-//    @Query(value = "select * from project_repositories p where p.repository_id = :repoId", nativeQuery = true)
-//    Optional<BitbucketProject> getBitbucketProjectByRepoId(@Param("repoId") Long repoId);
 }

@@ -66,10 +66,10 @@ public class Project {
         return Optional.of(project);
     }
 
-    public Optional<BitbucketProject> getBitbucketRepo(String slug){
+    public Optional<BitbucketProject> getBitbucketRepoByPrChannelId(long id){
         BitbucketProject project = null;
         for(BitbucketProject p: bitbucketProjects){
-            if(p.getRepoSlug().equals(slug)){
+            if(p.getPullRequestChannelId() == id){
                 project = p;
                 break;
             }
