@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -51,5 +52,10 @@ public class Project {
             projectName = json.getString("name");
             projectKey = json.getString("key");
         }
+    }
+
+    public void updateBitbucketRepo(BitbucketProject project){
+        bitbucketProjects.removeIf(bp -> Objects.equals(bp.getRepositoryId(), project.getRepositoryId()));
+        bitbucketProjects.add(project);
     }
 }
