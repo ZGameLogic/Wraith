@@ -84,13 +84,12 @@ public class BitbucketBot extends AdvancedListenerAdapter {
     @ButtonResponse("merge")
     private void merge(ButtonInteractionEvent event) throws JSONException {
         event.deferReply().queue();
-        String projectId = event.getChannel().getName().replace("-pull-requests", "");
-        Optional<Project> jiraProject = projectRepository.getJiraProjectByBitbucketRepoSlug(projectId);
+        Optional<Project> jiraProject = projectRepository.getJiraProjectByBitbucketPrChannelId(event.getChannel().getIdLong());
         if(!jiraProject.isPresent()) {
             event.getHook().sendMessage("Unable to find project").setEphemeral(true).queue();
             return;
         }
-        Optional<BitbucketProject> project = jiraProject.get().getBitbucketRepo(projectId);
+        Optional<BitbucketProject> project = jiraProject.get().getBitbucketRepoByPrChannelId(event.getChannel().getIdLong());
         if(!project.isPresent()){
             event.getHook().sendMessage("Unable to find project").setEphemeral(true).queue();
             return;
