@@ -22,6 +22,7 @@ public class DevopsBot extends AdvancedListenerAdapter {
                         new SubcommandData("bb_link", "Links a bitbucket repository to this category")
                                 .addOption(OptionType.STRING, "project", "Project the repo lives in", true)
                                 .addOption(OptionType.STRING, "repo", "Name of the repository", true)
+                                .addOption(OptionType.BOOLEAN, "create_channel", "True if it should create a new channel. False to use existing", false)
                 )
                 .queue();
     }

@@ -58,14 +58,23 @@ public class BitbucketBot extends AdvancedListenerAdapter {
             event.reply("This project category already contains a bitbucket repository").setEphemeral(true).queue();
             return;
         }
+        boolean createNewChannel = project.get().getBitbucketProjects().size() < 1;
+        try {
+            createNewChannel = event.getOption("create_channel").getAsBoolean();
+        } catch(Exception ignored){}
         JSONObject response = BitbucketInterfacer.createWebhook(projectSlug, repoSlug);
         if(!response.has("id")) {
             event.reply("Unable to create webhook in bitbucket repository").setEphemeral(true).queue();
             return;
         }
         Category cat = bot.getGuildById(App.config.getGuildId()).getCategoryById(project.get().getCategoryId());
-        TextChannel bbGen = cat.createTextChannel(repoSlug).complete();
-        bbGen.getManager().setTopic("Channel for bitbucket events for this project").queue();
+        TextChannel bbGen;
+        if(createNewChannel) {
+            bbGen = cat.createTextChannel(repoSlug).complete();
+            bbGen.getManager().setTopic("Channel for bitbucket events for this project").queue();
+        } else {
+            bbGen = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getBitbucketProjects().get(0).getChannelId());
+        }
         TextChannel bbpr = cat.createTextChannel(repoSlug + "-pull-requests").complete();
         bbpr.getManager().setTopic("Channel for bitbucket pul requests for this project").queue();
         BitbucketProject newProject = new BitbucketProject();
