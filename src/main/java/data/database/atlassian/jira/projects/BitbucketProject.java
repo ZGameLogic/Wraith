@@ -11,12 +11,10 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor
 @Embeddable
 public class BitbucketProject {
-
     private Long repositoryId;
     private Long channelId;
     private Long pullRequestChannelId;
     private Long recentPrMessageId;
     private String projectSlug;
     private String repoSlug;
-
 }

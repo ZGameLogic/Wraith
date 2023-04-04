@@ -8,6 +8,7 @@ import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Getter
 @Setter
@@ -52,6 +53,28 @@ public class Project {
             projectName = json.getString("name");
             projectKey = json.getString("key");
         }
+    }
+
+    public Optional<BitbucketProject> getBitbucketRepo(long id){
+        BitbucketProject project = null;
+        for(BitbucketProject p: bitbucketProjects){
+            if(p.getRepositoryId() == id){
+                project = p;
+                break;
+            }
+        }
+        return Optional.of(project);
+    }
+
+    public Optional<BitbucketProject> getBitbucketRepo(String slug){
+        BitbucketProject project = null;
+        for(BitbucketProject p: bitbucketProjects){
+            if(p.getRepoSlug().equals(slug)){
+                project = p;
+                break;
+            }
+        }
+        return Optional.of(project);
     }
 
     public void updateBitbucketRepo(BitbucketProject project){

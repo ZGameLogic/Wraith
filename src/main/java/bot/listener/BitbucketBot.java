@@ -84,8 +84,13 @@ public class BitbucketBot extends AdvancedListenerAdapter {
     @ButtonResponse("merge")
     private void merge(ButtonInteractionEvent event) throws JSONException {
         event.deferReply().queue();
-        String projectId = event.getChannel().getName();
-        Optional<BitbucketProject> project = projectRepository.getBitbucketProjectByRepoSlug(projectId);
+        String projectId = event.getChannel().getName().replace("-pull-requests", "");
+        Optional<Project> jiraProject = projectRepository.getJiraProjectByBitbucketRepoSlug(projectId);
+        if(!jiraProject.isPresent()) {
+            event.getHook().sendMessage("Unable to find project").setEphemeral(true).queue();
+            return;
+        }
+        Optional<BitbucketProject> project = jiraProject.get().getBitbucketRepo(projectId);
         if(!project.isPresent()){
             event.getHook().sendMessage("Unable to find project").setEphemeral(true).queue();
             return;
@@ -128,7 +133,9 @@ public class BitbucketBot extends AdvancedListenerAdapter {
 
     private void prMerged(JSONObject body) throws JSONException {
         long id = body.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getLong("id");
-        Optional<BitbucketProject> project = projectRepository.getBitbucketProjectByRepoId(id);
+        Optional<Project> jiraProject = projectRepository.getJiraProjectByBitbucketRepoId(id);
+        if(!jiraProject.isPresent()) return;
+        Optional<BitbucketProject> project = jiraProject.get().getBitbucketRepo(id);
         if(!project.isPresent()) return;
         TextChannel bbUpdates = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getChannelId());
         bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketPrMerged(body)).queue();
@@ -136,7 +143,9 @@ public class BitbucketBot extends AdvancedListenerAdapter {
 
     private void prCreated(JSONObject body) throws JSONException {
         long id = body.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getLong("id");
-        Optional<BitbucketProject> project = projectRepository.getBitbucketProjectByRepoId(id);
+        Optional<Project> jiraProject = projectRepository.getJiraProjectByBitbucketRepoId(id);
+        if(!jiraProject.isPresent()) return;
+        Optional<BitbucketProject> project = jiraProject.get().getBitbucketRepo(id);
         if(!project.isPresent()) return;
         TextChannel bbUpdates = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getChannelId());
         bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketPrCreate(body)).queue();
@@ -144,7 +153,9 @@ public class BitbucketBot extends AdvancedListenerAdapter {
 
     private void branchCreated(JSONObject body) throws JSONException {
         long id = body.getJSONObject("repository").getLong("id");
-        Optional<BitbucketProject> project = projectRepository.getBitbucketProjectByRepoId(id);
+        Optional<Project> jiraProject = projectRepository.getJiraProjectByBitbucketRepoId(id);
+        if(!jiraProject.isPresent()) return;
+        Optional<BitbucketProject> project = jiraProject.get().getBitbucketRepo(id);
         if(!project.isPresent()) return;
         TextChannel bbUpdates = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getChannelId());
         bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketBranchCreated(body)).queue();
@@ -152,32 +163,32 @@ public class BitbucketBot extends AdvancedListenerAdapter {
 
     private void branchPushedTo(JSONObject body) throws JSONException {
         long id = body.getJSONObject("repository").getLong("id");
-        Optional<BitbucketProject> project = projectRepository.getBitbucketProjectByRepoId(id);
-        System.out.println(project);
         Optional<Project> jiraProject = projectRepository.getJiraProjectByBitbucketRepoId(id);
-//        if(!project.isPresent() || !jiraProject.isPresent()) return;
-//        TextChannel bbUpdates = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getChannelId());
-//        String commitId = body.getJSONArray("changes").getJSONObject(0).getString("toHash");
-//        String projectKey = body.getJSONObject("repository").getJSONObject("project").getString("key");
-//        String repoKey = body.getJSONObject("repository").getString("slug");
-//        JSONObject commit = BitbucketInterfacer.getBitbucketCommit(projectKey, repoKey, commitId);
-//        MessageEmbed push = EmbedMessageGenerator.bitbucketPushMade(body, commit);
-//        bbUpdates.sendMessageEmbeds(push).queue();
-//        boolean devlBranch = body.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId").equals("development");
-//        if(devlBranch){
-//            TextChannel bbPr = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getPullRequestChannelId());
-//            if(project.get().getRecentPrMessageId() != null){ // Remove stuff if it exists
-//                Message message = bbPr.retrieveMessageById(project.get().getRecentPrMessageId()).complete();
-//                if(!((Button)(message.getActionRows().get(0).getComponents().get(0))).isDisabled()){
-//                    message.editMessageComponents().queue();
-//                }
-//            }
-//            Message message = bbPr.sendMessageEmbeds(push).addActionRow(
-//                    Button.primary("merge", "Merge into master")
-//            ).complete();
-//            project.get().setRecentPrMessageId(message.getIdLong());
-//            jiraProject.get().updateBitbucketRepo(project.get());
-//            projectRepository.save(jiraProject.get());
-//        }
+        if(!jiraProject.isPresent()) return;
+        Optional<BitbucketProject> project = jiraProject.get().getBitbucketRepo(id);
+        if(!project.isPresent()) return;
+        TextChannel bbUpdates = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getChannelId());
+        String commitId = body.getJSONArray("changes").getJSONObject(0).getString("toHash");
+        String projectKey = body.getJSONObject("repository").getJSONObject("project").getString("key");
+        String repoKey = body.getJSONObject("repository").getString("slug");
+        JSONObject commit = BitbucketInterfacer.getBitbucketCommit(projectKey, repoKey, commitId);
+        MessageEmbed push = EmbedMessageGenerator.bitbucketPushMade(body, commit);
+        bbUpdates.sendMessageEmbeds(push).queue();
+        boolean devlBranch = body.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId").equals("development");
+        if(devlBranch){
+            TextChannel bbPr = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getPullRequestChannelId());
+            if(project.get().getRecentPrMessageId() != null){ // Remove stuff if it exists
+                Message message = bbPr.retrieveMessageById(project.get().getRecentPrMessageId()).complete();
+                if(!((Button)(message.getActionRows().get(0).getComponents().get(0))).isDisabled()){
+                    message.editMessageComponents().queue();
+                }
+            }
+            Message message = bbPr.sendMessageEmbeds(push).addActionRow(
+                    Button.primary("merge", "Merge into master")
+            ).complete();
+            project.get().setRecentPrMessageId(message.getIdLong());
+            jiraProject.get().updateBitbucketRepo(project.get());
+            projectRepository.save(jiraProject.get());
+        }
     }
 }
