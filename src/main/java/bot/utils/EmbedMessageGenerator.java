@@ -37,7 +37,7 @@ public abstract class EmbedMessageGenerator {
                 "**" + prTitle + "**\n" +
                         "Author: " + author
         );
-        eb.setAuthor(repoName);
+        eb.setFooter(repoName);
         eb.setTimestamp(Instant.now());
         return eb.build();
     }
@@ -60,7 +60,7 @@ public abstract class EmbedMessageGenerator {
                 "Author: " + author
         );
         eb.setTimestamp(Instant.now());
-        eb.setAuthor(repoName);
+        eb.setFooter(repoName);
         return eb.build();
     }
 
@@ -73,7 +73,7 @@ public abstract class EmbedMessageGenerator {
         eb.setTitle("Branch created: " + branchName);
         eb.setDescription("Created by: " + creator);
         eb.setTimestamp(Instant.now());
-        eb.setAuthor(repoName);
+        eb.setFooter(repoName);
         return eb.build();
     }
 
@@ -89,6 +89,8 @@ public abstract class EmbedMessageGenerator {
         eb.setColor(ATLASSIAN_COLOR);
         eb.setTitle("Push was made to branch: " + branch, commitUrl);
         eb.setDescription(message + "\n" + author);
+        String repoName = json.getJSONObject("repository").getString("name");
+        eb.setFooter(repoName);
         eb.setTimestamp(Instant.now());
         return eb.build();
     }
@@ -97,7 +99,6 @@ public abstract class EmbedMessageGenerator {
         String key = json.getJSONObject("issue").getString("key");
         String issueUrl = App.config.getJiraURL() + "browse/" + key;
         String message = json.getJSONObject("comment").getString("body");
-        String repoName = json.getJSONObject("repository").getString("name");
         String author = json.getJSONObject("comment").getJSONObject("author").getString("name");
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(ATLASSIAN_COLOR);
@@ -106,7 +107,6 @@ public abstract class EmbedMessageGenerator {
                 message  + "\nBy user: " + author
         );
         eb.setTimestamp(Instant.now());
-        eb.setAuthor(repoName);
         return eb.build();
     }
 
