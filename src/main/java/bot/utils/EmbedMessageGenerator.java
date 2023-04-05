@@ -27,6 +27,7 @@ public abstract class EmbedMessageGenerator {
         String url = App.config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/pull-requests/" + prId + "/overview";
         String fromBranchName = json.getJSONObject("pullRequest").getJSONObject("fromRef").getString("displayId");
         String toBranchName = json.getJSONObject("pullRequest").getJSONObject("toRef").getString("displayId");
+        String repoName = json.getJSONObject("pullRequest").getJSONObject("toRef").getJSONObject("repository").getString("name");
         String prTitle = json.getJSONObject("pullRequest").getString("title");
         String author = json.getJSONObject("pullRequest").getJSONObject("author").getJSONObject("user").getString("name");
         EmbedBuilder eb = new EmbedBuilder();
@@ -36,6 +37,7 @@ public abstract class EmbedMessageGenerator {
                 "**" + prTitle + "**\n" +
                         "Author: " + author
         );
+        eb.setAuthor(repoName);
         eb.setTimestamp(Instant.now());
         return eb.build();
     }
@@ -48,6 +50,7 @@ public abstract class EmbedMessageGenerator {
         String fromBranchName = json.getJSONObject("pullRequest").getJSONObject("fromRef").getString("displayId");
         String toBranchName = json.getJSONObject("pullRequest").getJSONObject("toRef").getString("displayId");
         String prTitle = json.getJSONObject("pullRequest").getString("title");
+        String repoName = json.getJSONObject("pullRequest").getJSONObject("toRef").getJSONObject("repository").getString("name");
         String author = json.getJSONObject("pullRequest").getJSONObject("author").getJSONObject("user").getString("name");
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(ATLASSIAN_COLOR);
@@ -57,17 +60,20 @@ public abstract class EmbedMessageGenerator {
                 "Author: " + author
         );
         eb.setTimestamp(Instant.now());
+        eb.setAuthor(repoName);
         return eb.build();
     }
 
     public static MessageEmbed bitbucketBranchCreated(JSONObject json) throws JSONException {
         String branchName = json.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId");
         String creator = json.getJSONObject("actor").getString("name");
+        String repoName = json.getJSONObject("repository").getString("name");
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(ATLASSIAN_COLOR);
         eb.setTitle("Branch created: " + branchName);
         eb.setDescription("Created by: " + creator);
         eb.setTimestamp(Instant.now());
+        eb.setAuthor(repoName);
         return eb.build();
     }
 
@@ -91,6 +97,7 @@ public abstract class EmbedMessageGenerator {
         String key = json.getJSONObject("issue").getString("key");
         String issueUrl = App.config.getJiraURL() + "browse/" + key;
         String message = json.getJSONObject("comment").getString("body");
+        String repoName = json.getJSONObject("repository").getString("name");
         String author = json.getJSONObject("comment").getJSONObject("author").getString("name");
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(ATLASSIAN_COLOR);
@@ -99,6 +106,7 @@ public abstract class EmbedMessageGenerator {
                 message  + "\nBy user: " + author
         );
         eb.setTimestamp(Instant.now());
+        eb.setAuthor(repoName);
         return eb.build();
     }
 
