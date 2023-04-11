@@ -21,7 +21,7 @@ import java.io.InputStreamReader;
 @Slf4j
 public abstract class BitbucketInterfacer {
 
-    public static JSONObject createPullRequest(String project, String repo){
+    public static JSONObject createPullRequest(String project, String repo, String from, String to){
         String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/pull-requests";
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
@@ -38,11 +38,11 @@ public abstract class BitbucketInterfacer {
             repository.put("slug", repo);
             repository.put("project", new JSONObject("{\"key\": \"" + project + "\"}"));
             JSONObject fromRef = new JSONObject();
-            fromRef.put("id", "refs/heads/development");
+            fromRef.put("id", "refs/heads/" + from);
             fromRef.put("repository", repository);
             body.put("fromRef", fromRef);
             JSONObject toRef = new JSONObject();
-            toRef.put("id", "refs/heads/master");
+            toRef.put("id", "refs/heads/" + to);
             toRef.put("repository", repository);
             body.put("toRef", toRef);
         } catch (JSONException e){
@@ -101,6 +101,22 @@ public abstract class BitbucketInterfacer {
 
     public static JSONObject getBitbucketCommit(String project, String repo, String commit){
         String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/commits/" + commit;
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpGet httpget = new HttpGet(url);
+        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + App.config.getBitbucketPAT());
+        try {
+            HttpResponse httpresponse = httpclient.execute(httpget);
+            if (httpresponse.getStatusLine().getStatusCode() != 200) return null;
+            BufferedReader in = new BufferedReader(new InputStreamReader(httpresponse.getEntity().getContent()));
+            return new JSONObject(in.readLine());
+        } catch (IOException | JSONException e) {
+            log.error("Error when getting bitbucket commit", e);
+            return null;
+        }
+    }
+
+    public static JSONObject getBitbucketBranches(String project, String repo){
+        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/branches";
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);
         httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + App.config.getBitbucketPAT());

@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -105,7 +106,10 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         }
         String projectSlug = project.get().getProjectSlug();
         String repoSlug = project.get().getRepoSlug();
-        JSONObject pullRequest = BitbucketInterfacer.createPullRequest(projectSlug, repoSlug);
+        MessageEmbed message = event.getMessage().getEmbeds().get(0);
+        String from = message.getTitle().replace("Push was made to branch: ", "");
+        String to = event.getButton().getLabel().replace("Merge into ", "");
+        JSONObject pullRequest = BitbucketInterfacer.createPullRequest(projectSlug, repoSlug, from, to);
         long version = pullRequest.getLong("version");
         long prId = pullRequest.getLong("id");
         BitbucketInterfacer.mergePullRequest(projectSlug, repoSlug, prId, version);
@@ -182,21 +186,31 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         JSONObject commit = BitbucketInterfacer.getBitbucketCommit(projectKey, repoKey, commitId);
         MessageEmbed push = EmbedMessageGenerator.bitbucketPushMade(body, commit);
         bbUpdates.sendMessageEmbeds(push).queue();
-        boolean devlBranch = body.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId").equals("development");
-        if(devlBranch){
-            TextChannel bbPr = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getPullRequestChannelId());
-            if(project.get().getRecentPrMessageId() != null){ // Remove stuff if it exists
-                Message message = bbPr.retrieveMessageById(project.get().getRecentPrMessageId()).complete();
-                if(!((Button)(message.getActionRows().get(0).getComponents().get(0))).isDisabled()){
-                    message.editMessageComponents().queue();
-                }
+
+        String branch = body.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId");
+        if(!branch.equals("development") && !branch.equals("cert")) return;
+        JSONArray branches = BitbucketInterfacer.getBitbucketBranches(projectKey, repoKey).getJSONArray("values");
+        boolean cert = false;
+        for(int i = 0; i < branches.length(); i++){
+            JSONObject jsonBranch = branches.getJSONObject(i);
+            if(jsonBranch.getString("displayId").equals("cert")){
+                cert = true;
+                break;
             }
-            Message message = bbPr.sendMessageEmbeds(push).addActionRow(
-                    Button.primary("merge", "Merge into master")
-            ).complete();
-            project.get().setRecentPrMessageId(message.getIdLong());
-            jiraProject.get().updateBitbucketRepo(project.get());
-            projectRepository.save(jiraProject.get());
         }
+        String toBranch = cert ? (branch.equals("development") ? "cert" : "master") : "master";
+        TextChannel bbPr = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getPullRequestChannelId());
+        if(project.get().getRecentPrMessageId() != null){ // Remove stuff if it exists
+            Message message = bbPr.retrieveMessageById(project.get().getRecentPrMessageId()).complete();
+            if(!((Button)(message.getActionRows().get(0).getComponents().get(0))).isDisabled()){
+                message.editMessageComponents().queue();
+            }
+        }
+        Message message = bbPr.sendMessageEmbeds(push).addActionRow(
+                Button.primary("merge", "Merge into " + toBranch)
+        ).complete();
+        project.get().setRecentPrMessageId(message.getIdLong());
+        jiraProject.get().updateBitbucketRepo(project.get());
+        projectRepository.save(jiraProject.get());
     }
 }
