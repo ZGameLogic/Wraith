@@ -183,14 +183,14 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         Optional<BitbucketProject> project = jiraProject.get().getBitbucketRepo(id);
         if(!project.isPresent()) return;
         TextChannel bbUpdates = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getChannelId());
-        String commitId = body.getJSONArray("changes").getJSONObject(0).getString("toHash");
+        String commitId = body.getJSONArray("changes").getJSONObject(index).getString("toHash");
         String projectKey = body.getJSONObject("repository").getJSONObject("project").getString("key");
         String repoKey = body.getJSONObject("repository").getString("slug");
         JSONObject commit = BitbucketInterfacer.getBitbucketCommit(projectKey, repoKey, commitId);
         MessageEmbed push = EmbedMessageGenerator.bitbucketPushMade(body, commit, index);
         bbUpdates.sendMessageEmbeds(push).queue();
 
-        String branch = body.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId");
+        String branch = body.getJSONArray("changes").getJSONObject(index).getJSONObject("ref").getString("displayId");
         if(!branch.equals("development") && !branch.equals("cert")) return;
         JSONArray branches = BitbucketInterfacer.getBitbucketBranches(projectKey, repoKey).getJSONArray("values");
         boolean cert = false;
