@@ -64,8 +64,8 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed bitbucketBranchCreated(JSONObject json) throws JSONException {
-        String branchName = json.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId");
+    public static MessageEmbed bitbucketBranchCreated(JSONObject json, int index) throws JSONException {
+        String branchName = json.getJSONArray("changes").getJSONObject(index).getJSONObject("ref").getString("displayId");
         String creator = json.getJSONObject("actor").getString("name");
         String repoName = json.getJSONObject("repository").getString("name");
         EmbedBuilder eb = new EmbedBuilder();
@@ -77,12 +77,12 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed bitbucketPushMade(JSONObject json, JSONObject commit) throws JSONException {
-        String branch = json.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId");
+    public static MessageEmbed bitbucketPushMade(JSONObject json, JSONObject commit, int index) throws JSONException {
+        String branch = json.getJSONArray("changes").getJSONObject(index).getJSONObject("ref").getString("displayId");
         String commitUrl = App.config.getBitbucketURL() + "projects/" +
                 json.getJSONObject("repository").getJSONObject("project").getString("key") +
                 "/repos/" + json.getJSONObject("repository").getString("slug") + "/commits/" +
-                json.getJSONArray("changes").getJSONObject(0).getString("toHash");
+                json.getJSONArray("changes").getJSONObject(index).getString("toHash");
         String message = commit.getString("message");
         String author = json.getJSONObject("actor").getString("name");
         EmbedBuilder eb = new EmbedBuilder();

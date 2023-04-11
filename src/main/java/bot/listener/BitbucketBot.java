@@ -122,13 +122,16 @@ public class BitbucketBot extends AdvancedListenerAdapter {
     public void handleBitbucketWebhook(JSONObject body) throws JSONException {
         switch(body.getString("eventKey")) {
             case "repo:refs_changed": // push was made
-                switch(body.getJSONArray("changes").getJSONObject(0).getString("type")){
-                    case "ADD":
-                        branchCreated(body);
-                        break;
-                    case "UPDATE":
-                        branchPushedTo(body);
-                        break;
+                for(int i = 0; i < body.getJSONArray("changes").length(); i++) {
+                    JSONObject change = body.getJSONArray("changes").getJSONObject(i);
+                    switch (change.getString("type")) {
+                        case "ADD":
+                            branchCreated(body, i);
+                            break;
+                        case "UPDATE":
+                            branchPushedTo(body, i);
+                            break;
+                    }
                 }
                 break;
             case "pr:opened":
@@ -163,17 +166,17 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketPrCreate(body)).queue();
     }
 
-    private void branchCreated(JSONObject body) throws JSONException {
+    private void branchCreated(JSONObject body, int index) throws JSONException {
         long id = body.getJSONObject("repository").getLong("id");
         Optional<Project> jiraProject = projectRepository.getJiraProjectByBitbucketRepoId(id);
         if(!jiraProject.isPresent()) return;
         Optional<BitbucketProject> project = jiraProject.get().getBitbucketRepo(id);
         if(!project.isPresent()) return;
         TextChannel bbUpdates = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getChannelId());
-        bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketBranchCreated(body)).queue();
+        bbUpdates.sendMessageEmbeds(EmbedMessageGenerator.bitbucketBranchCreated(body, index)).queue();
     }
 
-    private void branchPushedTo(JSONObject body) throws JSONException {
+    private void branchPushedTo(JSONObject body, int index) throws JSONException {
         long id = body.getJSONObject("repository").getLong("id");
         Optional<Project> jiraProject = projectRepository.getJiraProjectByBitbucketRepoId(id);
         if(!jiraProject.isPresent()) return;
@@ -184,7 +187,7 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         String projectKey = body.getJSONObject("repository").getJSONObject("project").getString("key");
         String repoKey = body.getJSONObject("repository").getString("slug");
         JSONObject commit = BitbucketInterfacer.getBitbucketCommit(projectKey, repoKey, commitId);
-        MessageEmbed push = EmbedMessageGenerator.bitbucketPushMade(body, commit);
+        MessageEmbed push = EmbedMessageGenerator.bitbucketPushMade(body, commit, index);
         bbUpdates.sendMessageEmbeds(push).queue();
 
         String branch = body.getJSONArray("changes").getJSONObject(0).getJSONObject("ref").getString("displayId");
