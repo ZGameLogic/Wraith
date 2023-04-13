@@ -6,6 +6,7 @@ import com.zgamelogic.AdvancedListenerAdapter;
 import data.database.atlassian.jira.projects.BitbucketProject;
 import data.database.atlassian.jira.projects.Project;
 import data.database.atlassian.jira.projects.ProjectRepository;
+import data.database.atlassian.jira.projects.PullRequest;
 import interfaces.atlassian.BitbucketInterfacer;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
@@ -203,17 +204,21 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         }
         String toBranch = cert ? (branch.equals("development") ? "cert" : "master") : "master";
         TextChannel bbPr = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getPullRequestChannelId());
-        if(project.get().getRecentPrMessageId() != null){ // Remove stuff if it exists
-            Message message = bbPr.retrieveMessageById(project.get().getRecentPrMessageId()).complete();
-            if(!((Button)(message.getActionRows().get(0).getComponents().get(0))).isDisabled()){
-                message.editMessageComponents().queue();
-            }
-        }
+        Optional<PullRequest> pullRequest = jiraProject.get().getPrMessageId(repoKey, branch);
+        pullRequest.ifPresent(pullRequestMessageId -> {
+            Message message = bbPr.retrieveMessageById(pullRequestMessageId.getRecentPrMessageId()).complete();
+            message.editMessageComponents().queue();
+        });
         Message message = bbPr.sendMessageEmbeds(push).addActionRow(
                 Button.primary("merge", "Merge into " + toBranch)
         ).complete();
-        project.get().setRecentPrMessageId(message.getIdLong());
+        if(pullRequest.isPresent()){
+            pullRequest.get().setRecentPrMessageId(message.getIdLong());
+        } else {
+            pullRequest = Optional.of(new PullRequest(message.getIdLong(), ));
+        }
         jiraProject.get().updateBitbucketRepo(project.get());
+        jiraProject.get().updatePullRequest(pullRequest.get());
         projectRepository.save(jiraProject.get());
     }
 }
