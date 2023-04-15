@@ -187,6 +187,7 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         String commitId = body.getJSONArray("changes").getJSONObject(index).getString("toHash");
         String projectKey = body.getJSONObject("repository").getJSONObject("project").getString("key");
         String repoKey = body.getJSONObject("repository").getString("slug");
+        String branchName = body.getJSONArray("changes").getJSONObject(index).getJSONObject("ref").getString("displayId");
         JSONObject commit = BitbucketInterfacer.getBitbucketCommit(projectKey, repoKey, commitId);
         MessageEmbed push = EmbedMessageGenerator.bitbucketPushMade(body, commit, index);
         bbUpdates.sendMessageEmbeds(push).queue();
@@ -215,7 +216,7 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         if(pullRequest.isPresent()){
             pullRequest.get().setRecentPrMessageId(message.getIdLong());
         } else {
-            pullRequest = Optional.of(new PullRequest(message.getIdLong(), ));
+            pullRequest = Optional.of(new PullRequest(message.getIdLong(), branchName, repoKey));
         }
         jiraProject.get().updateBitbucketRepo(project.get());
         jiraProject.get().updatePullRequest(pullRequest.get());
