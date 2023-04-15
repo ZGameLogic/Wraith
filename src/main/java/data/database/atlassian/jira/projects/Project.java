@@ -25,20 +25,19 @@ public class Project {
     private Long jiraChannelId;
     private Long forumChannelId;
 
-//    private Long bitbucketChannelId;
-//    private Long bitbucketPrChannelId;
-//    private Long bitbucketRecentPrMessageId;
-//    private Long bitbucketRepoId;
-//    private String bitbucketProjectSlug;
-//    private String bitbucketRepoSlug;
-
     @Column
     @CollectionTable(name = "project_repositories", joinColumns = @JoinColumn(name = "project_id"))
     @ElementCollection
     private List<BitbucketProject> bitbucketProjects;
 
+    @Column
+    @CollectionTable(name = "project_pull_requests", joinColumns = @JoinColumn(name = "project_id"))
+    @ElementCollection
+    private List<PullRequest> pullRequests;
+
     public Project(){
         bitbucketProjects = new LinkedList<>();
+        pullRequests = new LinkedList<>();
     }
 
     public Project(JSONObject json) throws JSONException {
@@ -80,5 +79,19 @@ public class Project {
     public void updateBitbucketRepo(BitbucketProject project){
         bitbucketProjects.removeIf(bp -> Objects.equals(bp.getRepositoryId(), project.getRepositoryId()));
         bitbucketProjects.add(project);
+    }
+
+    public void updatePullRequest(PullRequest pullRequest){
+        pullRequests.removeIf(pr -> Objects.equals(pr.getRepoSlug(),pullRequest.getRepoSlug()) && Objects.equals(pr.getFromBranch(), pullRequest.getFromBranch()));
+        pullRequests.add(pullRequest);
+    }
+
+    public Optional<PullRequest> getPrMessageId(String repoSlug, String fromBranch){
+        for(PullRequest pr: pullRequests){
+            if(pr.getFromBranch().equals(fromBranch) && pr.getRepoSlug().equals(repoSlug)){
+                return Optional.of(pr);
+            }
+        }
+        return Optional.empty();
     }
 }
