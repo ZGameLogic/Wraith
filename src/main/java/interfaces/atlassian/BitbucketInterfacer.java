@@ -132,7 +132,19 @@ public abstract class BitbucketInterfacer {
     }
 
     public static JSONObject getBitbucketProjectRepos(String project){
-
+        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/";
+        CloseableHttpClient httpclient = HttpClients.createDefault();
+        HttpGet httpget = new HttpGet(url);
+        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + App.config.getBitbucketPAT());
+        try {
+            HttpResponse httpresponse = httpclient.execute(httpget);
+            if (httpresponse.getStatusLine().getStatusCode() != 200) return null;
+            BufferedReader in = new BufferedReader(new InputStreamReader(httpresponse.getEntity().getContent()));
+            return new JSONObject(in.readLine());
+        } catch (IOException | JSONException e) {
+            log.error("Error when getting bitbucket branches", e);
+            return null;
+        }
     }
 
     public static JSONObject createWebhook(String project, String repo){
