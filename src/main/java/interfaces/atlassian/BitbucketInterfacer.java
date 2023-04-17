@@ -126,9 +126,13 @@ public abstract class BitbucketInterfacer {
             BufferedReader in = new BufferedReader(new InputStreamReader(httpresponse.getEntity().getContent()));
             return new JSONObject(in.readLine());
         } catch (IOException | JSONException e) {
-            log.error("Error when getting bitbucket commit", e);
+            log.error("Error when getting bitbucket branches", e);
             return null;
         }
+    }
+
+    public static JSONObject getBitbucketProjectRepos(String project){
+
     }
 
     public static JSONObject createWebhook(String project, String repo){
