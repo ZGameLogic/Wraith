@@ -52,13 +52,24 @@ public class BitbucketBot extends AdvancedListenerAdapter {
             return;
         }
 
+        boolean createNewChannel = project.get().getBitbucketProjects().size() < 1;
+        try {
+            createNewChannel = event.getOption("create_channel").getAsBoolean();
+        } catch(Exception ignored){}
+
         if (repoMapping != null) {
             String repoSlug = repoMapping.getAsString();
-            if(createBitbucketOnDiscord(project.get(), projectSlug, repoSlug, )){
+            if(createBitbucketOnDiscord(project.get(), projectSlug, repoSlug, createNewChannel)){
                 event.reply("Adding bitbucket repository to this project category.\n" +
                         App.config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/browse/").queue();
             } else {
-
+                event.reply("Unable to add the bitbucket repository").queue();
+            }
+        } else {
+            JSONArray repos = BitbucketInterfacer.getBitbucketProjectRepos(projectSlug).getJSONArray("values");
+            for(int i = 0; i < repos.length(); i++){
+                JSONObject repo = repos.getJSONObject(i);
+                // TODO go through all the repos
             }
         }
     }
