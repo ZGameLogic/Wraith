@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -43,39 +44,54 @@ public class BitbucketBot extends AdvancedListenerAdapter {
     private void linkBitbucket(SlashCommandInteractionEvent event) throws JSONException {
         String projectKey = event.getChannel().getName().split("-")[0].toUpperCase();
         String projectSlug = event.getOption("project").getAsString();
-        String repoSlug = event.getOption("repo").getAsString();
+        OptionMapping repoMapping = event.getOption("repo");
+
         Optional<Project> project = projectRepository.getProjectByKey(projectKey);
         if(!project.isPresent()){
             event.reply("This can only be used in a project category").setEphemeral(true).queue();
             return;
         }
-        boolean alreadyContains = false;
-        for(BitbucketProject bp: project.get().getBitbucketProjects()){
-            if (bp.getProjectSlug().equals(projectSlug) && bp.getRepoSlug().equals(repoSlug)) {
-                alreadyContains = true;
-                break;
-            }
-        }
-        if(alreadyContains){
-            event.reply("This project category already contains a bitbucket repository").setEphemeral(true).queue();
-            return;
-        }
+
         boolean createNewChannel = project.get().getBitbucketProjects().size() < 1;
         try {
             createNewChannel = event.getOption("create_channel").getAsBoolean();
         } catch(Exception ignored){}
+
+        if (repoMapping != null) {
+            String repoSlug = repoMapping.getAsString();
+            if(createBitbucketOnDiscord(project.get(), projectSlug, repoSlug, createNewChannel)){
+                event.reply("Adding bitbucket repository to this project category.\n" +
+                        App.config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/browse/").queue();
+            } else {
+                event.reply("Unable to add the bitbucket repository").queue();
+            }
+        } else {
+            JSONArray repos = BitbucketInterfacer.getBitbucketProjectRepos(projectSlug).getJSONArray("values");
+            for(int i = 0; i < repos.length(); i++){
+                JSONObject repo = repos.getJSONObject(i);
+                // TODO go through all the repos
+            }
+        }
+    }
+
+    private boolean createBitbucketOnDiscord(Project project, String projectSlug, String repoSlug, boolean createNewChannel) throws JSONException {
+        for(BitbucketProject bp: project.getBitbucketProjects()){
+            if (bp.getProjectSlug().equals(projectSlug) && bp.getRepoSlug().equals(repoSlug)) {
+                return false;
+            }
+        }
+
         JSONObject response = BitbucketInterfacer.createWebhook(projectSlug, repoSlug);
         if(!response.has("id")) {
-            event.reply("Unable to create webhook in bitbucket repository").setEphemeral(true).queue();
-            return;
+            return false;
         }
-        Category cat = bot.getGuildById(App.config.getGuildId()).getCategoryById(project.get().getCategoryId());
+        Category cat = bot.getGuildById(App.config.getGuildId()).getCategoryById(project.getCategoryId());
         TextChannel bbGen;
         if(createNewChannel) {
             bbGen = cat.createTextChannel(repoSlug).complete();
             bbGen.getManager().setTopic("Channel for bitbucket events for this project").queue();
         } else {
-            bbGen = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getBitbucketProjects().get(0).getChannelId());
+            bbGen = bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.getBitbucketProjects().get(0).getChannelId());
         }
         TextChannel bbpr = cat.createTextChannel(repoSlug + "-pull-requests").complete();
         bbpr.getManager().setTopic("Channel for bitbucket pul requests for this project").queue();
@@ -86,10 +102,9 @@ public class BitbucketBot extends AdvancedListenerAdapter {
         newProject.setRepositoryId(bbProject.getLong("id"));
         newProject.setProjectSlug(bbProject.getJSONObject("project").getString("key"));
         newProject.setRepoSlug(bbProject.getString("slug"));
-        project.get().getBitbucketProjects().add(newProject);
-        projectRepository.save(project.get());
-        event.reply("Adding bitbucket repository to this project category.\n" +
-                App.config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/browse/").queue();
+        project.getBitbucketProjects().add(newProject);
+        projectRepository.save(project);
+        return true;
     }
 
     @ButtonResponse("merge")

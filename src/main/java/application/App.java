@@ -32,7 +32,6 @@ public class App {
 
         Properties props = new Properties();
         props.setProperty("server.port", config.getWebHookPort() + "");
-        props.setProperty("spring.main.banner-mode", "off");
         props.setProperty("logging.level.root", "INFO");
 
         // SSL stuff
