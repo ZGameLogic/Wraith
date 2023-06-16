@@ -56,4 +56,13 @@ public class ConfigLoader {
 
     @Value("${base.url}")
     private String baseUrl;
+
+    @Value("${datadog.base.url}")
+    private String datadogBaseUrl;
+    @Value("${datadog.api.key}")
+    private String datadogApiKey;
+    @Value("${datadog.app.key}")
+    private String datadogAppKey;
+    @Value("${datadog.channel.id}")
+    private String datadogChannelId;
 }
