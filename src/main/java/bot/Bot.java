@@ -36,11 +36,12 @@ public class Bot {
     private JiraBot jiraBot;
     private BitbucketBot bitbucketBot;
     private BambooBot bambooBot;
+    private DatadogBot datadogBot;
 
     private JDA bot;
 
     @PostConstruct
-    public void start(){
+    public void start() {
         ConfigLoader config = App.config;
 
         // Create bot
@@ -52,8 +53,9 @@ public class Bot {
         jiraBot = new JiraBot(projectRepository, issueRepository);
         bitbucketBot = new BitbucketBot(projectRepository);
         bambooBot = new BambooBot(projectRepository);
+        datadogBot = new DatadogBot();
 
-        bot.addEventListeners(curseForgeBot, new DevopsBot(), jiraBot, bitbucketBot);
+        bot.addEventListeners(curseForgeBot, new DevopsBot(), jiraBot, bitbucketBot, datadogBot);
 
         this.bot = bot.build();
 
@@ -63,6 +65,8 @@ public class Bot {
         } catch (InterruptedException e) {
             log.error("Unable to launch bot");
         }
+
+        tenMinuteTask();
     }
 
     @PostMapping("webhooks/jira")
@@ -91,5 +95,10 @@ public class Bot {
     @Scheduled(cron = "0 */5 * * * *")
     private void fiveMinuteTask() {
         curseForgeBot.update();
+    }
+
+    @Scheduled(cron = "0 */10 * * * *")
+    private void tenMinuteTask(){
+        datadogBot.update();
     }
 }
