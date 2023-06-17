@@ -87,6 +87,16 @@ public class Bot {
         bambooBot.handleBambooWebhook(jsonBody);
     }
 
+    @PostMapping("webhooks/datadog")
+    private void datadogWebhook(@RequestBody String body){
+        log.info("Post " + body);
+    }
+
+    @GetMapping("webhooks/datadog")
+    private void datadoggetWebhook(@RequestBody String body){
+        log.info("Get " + body);
+    }
+
     @GetMapping("health")
     private String healthCheck(){
         return "Healthy";
@@ -97,7 +107,7 @@ public class Bot {
         curseForgeBot.update();
     }
 
-    @Scheduled(cron = "0 */10 * * * *")
+    @Scheduled(cron = "0 */30 * * * *")
     private void tenMinuteTask(){
         datadogBot.update();
     }
