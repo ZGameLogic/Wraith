@@ -3,7 +3,6 @@ package bot.utils;
 import application.App;
 import bot.listener.CurseForgeBot;
 import data.api.atlassian.jira.JiraAPIIssue;
-import data.api.datadog.Monitor;
 import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
