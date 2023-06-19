@@ -36,7 +36,6 @@ public class Bot {
     private JiraBot jiraBot;
     private BitbucketBot bitbucketBot;
     private BambooBot bambooBot;
-    private DatadogBot datadogBot;
 
     private JDA bot;
 
@@ -53,9 +52,8 @@ public class Bot {
         jiraBot = new JiraBot(projectRepository, issueRepository);
         bitbucketBot = new BitbucketBot(projectRepository);
         bambooBot = new BambooBot(projectRepository);
-        datadogBot = new DatadogBot();
 
-        bot.addEventListeners(curseForgeBot, new DevopsBot(), jiraBot, bitbucketBot, datadogBot);
+        bot.addEventListeners(curseForgeBot, new DevopsBot(), jiraBot, bitbucketBot);
 
         this.bot = bot.build();
 
@@ -107,8 +105,8 @@ public class Bot {
         curseForgeBot.update();
     }
 
-    @Scheduled(cron = "0 */30 * * * *")
+    @Scheduled(cron = "0 */10 * * * *")
     private void tenMinuteTask(){
-        datadogBot.update();
+
     }
 }

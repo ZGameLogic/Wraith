@@ -29,35 +29,6 @@ public abstract class EmbedMessageGenerator {
     private final static String DATA_DOG_ALERT = ":red_square:";
     private final static String DATA_DOG_NONE = ":white_large_square:";
 
-    public static MessageEmbed datadogMonitor(Monitor[] monitors){
-        EmbedBuilder eb = new EmbedBuilder();
-        boolean ok = false;
-        boolean alert = false;
-
-        eb.setTitle("Datadog monitor status");
-        eb.setTimestamp(Instant.now());
-
-        StringBuilder desc = new StringBuilder();
-
-        for(Monitor monitor: monitors){
-            desc.append(monitor.getState().replace("OK", DATA_DOG_OK).replace("Alert", DATA_DOG_ALERT).replace("No Data", DATA_DOG_NONE)).append(" ").append(monitor.getName()).append("\n");
-            if(monitor.getState().equals("OK")) ok = true;
-            if(monitor.getState().equals("Alert")) alert = true;
-        }
-
-        eb.setDescription(desc.toString());
-
-        if(!ok && !alert){
-            eb.setColor(DATA_DOG_NONE_COLOR);
-        } else if (alert){
-            eb.setColor(DATA_DOG_ALERT_COLOR);
-        } else {
-            eb.setColor(DATA_DOG_OK_COLOR);
-        }
-
-        return eb.build();
-    }
-
     public static MessageEmbed bitbucketPrMerged(JSONObject json) throws JSONException {
         String projectSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getJSONObject("project").getString("key");
         String repoSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getString("slug");
