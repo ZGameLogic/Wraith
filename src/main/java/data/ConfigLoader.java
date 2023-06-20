@@ -56,4 +56,7 @@ public class ConfigLoader {
 
     @Value("${base.url}")
     private String baseUrl;
+
+    @Value("${monitoring.id}")
+    private String monitoringId;
 }

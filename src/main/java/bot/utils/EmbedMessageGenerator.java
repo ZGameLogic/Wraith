@@ -3,6 +3,8 @@ package bot.utils;
 import application.App;
 import bot.listener.CurseForgeBot;
 import data.api.atlassian.jira.JiraAPIIssue;
+import data.api.monitor.MinecraftMonitor;
+import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -22,11 +24,36 @@ public abstract class EmbedMessageGenerator {
 
     private final static Color DATA_DOG_OK_COLOR = new Color(64, 194, 99);
     private final static Color DATA_DOG_ALERT_COLOR = new Color(233, 54, 74);
-    private final static Color DATA_DOG_NONE_COLOR = new Color(129, 138, 163);
 
     private final static String DATA_DOG_OK = ":green_square:";
     private final static String DATA_DOG_ALERT = ":red_square:";
-    private final static String DATA_DOG_NONE = ":white_large_square:";
+
+    public static MessageEmbed monitorStatus(LinkedList<Monitor> monitors){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Monitors status");
+        StringBuilder desc = new StringBuilder();
+
+        boolean good = true;
+
+        for(Monitor m: monitors){
+            if(!m.isStatus()) good = false;
+            if(m.getType().equals("minecraft")){
+                MinecraftMonitor mcMonitor = (MinecraftMonitor)m;
+                desc.append(m.isStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
+                desc.append("**Online: **").append(mcMonitor.getOnline()).append("\n");
+                for(String name: mcMonitor.getOnlinePlayers()){
+                    desc.append("-").append(name).append("\n");
+                }
+            } else {
+                desc.append(m.isStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
+            }
+        }
+
+        eb.setColor(good ? DATA_DOG_OK_COLOR : DATA_DOG_ALERT_COLOR);
+        eb.setDescription(desc.toString());
+        eb.setTimestamp(Instant.now());
+        return eb.build();
+    }
 
     public static MessageEmbed bitbucketPrMerged(JSONObject json) throws JSONException {
         String projectSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getJSONObject("project").getString("key");
