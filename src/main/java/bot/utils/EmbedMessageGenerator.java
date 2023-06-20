@@ -41,7 +41,9 @@ public abstract class EmbedMessageGenerator {
                 MinecraftMonitor mcMonitor = (MinecraftMonitor)m;
                 desc.append(m.isStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
                 desc.append("**Online: **").append(mcMonitor.getOnline()).append("\n");
-                for(String name: mcMonitor.getOnlinePlayers()){
+                LinkedList<String> players = new LinkedList<>(mcMonitor.getOnlinePlayers());
+                players.sort(String::compareTo);
+                for(String name: players){
                     desc.append("-").append(name).append("\n");
                 }
             } else {
