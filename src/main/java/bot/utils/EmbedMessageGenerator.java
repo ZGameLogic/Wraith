@@ -40,11 +40,15 @@ public abstract class EmbedMessageGenerator {
             if(m.getType().equals("minecraft")){
                 MinecraftMonitor mcMonitor = (MinecraftMonitor)m;
                 desc.append(m.isStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
-                desc.append("**Online: **").append(mcMonitor.getOnline()).append("\n");
-                LinkedList<String> players = new LinkedList<>(mcMonitor.getOnlinePlayers());
-                players.sort(String::compareTo);
-                for(String name: players){
-                    desc.append("-").append(name).append("\n");
+                if(m.isStatus()) {
+                    desc.append("**Online: **").append(mcMonitor.getOnline()).append("\n");
+                    if(mcMonitor.getOnline() > 0) {
+                        LinkedList<String> players = new LinkedList<>(mcMonitor.getOnlinePlayers());
+                        players.sort(String::compareTo);
+                        for (String name : players) {
+                            desc.append("-").append(name).append("\n");
+                        }
+                    }
                 }
             } else {
                 desc.append(m.isStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
