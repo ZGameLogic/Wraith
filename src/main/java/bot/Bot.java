@@ -106,7 +106,7 @@ public class Bot {
         curseForgeBot.update();
     }
 
-    @Scheduled(cron = "0 */10 * * * *")
+    @Scheduled(cron = "0 */1 * * * *")
     private void tenMinuteTask(){
         monitoringBot.update();
     }
