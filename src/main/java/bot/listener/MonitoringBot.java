@@ -22,7 +22,7 @@ public class MonitoringBot extends AdvancedListenerAdapter {
         if(message == null){
             message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(MonitorsInterfacer.getMonitorStatus())).complete();
         } else {
-            message = channel.editMessageEmbedsById(channel.getHistory().getRetrievedHistory().get(0).getIdLong(), EmbedMessageGenerator.monitorStatus(MonitorsInterfacer.getMonitorStatus())).complete();
+            message = channel.editMessageEmbedsById(message.getId(), EmbedMessageGenerator.monitorStatus(MonitorsInterfacer.getMonitorStatus())).complete();
         }
     }
 }
