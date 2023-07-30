@@ -3,7 +3,6 @@ package bot.utils;
 import application.App;
 import bot.listener.CurseForgeBot;
 import data.api.atlassian.jira.JiraAPIIssue;
-import data.api.monitor.MinecraftMonitor;
 import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -36,20 +35,19 @@ public abstract class EmbedMessageGenerator {
         boolean good = true;
 
         for(Monitor m: monitors){
-            if(!m.isStatus()) good = false;
+            if(!m.getStatus()) good = false;
             if(m.getType().equals("minecraft")){
-                MinecraftMonitor mcMonitor = (MinecraftMonitor)m;
-                desc.append(m.isStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
-                if(m.isStatus() && mcMonitor.getOnline() > 0) {
-                    desc.append("**Online: **").append(mcMonitor.getOnline()).append("\n");
-                    LinkedList<String> players = new LinkedList<>(mcMonitor.getOnlinePlayers());
+                desc.append(m.getStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
+                if(m.getStatus() && m.getOnline() > 0) {
+                    desc.append("**Online: **").append(m.getOnline()).append("\n");
+                    LinkedList<String> players = new LinkedList<>(m.getOnlinePlayers());
                     players.sort(String::compareTo);
                     for (String name : players) {
                         desc.append("-").append(name).append("\n");
                     }
                 }
             } else {
-                desc.append(m.isStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
+                desc.append(m.getStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
             }
         }
 
@@ -222,7 +220,7 @@ public abstract class EmbedMessageGenerator {
         eb.setColor(CURSEFORGE_COLOR);
         eb.setTitle("File update for " + project.getName(), project.getUrl());
         eb.setDescription(project.getFileName());
-        if(!project.getServerFileName().equals("")){
+        if(!project.getServerFileName().isEmpty()){
             eb.addField("Server file", project.getServerFileName() + "\n" + project.getServerFileUrl(), true);
         }
         eb.setThumbnail(project.getLogoUrl());
