@@ -1,7 +1,6 @@
 package interfaces.monitor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import data.api.monitor.MinecraftMonitor;
 import data.api.monitor.Monitor;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,6 +14,7 @@ public abstract class MonitorsInterfacer {
     public static LinkedList<Monitor> getMonitorStatus(){
         LinkedList<Monitor> monitors = new LinkedList<>();
         String URL = "http://54.211.139.84:8080/monitors";
+        // String URL = "http://localhost:8080/monitors";
         RestTemplate restTemplate = new RestTemplate();
         String response;
         try {
@@ -23,11 +23,7 @@ public abstract class MonitorsInterfacer {
             JSONArray jsonArray = new JSONArray(response);
             for(int i = 0; i < jsonArray.length(); i++){
                 JSONObject monitor = jsonArray.getJSONObject(i);
-                if(monitor.getString("type").equals("minecraft")){
-                    monitors.add(om.readValue(monitor.toString(), MinecraftMonitor.class));
-                } else {
-                    monitors.add(om.readValue(monitor.toString(), Monitor.class));
-                }
+                monitors.add(om.readValue(monitor.toString(), Monitor.class));
             }
         } catch (Exception e) {
             e.printStackTrace();
