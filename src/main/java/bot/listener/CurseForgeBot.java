@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -53,7 +54,8 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
                 guild.upsertCommand(Commands.slash("curseforge", "Slash command for curseforge related things")
                         .addSubcommands(
                                 new SubcommandData("listen", "Listens to a project")
-                                        .addOption(OptionType.STRING, "project", "Project to watch", true),
+                                        .addOption(OptionType.STRING, "project", "Project to watch", true)
+                                        .addOption(OptionType.BOOLEAN, "mention", "Get mentioned when this updates", false),
                                 new SubcommandData("forget", "Stops listening to a project")
                                         .addOption(OptionType.STRING, "project", "Project to watch", true),
                                 new SubcommandData("list", "Lists all the projects currently followed in this channel"),
@@ -110,6 +112,9 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
         cfr.setGuildId(event.getGuild().getIdLong());
         cfr.setLastChecked(new Date());
         cfr.setLastUpdated(new Date());
+        cfr.setMentionable(
+                event.getOption("mention") != null && event.getOption("mention").getAsBoolean()
+        );
         cfr.setProjectId(project);
         CurseforgeProject response = new CurseforgeProject(project);
         if(!response.isValid()){
@@ -138,9 +143,12 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
         for(CurseforgeRecord check: checks.findAll()){
             CurseforgeProject current = new CurseforgeProject(check.getProjectId());
             if(current.getFileId() != null && (check.getProjectVersionId() == null || !check.getProjectVersionId().equals(current.fileId))){
-                bot.getGuildById(check.getGuildId()).getTextChannelById(check.getChannelId()).sendMessageEmbeds(
-                        EmbedMessageGenerator.curseforgeUpdate(current)
-                ).queue();
+                boolean mention = check.getMentionable();
+                MessageCreateAction message = bot.getGuildById(check.getGuildId()).getTextChannelById(check.getChannelId()).sendMessageEmbeds(
+                    EmbedMessageGenerator.curseforgeUpdate(current, mention)
+                );
+                if(mention) message.mentionUsers(232675572772372481L);
+                message.queue();
                 check.setProjectVersionId(current.getFileId());
                 check.setLastUpdated(new Date());
                 check.setName(current.getName());
