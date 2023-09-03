@@ -31,4 +31,5 @@ public class CurseforgeRecord {
     private Date lastChecked;
     private Date lastUpdated;
     private String name;
+    private Boolean mentionable;
 }
