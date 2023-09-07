@@ -215,11 +215,11 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed curseforgeUpdate(CurseForgeBot.CurseforgeProject project, boolean mentionable){
+    public static MessageEmbed curseforgeUpdate(CurseForgeBot.CurseforgeProject project, Boolean mentionable){
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(CURSEFORGE_COLOR);
         eb.setTitle("File update for " + project.getName(), project.getUrl());
-        eb.setDescription(project.getFileName() + (mentionable ? " <@232675572772372481>" : ""));
+        eb.setDescription(project.getFileName() + (mentionable != null && mentionable ? " <@232675572772372481>" : ""));
         if(!project.getServerFileName().isEmpty()){
             eb.addField("Server file", project.getServerFileName() + "\n" + project.getServerFileUrl(), true);
         }
