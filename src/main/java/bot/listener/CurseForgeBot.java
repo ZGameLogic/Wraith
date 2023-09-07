@@ -143,11 +143,11 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
         for(CurseforgeRecord check: checks.findAll()){
             CurseforgeProject current = new CurseforgeProject(check.getProjectId());
             if(current.getFileId() != null && (check.getProjectVersionId() == null || !check.getProjectVersionId().equals(current.fileId))){
-                boolean mention = check.getMentionable();
+                Boolean mention = check.getMentionable();
                 MessageCreateAction message = bot.getGuildById(check.getGuildId()).getTextChannelById(check.getChannelId()).sendMessageEmbeds(
                     EmbedMessageGenerator.curseforgeUpdate(current, mention)
                 );
-                if(mention) message.mentionUsers(232675572772372481L);
+                if(mention != null && mention) message.mentionUsers(232675572772372481L);
                 message.queue();
                 check.setProjectVersionId(current.getFileId());
                 check.setLastUpdated(new Date());
