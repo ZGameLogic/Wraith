@@ -44,8 +44,8 @@
 
     <dependency>
       <groupId>com.zgamelogic</groupId>
-      <artifactId>Advanced-Listener-Adapter</artifactId>
-      <version>1.4.0</version>
+      <artifactId>Spring-JDA</artifactId>
+      <version>1.0.1</version>
     </dependency>
 
     <dependency>

@@ -1,16 +1,30 @@
 package bot.listener;
 
-import application.App;
-import com.zgamelogic.AdvancedListenerAdapter;
+import com.zgamelogic.jda.AdvancedListenerAdapter;
+import data.ConfigLoader;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import static com.zgamelogic.jda.Annotations.*;
+
+@RestController
 public class DevopsBot extends AdvancedListenerAdapter {
-    @Override
-    public void onReady(ReadyEvent event) {
-        Guild guild = event.getJDA().getGuildById(App.config.getGuildId());
+
+    private final ConfigLoader config;
+
+    @Autowired
+    public DevopsBot(ConfigLoader config) {
+        this.config = config;
+    }
+
+    @OnReady
+    private void ready(ReadyEvent event) {
+        Guild guild = event.getJDA().getGuildById(config.getGuildId());
         guild.upsertCommand("devops", "All commands having to do with devops")
                 .addSubcommands(
                         new SubcommandData("add_project", "Add a jira project to this discord")
@@ -25,5 +39,10 @@ public class DevopsBot extends AdvancedListenerAdapter {
                                 .addOption(OptionType.BOOLEAN, "create_channel", "True if it should create a new channel. False to use existing", false)
                 )
                 .queue();
+    }
+
+    @GetMapping("health")
+    private String healthCheck(){
+        return "Healthy";
     }
 }
