@@ -1,8 +1,8 @@
 package bot.listener;
 
-import application.App;
 import bot.utils.EmbedMessageGenerator;
-import com.zgamelogic.AdvancedListenerAdapter;
+import com.zgamelogic.jda.AdvancedListenerAdapter;
+import data.ConfigLoader;
 import data.database.curseforge.CurseforgeRecord;
 import data.database.curseforge.CurseforgeRepository;
 import lombok.Getter;
@@ -25,6 +25,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -36,18 +39,24 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.zgamelogic.jda.Annotations.*;
+
 @Slf4j
+@RestController
 public class CurseForgeBot extends AdvancedListenerAdapter {
 
     private final CurseforgeRepository checks;
+    private final ConfigLoader config;
     private JDA bot;
 
-    public CurseForgeBot(CurseforgeRepository checks) {
+    @Autowired
+    public CurseForgeBot(CurseforgeRepository checks, ConfigLoader config) {
         this.checks = checks;
+        this.config = config;
     }
 
-    @Override
-    public void onReady(ReadyEvent event) {
+    @OnReady
+    private void ready(ReadyEvent event) {
         bot = event.getJDA();
         new Thread(() -> {
             for(Guild guild: bot.getGuilds()) {
@@ -139,6 +148,11 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
         event.reply("No project with that ID is being followed").queue();
     }
 
+    @Scheduled(cron = "0 */5 * * * *")
+    private void fiveMinuteTask() {
+        update();
+    }
+
     public void update(){
         for(CurseforgeRecord check: checks.findAll()){
             CurseforgeProject current = new CurseforgeProject(check.getProjectId());
@@ -179,7 +193,7 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
             String url = "https://api.curseforge.com/v1/mods/" + project;
             CloseableHttpClient httpclient = HttpClients.createDefault();
             HttpGet httpget = new HttpGet(url);
-            httpget.setHeader("x-api-key", App.config.getCurseforgeApiToken());
+            httpget.setHeader("x-api-key", config.getCurseforgeApiToken());
             JSONObject json;
             try {
                 HttpResponse httpresponse = httpclient.execute(httpget);
@@ -217,7 +231,7 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
             String url = "https://api.curseforge.com/v1/mods/" + project + "/files/" + file;
             CloseableHttpClient httpclient = HttpClients.createDefault();
             HttpGet httpget = new HttpGet(url);
-            httpget.setHeader("x-api-key", App.config.getCurseforgeApiToken());
+            httpget.setHeader("x-api-key", config.getCurseforgeApiToken());
             JSONObject json;
             try {
                 HttpResponse httpresponse = httpclient.execute(httpget);

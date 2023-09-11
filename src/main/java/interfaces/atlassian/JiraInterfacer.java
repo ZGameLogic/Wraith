@@ -1,6 +1,5 @@
 package interfaces.atlassian;
 
-import application.App;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -19,8 +18,8 @@ import java.io.InputStreamReader;
 
 public abstract class JiraInterfacer {
 
-    public static JSONObject sendCommentToIssue(String issueKey, String message, String username){
-        String url = App.config.getJiraURL() + "rest/api/2/issue/" + issueKey + "/comment";
+    public static JSONObject sendCommentToIssue(String jiraURL, String jiraPAT, String issueKey, String message, String username){
+        String url = jiraURL + "rest/api/2/issue/" + issueKey + "/comment";
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -30,7 +29,7 @@ public abstract class JiraInterfacer {
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        headers.add("Authorization", "Bearer " + App.config.getJiraPAT());
+        headers.add("Authorization", "Bearer " + jiraPAT);
         HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
         try {
             return new JSONObject(restTemplate.postForObject(url, request, String.class));
@@ -44,11 +43,11 @@ public abstract class JiraInterfacer {
      * @param projectKey Key of the project
      * @return JSONObject representation of the project
      */
-    public static JSONObject getProject(String projectKey){
-        String url = App.config.getJiraURL() + "rest/api/2/project/" + projectKey;
+    public static JSONObject getProject(String jiraURL, String jiraPAT, String projectKey){
+        String url = jiraURL + "rest/api/2/project/" + projectKey;
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);
-        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + App.config.getJiraPAT());
+        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + jiraPAT);
         try {
             HttpResponse httpresponse = httpclient.execute(httpget);
             if (httpresponse.getStatusLine().getStatusCode() != 200) return null;
@@ -71,8 +70,8 @@ public abstract class JiraInterfacer {
      * @param userId
      * @return
      */
-    public static JSONObject createBug(String projectKey, String title, String description, String username, String userId){
-        String link = App.config.getJiraURL() + "/rest/api/2/issue";
+    public static JSONObject createBug(String jiraURL, String jiraPAT, String projectKey, String title, String description, String username, String userId){
+        String link = jiraURL + "/rest/api/2/issue";
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -95,7 +94,7 @@ public abstract class JiraInterfacer {
             throw new RuntimeException(e);
         }
 
-        headers.add("Authorization", "Bearer " + App.config.getJiraPAT());
+        headers.add("Authorization", "Bearer " + jiraPAT);
         HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
 
         try {
@@ -113,8 +112,8 @@ public abstract class JiraInterfacer {
      * @param userId
      * @return
      */
-    public static JSONObject createTask(String projectKey, String title, String description, String[] inputLabels, String username, String userId){
-        String link = App.config.getJiraURL() + "/rest/api/2/issue";
+    public static JSONObject createTask(String jiraURL, String jiraPAT, String projectKey, String title, String description, String[] inputLabels, String username, String userId){
+        String link = jiraURL + "/rest/api/2/issue";
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -137,7 +136,7 @@ public abstract class JiraInterfacer {
             throw new RuntimeException(e);
         }
 
-        headers.add("Authorization", "Bearer " + App.config.getJiraPAT());
+        headers.add("Authorization", "Bearer " + jiraPAT);
         HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
 
         try {

@@ -1,6 +1,5 @@
 package interfaces.atlassian;
 
-import application.App;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -21,8 +20,8 @@ import java.io.InputStreamReader;
 @Slf4j
 public abstract class BitbucketInterfacer {
 
-    public static JSONObject createPullRequest(String project, String repo, String from, String to){
-        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/pull-requests";
+    public static JSONObject createPullRequest(String bitbucketURL, String bitbucketPAT, String project, String repo, String from, String to){
+        String url = bitbucketURL + "rest/api/latest/projects/" + project + "/repos/" + repo + "/pull-requests";
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -48,7 +47,7 @@ public abstract class BitbucketInterfacer {
         } catch (JSONException e){
             log.error("Error when creating JSON object", e);
         }
-        headers.add("Authorization", "Bearer " + App.config.getBitbucketPAT());
+        headers.add("Authorization", "Bearer " + bitbucketPAT);
         HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
         try {
             return new JSONObject(restTemplate.postForObject(url, request, String.class));
@@ -58,19 +57,19 @@ public abstract class BitbucketInterfacer {
         }
     }
 
-    public static JSONObject mergePullRequest(String project, String repo, long prId, long version){
-        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/pull-requests/" + prId + "/merge";
+    public static JSONObject mergePullRequest(String bitbucketURL, String bitbucketPAT, String baseURL, int webhookPort, String project, String repo, long prId, long version){
+        String url = bitbucketURL + "rest/api/latest/projects/" + project + "/repos/" + repo + "/pull-requests/" + prId + "/merge";
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         JSONObject body = new JSONObject();
-        String baseUrl = App.config.getBaseUrl() + ":" + App.config.getWebHookPort() + "/webhooks/bitbucket";
+        String baseUrl = baseURL + ":" + webhookPort + "/webhooks/bitbucket";
         try {
             body.put("version", version);
         } catch (JSONException e){
             log.error("Error when creating JSON object", e);
         }
-        headers.add("Authorization", "Bearer " + App.config.getBitbucketPAT());
+        headers.add("Authorization", "Bearer " + bitbucketPAT);
         HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
         try {
             return new JSONObject(restTemplate.postForObject(url, request, String.class));
@@ -80,11 +79,11 @@ public abstract class BitbucketInterfacer {
         }
     }
 
-    public static JSONObject getBitbucketRepository(String project, String repo){
-        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo;
+    public static JSONObject getBitbucketRepository(String bitbucketURL, String bitbucketPAT, String project, String repo){
+        String url = bitbucketURL + "rest/api/latest/projects/" + project + "/repos/" + repo;
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);
-        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + App.config.getBitbucketPAT());
+        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + bitbucketPAT);
         try {
             HttpResponse httpresponse = httpclient.execute(httpget);
             if (httpresponse.getStatusLine().getStatusCode() != 200) return null;
@@ -99,11 +98,11 @@ public abstract class BitbucketInterfacer {
         }
     }
 
-    public static JSONObject getBitbucketCommit(String project, String repo, String commit){
-        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/commits/" + commit;
+    public static JSONObject getBitbucketCommit(String bitbucketURL, String bitbucketPAT, String project, String repo, String commit){
+        String url = bitbucketURL + "rest/api/latest/projects/" + project + "/repos/" + repo + "/commits/" + commit;
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);
-        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + App.config.getBitbucketPAT());
+        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + bitbucketPAT);
         try {
             HttpResponse httpresponse = httpclient.execute(httpget);
             if (httpresponse.getStatusLine().getStatusCode() != 200) return null;
@@ -115,11 +114,11 @@ public abstract class BitbucketInterfacer {
         }
     }
 
-    public static JSONObject getBitbucketBranches(String project, String repo){
-        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/branches";
+    public static JSONObject getBitbucketBranches(String bitbucketURL, String bitbucketPAT, String project, String repo){
+        String url = bitbucketURL + "rest/api/latest/projects/" + project + "/repos/" + repo + "/branches";
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);
-        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + App.config.getBitbucketPAT());
+        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + bitbucketPAT);
         try {
             HttpResponse httpresponse = httpclient.execute(httpget);
             if (httpresponse.getStatusLine().getStatusCode() != 200) return null;
@@ -131,11 +130,11 @@ public abstract class BitbucketInterfacer {
         }
     }
 
-    public static JSONObject getBitbucketProjectRepos(String project){
-        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/";
+    public static JSONObject getBitbucketProjectRepos(String bitbucketURL, String bitbucketPAT, String project){
+        String url = bitbucketURL + "rest/api/latest/projects/" + project + "/repos/";
         CloseableHttpClient httpclient = HttpClients.createDefault();
         HttpGet httpget = new HttpGet(url);
-        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + App.config.getBitbucketPAT());
+        httpget.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + bitbucketPAT);
         try {
             HttpResponse httpresponse = httpclient.execute(httpget);
             if (httpresponse.getStatusLine().getStatusCode() != 200) return null;
@@ -147,13 +146,13 @@ public abstract class BitbucketInterfacer {
         }
     }
 
-    public static JSONObject createWebhook(String project, String repo){
-        String url = App.config.getBitbucketURL() + "rest/api/latest/projects/" + project + "/repos/" + repo + "/webhooks";
+    public static JSONObject createWebhook(String bitbucketURL, String bitbucketPAT, String baseURL, int webhookPort, String project, String repo){
+        String url = bitbucketURL + "rest/api/latest/projects/" + project + "/repos/" + repo + "/webhooks";
         RestTemplate restTemplate = new RestTemplate();
         org.springframework.http.HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         JSONObject body = new JSONObject();
-        String baseUrl = App.config.getBaseUrl() + ":" + App.config.getWebHookPort() + "/webhooks/bitbucket";
+        String baseUrl = baseURL + ":" + webhookPort + "/webhooks/bitbucket";
         try {
             body.put("name", "Wraith webhook");
             body.put("url", baseUrl);
@@ -167,7 +166,7 @@ public abstract class BitbucketInterfacer {
             log.error("Error when creating JSON object", e);
         }
 
-        headers.add("Authorization", "Bearer " + App.config.getBitbucketPAT());
+        headers.add("Authorization", "Bearer " + bitbucketPAT);
         HttpEntity<String> request = new HttpEntity<>(body.toString(), headers);
         try {
             return new JSONObject(restTemplate.postForObject(url, request, String.class));

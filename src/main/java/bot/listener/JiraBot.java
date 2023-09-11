@@ -1,10 +1,10 @@
 package bot.listener;
 
-import application.App;
 import bot.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zgamelogic.AdvancedListenerAdapter;
+import com.zgamelogic.jda.AdvancedListenerAdapter;
+import data.ConfigLoader;
 import data.api.atlassian.jira.JiraAPIIssue;
 import data.database.atlassian.jira.issues.Issue;
 import data.database.atlassian.jira.issues.IssueRepository;
@@ -29,22 +29,33 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.Optional;
 
+import static com.zgamelogic.jda.Annotations.*;
+
 @Slf4j
+@RestController
 public class JiraBot extends AdvancedListenerAdapter {
 
     private JDA bot;
     private final ProjectRepository projectRepository;
     private final IssueRepository issueRepository;
+    private final ConfigLoader config;
 
-    public JiraBot(ProjectRepository projectRepository, IssueRepository issueRepository){
+    @Autowired
+    public JiraBot(ProjectRepository projectRepository, IssueRepository issueRepository, ConfigLoader config){
         this.issueRepository = issueRepository;
         this.projectRepository = projectRepository;
+        this.config = config;
     }
 
-    @Override
-    public void onReady(ReadyEvent event) {
+    @OnReady
+    private void ready(ReadyEvent event) {
         bot = event.getJDA();
     }
 
@@ -55,10 +66,16 @@ public class JiraBot extends AdvancedListenerAdapter {
         if(!issue.isPresent()) return;
         String message = event.getMessage().getContentRaw();
         String user = event.getAuthor().getName();
-        JiraInterfacer.sendCommentToIssue(issue.get().getIssueKey(), message, user);
+        JiraInterfacer.sendCommentToIssue(config.getJiraURL(), config.getJiraPAT(), issue.get().getIssueKey(), message, user);
     }
 
-    public void handleJiraWebhook(JSONObject body) throws JSONException {
+    @PostMapping("webhooks/jira")
+    private void jiraWebhook(@RequestBody String body) throws JSONException {
+        JSONObject jsonBody = new JSONObject(body);
+        handleJiraWebhook(jsonBody);
+    }
+
+    private void handleJiraWebhook(JSONObject body) throws JSONException {
         switch (body.getString("webhookEvent")){
             case "project_created":
                 projectCreated(body);
@@ -92,35 +109,33 @@ public class JiraBot extends AdvancedListenerAdapter {
         long projectId = Long.parseLong(body.getJSONObject("issue").getJSONObject("fields").getJSONObject("project").getString("id"));
         Optional<Project> project = projectRepository.findById(projectId);
         if(!project.isPresent()) return;
-        bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
-                EmbedMessageGenerator.jiraIssueCommented(body)
+        bot.getGuildById(config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
+                EmbedMessageGenerator.jiraIssueCommented(body, config)
         ).queue();
         String key = body.getJSONObject("issue").getString("key");
         Optional<Issue> issue = issueRepository.getIssueByKey(key);
         if(issue.isPresent()){
-            bot.getGuildById(App.config.getGuildId()).getThreadChannelById(issue.get().getThreadChannelId()).sendMessageEmbeds(
-                    EmbedMessageGenerator.jiraIssueCommented(body)
+            bot.getGuildById(config.getGuildId()).getThreadChannelById(issue.get().getThreadChannelId()).sendMessageEmbeds(
+                    EmbedMessageGenerator.jiraIssueCommented(body, config)
             ).queue();
         }
     }
 
-    private void issueUpdate(JSONObject body) throws JSONException {
+    private void issueUpdate(JSONObject body) {
         try {
             JiraAPIIssue jiraIssue = new ObjectMapper().readValue(body.toString(), JiraAPIIssue.class);
             if(!jiraIssue.getIssueEventTypeName().equals("issue_generic")) return;
             long projectId = Long.parseLong(jiraIssue.getIssue().getFields().getProject().getId());
             Optional<Project> project = projectRepository.findById(projectId);
             if(!project.isPresent()) return;
-            bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
-                    EmbedMessageGenerator.jiraIssueUpdated(jiraIssue)
+            bot.getGuildById(config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
+                    EmbedMessageGenerator.jiraIssueUpdated(jiraIssue, config)
             ).queue();
             String key = jiraIssue.getIssue().getKey();
             Optional<Issue> issue = issueRepository.getIssueByKey(key);
-            if(issue.isPresent()){
-                bot.getGuildById(App.config.getGuildId()).getThreadChannelById(issue.get().getThreadChannelId()).sendMessageEmbeds(
-                        EmbedMessageGenerator.jiraIssueUpdated(jiraIssue)
-                ).queue();
-            }
+            issue.ifPresent(value -> bot.getGuildById(config.getGuildId()).getThreadChannelById(value.getThreadChannelId()).sendMessageEmbeds(
+                    EmbedMessageGenerator.jiraIssueUpdated(jiraIssue, config)
+            ).queue());
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -130,8 +145,8 @@ public class JiraBot extends AdvancedListenerAdapter {
         long projectId = Long.parseLong(body.getJSONObject("issue").getJSONObject("fields").getJSONObject("project").getString("id"));
         Optional<Project> project = projectRepository.findById(projectId);
         if(!project.isPresent()) return;
-        bot.getGuildById(App.config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
-                EmbedMessageGenerator.jiraIssueCreated(body)
+        bot.getGuildById(config.getGuildId()).getTextChannelById(project.get().getJiraChannelId()).sendMessageEmbeds(
+                EmbedMessageGenerator.jiraIssueCreated(body, config)
         ).queue();
     }
 
@@ -145,12 +160,12 @@ public class JiraBot extends AdvancedListenerAdapter {
         }
         String summary = event.getValue("summary").getAsString();
         String description = event.getValue("description").getAsString();
-        JSONObject result = JiraInterfacer.createBug(projectKey, summary, description, event.getUser().getName(), event.getUser().getId());
+        JSONObject result = JiraInterfacer.createBug(config.getJiraURL(), config.getJiraPAT(), projectKey, summary, description, event.getUser().getName(), event.getUser().getId());
         String key = result.getString("key");
         long id = Long.parseLong(result.getString("id"));
         ForumChannel forumChannel = event.getGuild().getForumChannelById(project.get().getForumChannelId());
         ForumPost post = forumChannel.createForumPost(key, MessageCreateData.fromContent(
-                App.config.getJiraURL() + "browse/" + key + "\n" +
+                config.getJiraURL() + "browse/" + key + "\n" +
                         "Summary: " + summary + "\n" +
                         "Description: " + description + "\n" +
                         "Discord name: " + event.getUser().getName())
@@ -173,8 +188,8 @@ public class JiraBot extends AdvancedListenerAdapter {
         String description = event.getValue("description").getAsString();
         String inputLabels = event.getValue("labels").getAsString();
         String[] labels = inputLabels.split(" ");
-        JSONObject result = JiraInterfacer.createTask(projectKey, summary, description, labels, event.getUser().getName(), event.getUser().getId());
-        event.reply("Issue has been created: " + App.config.getJiraURL() + "browse/" + result.getString("key")).queue();
+        JSONObject result = JiraInterfacer.createTask(config.getJiraURL(), config.getJiraPAT(), projectKey, summary, description, labels, event.getUser().getName(), event.getUser().getId());
+        event.reply("Issue has been created: " + config.getJiraURL() + "browse/" + result.getString("key")).queue();
     }
 
     @SlashResponse(value = "devops", subCommandName = "create_bug")
@@ -215,7 +230,7 @@ public class JiraBot extends AdvancedListenerAdapter {
     @SlashResponse(value = "devops", subCommandName = "add_project")
     private void addProject(SlashCommandInteractionEvent event) throws JSONException {
         String key = event.getOption("key").getAsString();
-        JSONObject jiraProject = JiraInterfacer.getProject(key);
+        JSONObject jiraProject = JiraInterfacer.getProject(config.getJiraURL(), config.getJiraPAT(), key);
         if(jiraProject == null){
             event.reply("No project with that key was found").setEphemeral(true).queue();
             return;
@@ -241,7 +256,7 @@ public class JiraBot extends AdvancedListenerAdapter {
         long projectId = body.getJSONObject("project").getLong("id");
         Optional<Project> project = projectRepository.findById(projectId);
         if(!project.isPresent()) return;
-        Guild guild = bot.getGuildById(App.config.getGuildId());
+        Guild guild = bot.getGuildById(config.getGuildId());
         Category cat = guild.getCategoryById(project.get().getCategoryId());
         if(projectName.equals(project.get().getProjectName()) && projectKey.equals(project.get().getProjectKey())) return;
         cat.getForumChannels().get(0).getManager().setName(projectKey + "-tickets").queue();
@@ -266,7 +281,7 @@ public class JiraBot extends AdvancedListenerAdapter {
     private void projectDeleted(String key) {
         Optional<Project> project = projectRepository.getProjectByKey(key);
         if(!project.isPresent()) return;
-        Guild guild = bot.getGuildById(App.config.getGuildId());
+        Guild guild = bot.getGuildById(config.getGuildId());
         Category cat = guild.getCategoryById(project.get().getCategoryId());
         for(GuildChannel channel: cat.getChannels()){
             channel.delete().queue();
@@ -279,7 +294,7 @@ public class JiraBot extends AdvancedListenerAdapter {
         long projectId = body.getJSONObject("project").getLong("id");
         Optional<Project> project = projectRepository.findById(projectId);
         if(!project.isPresent()) return;
-        Guild guild = bot.getGuildById(App.config.getGuildId());
+        Guild guild = bot.getGuildById(config.getGuildId());
         Category cat = guild.getCategoryById(project.get().getCategoryId());
         for(GuildChannel channel: cat.getChannels()){
             channel.delete().queue();
@@ -289,7 +304,7 @@ public class JiraBot extends AdvancedListenerAdapter {
     }
 
     private void createDiscordProject(Project project){
-        Guild guild = bot.getGuildById(App.config.getGuildId());
+        Guild guild = bot.getGuildById(config.getGuildId());
         Category cat = guild.createCategory(project.getProjectName()).complete();
         cat.createTextChannel(project.getProjectKey() + "-general").queue(textChannel -> textChannel.getManager().setTopic("General channel for project " + project.getProjectName() + ".").queue());
         ForumChannel forumChannel = cat.createForumChannel(project.getProjectKey() + "-tickets").complete();
