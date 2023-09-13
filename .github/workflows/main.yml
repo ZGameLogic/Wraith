@@ -1,0 +1,14 @@
+name: Wraith
+
+on:
+  push:
+    branches: [master]
+  # pull_request:
+  #   branches: [master]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: build project
+        run: mvn install
