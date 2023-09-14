@@ -18,7 +18,9 @@ jobs:
     steps:
       - name: Stop service
         run: net stop Wraith
-      - name: Deploy Jar
+      - name: Remove old jar
+        run: del C:\Users\Ben\Desktop\services\Wraith\Wraith.jar
+      - name: Deploy jar
         run: move /Y C:\Users\Ben\Desktop\actions-runner\_work\Wraith\Wraith\target\Wraith-*.jar C:\Users\Ben\Desktop\services\Wraith\Wraith.jar
       - name: Start service
         run: net start Wraith
