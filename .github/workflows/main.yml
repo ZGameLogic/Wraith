@@ -19,6 +19,6 @@ jobs:
       - name: Stop service
         run: net stop Wraith
       - name: Deploy Jar
-        run: move C:\Users\Ben\Desktop\actions-runner\_work\Wraith\Wraith\target\Wraith-*.jar C:\Users\Ben\Desktop\services\Wraith\Wraith.jar
+        run: move /Y C:\Users\Ben\Desktop\actions-runner\_work\Wraith\Wraith\target\Wraith-*.jar C:\Users\Ben\Desktop\services\Wraith\Wraith.jar
       - name: Start service
         run: net start Wraith
