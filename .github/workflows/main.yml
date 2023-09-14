@@ -3,23 +3,22 @@ name: Wraith
 on:
   push:
     branches: [master]
-  # pull_request:
-  #   branches: [master]
 
 jobs:
-  build:
+  Build:
     runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Get Version
-        uses: ./
-        id: getVersion
       - name: build project
         run: mvn clean install
+  Deploy:
+    runs-on: self-hosted
+    needs: Build
+    steps:
       - name: Stop service
         run: net stop Wraith
       - name: Deploy Jar
-        run: move C:\Users\Ben\Desktop\actions-runner\_work\Wraith\Wraith\target\Wraith-${{ steps.getVersion.outputs.version }}.jar C:\Users\Ben\Desktop\services\Wraith\Wraith.jar
+        run: move C:\Users\Ben\Desktop\actions-runner\_work\Wraith\Wraith\target\Wraith-*.jar C:\Users\Ben\Desktop\services\Wraith\Wraith.jar
       - name: Start service
         run: net start Wraith
