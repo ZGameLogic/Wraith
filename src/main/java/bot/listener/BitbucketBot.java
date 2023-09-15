@@ -2,7 +2,7 @@ package bot.listener;
 
 import application.App;
 import bot.utils.EmbedMessageGenerator;
-import com.zgamelogic.AdvancedListenerAdapter;
+import com.zgamelogic.jda.AdvancedListenerAdapter;
 import data.database.atlassian.jira.projects.BitbucketProject;
 import data.database.atlassian.jira.projects.Project;
 import data.database.atlassian.jira.projects.ProjectRepository;
@@ -24,6 +24,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Optional;
+
+import static com.zgamelogic.jda.Annotations.*;
 
 @Slf4j
 public class BitbucketBot extends AdvancedListenerAdapter {

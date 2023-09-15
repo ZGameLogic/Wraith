@@ -1,6 +1,6 @@
 package bot.listener;
 
-import com.zgamelogic.AdvancedListenerAdapter;
+import com.zgamelogic.jda.AdvancedListenerAdapter;
 import data.database.atlassian.jira.projects.ProjectRepository;
 import org.json.JSONObject;
 

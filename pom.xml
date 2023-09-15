@@ -46,7 +46,7 @@
     <dependency>
       <groupId>com.zgamelogic</groupId>
       <artifactId>Spring-JDA</artifactId>
-      <version>1.1.1</version>
+      <version>1.0.1</version>
     </dependency>
 
     <dependency>
