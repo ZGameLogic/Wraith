@@ -25,10 +25,10 @@ public class ConfigLoader {
     @Value("${database.name}")
     private String databaseName;
 
-    @Value("${keystore.password:}")
+    @Value("${keystore.password}")
     private String keystorePassword;
 
-    @Value("${keystore.location:}")
+    @Value("${keystore.location}")
     private String keystoreLocation;
 
     @Value("${sql.username}")

@@ -1,7 +1,7 @@
 package bot.utils;
 
+import application.App;
 import bot.listener.CurseForgeBot;
-import data.ConfigLoader;
 import data.api.atlassian.jira.JiraAPIIssue;
 import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;
@@ -57,11 +57,11 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed bitbucketPrMerged(JSONObject json, ConfigLoader config) throws JSONException {
+    public static MessageEmbed bitbucketPrMerged(JSONObject json) throws JSONException {
         String projectSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getJSONObject("project").getString("key");
         String repoSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getString("slug");
         long prId = json.getJSONObject("pullRequest").getLong("id");
-        String url = config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/pull-requests/" + prId + "/overview";
+        String url = App.config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/pull-requests/" + prId + "/overview";
         String fromBranchName = json.getJSONObject("pullRequest").getJSONObject("fromRef").getString("displayId");
         String toBranchName = json.getJSONObject("pullRequest").getJSONObject("toRef").getString("displayId");
         String repoName = json.getJSONObject("pullRequest").getJSONObject("toRef").getJSONObject("repository").getString("name");
@@ -79,11 +79,11 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed bitbucketPrCreate(JSONObject json, ConfigLoader config) throws JSONException {
+    public static MessageEmbed bitbucketPrCreate(JSONObject json) throws JSONException {
         String projectSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getJSONObject("project").getString("key");
         String repoSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getString("slug");
         long prId = json.getJSONObject("pullRequest").getLong("id");
-        String url = config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/pull-requests/" + prId + "/overview";
+        String url = App.config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/pull-requests/" + prId + "/overview";
         String fromBranchName = json.getJSONObject("pullRequest").getJSONObject("fromRef").getString("displayId");
         String toBranchName = json.getJSONObject("pullRequest").getJSONObject("toRef").getString("displayId");
         String prTitle = json.getJSONObject("pullRequest").getString("title");
@@ -114,9 +114,9 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed bitbucketPushMade(JSONObject json, JSONObject commit, int index, ConfigLoader config) throws JSONException {
+    public static MessageEmbed bitbucketPushMade(JSONObject json, JSONObject commit, int index) throws JSONException {
         String branch = json.getJSONArray("changes").getJSONObject(index).getJSONObject("ref").getString("displayId");
-        String commitUrl = config.getBitbucketURL() + "projects/" +
+        String commitUrl = App.config.getBitbucketURL() + "projects/" +
                 json.getJSONObject("repository").getJSONObject("project").getString("key") +
                 "/repos/" + json.getJSONObject("repository").getString("slug") + "/commits/" +
                 json.getJSONArray("changes").getJSONObject(index).getString("toHash");
@@ -132,9 +132,9 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed jiraIssueCommented(JSONObject json, ConfigLoader config) throws JSONException {
+    public static MessageEmbed jiraIssueCommented(JSONObject json) throws JSONException {
         String key = json.getJSONObject("issue").getString("key");
-        String issueUrl = config.getJiraURL() + "browse/" + key;
+        String issueUrl = App.config.getJiraURL() + "browse/" + key;
         String message = json.getJSONObject("comment").getString("body");
         String author = json.getJSONObject("comment").getJSONObject("author").getString("name");
         EmbedBuilder eb = new EmbedBuilder();
@@ -147,10 +147,10 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed jiraIssueCreated(JSONObject json, ConfigLoader config) throws JSONException {
+    public static MessageEmbed jiraIssueCreated(JSONObject json) throws JSONException {
         String summary = json.getJSONObject("issue").getJSONObject("fields").getString("summary");
         String key = json.getJSONObject("issue").getString("key");
-        String issueUrl = config.getJiraURL() + "browse/" + key;
+        String issueUrl = App.config.getJiraURL() + "browse/" + key;
         String desc = json.getJSONObject("issue").getJSONObject("fields").getString("description");
         String createdBy = json.getJSONObject("user").getString("name");
         EmbedBuilder eb = new EmbedBuilder();
@@ -163,10 +163,10 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed jiraIssueUpdated(JiraAPIIssue issue, ConfigLoader config) {
+    public static MessageEmbed jiraIssueUpdated(JiraAPIIssue issue) {
         String key = issue.getIssue().getKey();
         String summary = issue.getIssue().getFields().getSummary();
-        String issueUrl = config.getJiraURL() + "browse/" + key;
+        String issueUrl = App.config.getJiraURL() + "browse/" + key;
         String from = "";
         String to = "";
         for(JiraAPIIssue.Changelog.Item item: issue.getChangelog().getItems()){
