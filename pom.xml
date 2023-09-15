@@ -7,8 +7,8 @@
   <name>Archetype - Wraith</name>
 
   <properties>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>20</maven.compiler.source>
+    <maven.compiler.target>20</maven.compiler.target>
   </properties>
 
   <repositories>
@@ -36,35 +36,27 @@
     </repository>
   </repositories>
 
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.1.2</version>
+  </parent>
+
   <dependencies>
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.9</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.zgamelogic</groupId>
-      <artifactId>Advanced-Listener-Adapter</artifactId>
-      <version>1.4.0</version>
+      <artifactId>Spring-JDA</artifactId>
+      <version>1.1.1</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-autoconfigure</artifactId>
-      <version>2.3.2.RELEASE</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-      <version>2.4.4</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
-      <version>2.4.4</version>
     </dependency>
 
     <dependency>
@@ -98,28 +90,19 @@
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>2.14.0</version>
-    </dependency>
-
-    <dependency>
       <groupId>com.microsoft.sqlserver</groupId>
       <artifactId>mssql-jdbc</artifactId>
       <version>11.2.1.jre8</version>
-      <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
-      <version>2.4.4</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-jdbc</artifactId>
-      <version>2.4.4</version>
     </dependency>
   </dependencies>
 
@@ -128,7 +111,7 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>2.7.14</version>
+        <version>3.1.2</version>
         <executions>
           <execution>
             <goals>
@@ -139,5 +122,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

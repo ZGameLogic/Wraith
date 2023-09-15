@@ -1,10 +1,11 @@
 package data.database.atlassian.jira.projects;
 
+import jakarta.persistence.Entity;
 import lombok.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
