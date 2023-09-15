@@ -2,7 +2,7 @@ package bot.listener;
 
 import application.App;
 import bot.utils.EmbedMessageGenerator;
-import com.zgamelogic.AdvancedListenerAdapter;
+import com.zgamelogic.jda.AdvancedListenerAdapter;
 import data.database.curseforge.CurseforgeRecord;
 import data.database.curseforge.CurseforgeRepository;
 import lombok.Getter;
@@ -35,6 +35,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.zgamelogic.jda.Annotations.*;
 
 @Slf4j
 public class CurseForgeBot extends AdvancedListenerAdapter {

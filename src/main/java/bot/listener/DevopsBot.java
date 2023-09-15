@@ -1,7 +1,7 @@
 package bot.listener;
 
 import application.App;
-import com.zgamelogic.AdvancedListenerAdapter;
+import com.zgamelogic.jda.AdvancedListenerAdapter;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

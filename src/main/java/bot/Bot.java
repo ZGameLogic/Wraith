@@ -6,6 +6,7 @@ import data.ConfigLoader;
 import data.database.atlassian.jira.issues.IssueRepository;
 import data.database.atlassian.jira.projects.ProjectRepository;
 import data.database.curseforge.CurseforgeRepository;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -19,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 
 @Slf4j
 @RestController

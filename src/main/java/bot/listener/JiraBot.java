@@ -4,7 +4,7 @@ import application.App;
 import bot.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zgamelogic.AdvancedListenerAdapter;
+import com.zgamelogic.jda.AdvancedListenerAdapter;
 import data.api.atlassian.jira.JiraAPIIssue;
 import data.database.atlassian.jira.issues.Issue;
 import data.database.atlassian.jira.issues.IssueRepository;
@@ -30,6 +30,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.json.JSONException;
 import org.json.JSONObject;
 import java.util.Optional;
+
+import static com.zgamelogic.jda.Annotations.*;
 
 @Slf4j
 public class JiraBot extends AdvancedListenerAdapter {
