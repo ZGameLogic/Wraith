@@ -2,15 +2,19 @@ package bot.listener;
 
 import application.App;
 import com.zgamelogic.jda.AdvancedListenerAdapter;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.zgamelogic.jda.Annotations.*;
 
+@Slf4j
 @RestController
 public class DevopsBot extends AdvancedListenerAdapter {
     @OnReady
@@ -37,4 +41,8 @@ public class DevopsBot extends AdvancedListenerAdapter {
         return "Healthy";
     }
 
+    @PostMapping("github")
+    private void github(@RequestBody String body){
+        log.info(body);
+    }
 }
