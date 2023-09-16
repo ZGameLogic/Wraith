@@ -22,17 +22,23 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
 import static com.zgamelogic.jda.Annotations.*;
 
 @Slf4j
+@RestController
 public class BitbucketBot extends AdvancedListenerAdapter {
 
     private JDA bot;
     private final ProjectRepository projectRepository;
 
+    @Autowired
     public BitbucketBot(ProjectRepository projectRepository) {
         this.projectRepository = projectRepository;
     }
@@ -135,6 +141,12 @@ public class BitbucketBot extends AdvancedListenerAdapter {
                 event.getMessage().getComponents().get(0).asDisabled()
         ).queue();
         event.getHook().sendMessage("Created a pull request and merged into master").queue();
+    }
+
+    @PostMapping("webhooks/bitbucket")
+    private void bitbucketWebhook(@RequestBody String body) throws JSONException {
+        JSONObject jsonBody = new JSONObject(body);
+        if(jsonBody.has("eventKey")) handleBitbucketWebhook(jsonBody);
     }
 
     public void handleBitbucketWebhook(JSONObject body) throws JSONException {

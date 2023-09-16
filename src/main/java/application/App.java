@@ -1,8 +1,10 @@
 package application;
 
+import com.zgamelogic.boot.JDASpringApplication;
 import data.ConfigLoader;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.SpringApplication;
+import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -21,7 +23,6 @@ public class App {
     public static ConfigLoader config;
 
     public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(App.class);
 
         // Load config
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
@@ -29,6 +30,12 @@ public class App {
         context.refresh();
         config = context.getBean(ConfigLoader.class);
         context.close();
+
+        JDABuilder bot = JDABuilder.createDefault(config.getBotToken());
+        bot.enableIntents(GatewayIntent.MESSAGE_CONTENT);
+        bot.setEventPassthrough(true);
+
+        JDASpringApplication app = new JDASpringApplication(bot, App.class);
 
         Properties props = new Properties();
         props.setProperty("server.port", config.getWebHookPort() + "");
