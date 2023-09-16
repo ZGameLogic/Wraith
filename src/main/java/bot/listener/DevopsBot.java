@@ -6,10 +6,15 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import static com.zgamelogic.jda.Annotations.*;
+
+@RestController
 public class DevopsBot extends AdvancedListenerAdapter {
-    @Override
-    public void onReady(ReadyEvent event) {
+    @OnReady
+    public void ready(ReadyEvent event) {
         Guild guild = event.getJDA().getGuildById(App.config.getGuildId());
         guild.upsertCommand("devops", "All commands having to do with devops")
                 .addSubcommands(
@@ -26,4 +31,10 @@ public class DevopsBot extends AdvancedListenerAdapter {
                 )
                 .queue();
     }
+
+    @GetMapping("health")
+    private String healthCheck(){
+        return "Healthy";
+    }
+
 }

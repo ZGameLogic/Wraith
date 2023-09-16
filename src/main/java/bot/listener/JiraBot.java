@@ -29,24 +29,31 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.Optional;
 
 import static com.zgamelogic.jda.Annotations.*;
 
 @Slf4j
+@RestController
 public class JiraBot extends AdvancedListenerAdapter {
 
     private JDA bot;
     private final ProjectRepository projectRepository;
     private final IssueRepository issueRepository;
 
+    @Autowired
     public JiraBot(ProjectRepository projectRepository, IssueRepository issueRepository){
         this.issueRepository = issueRepository;
         this.projectRepository = projectRepository;
     }
 
-    @Override
-    public void onReady(ReadyEvent event) {
+    @OnReady
+    public void ready(ReadyEvent event) {
         bot = event.getJDA();
     }
 
@@ -300,5 +307,11 @@ public class JiraBot extends AdvancedListenerAdapter {
         project.setCategoryId(cat.getIdLong());
         project.setForumChannelId(forumChannel.getIdLong());
         project.setJiraChannelId(jira.getIdLong());
+    }
+
+    @PostMapping("webhooks/jira")
+    private void jiraWebhook(@RequestBody String body) throws JSONException {
+        JSONObject jsonBody = new JSONObject(body);
+        handleJiraWebhook(jsonBody);
     }
 }
