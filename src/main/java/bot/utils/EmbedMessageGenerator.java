@@ -1,15 +1,11 @@
 package bot.utils;
 
-import application.App;
 import bot.listener.CurseForgeBot;
-import data.api.atlassian.jira.JiraAPIIssue;
 import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.utils.TimeFormat;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.awt.*;
 import java.time.Instant;
@@ -53,133 +49,6 @@ public abstract class EmbedMessageGenerator {
 
         eb.setColor(good ? DATA_DOG_OK_COLOR : DATA_DOG_ALERT_COLOR);
         eb.setDescription(desc.toString());
-        eb.setTimestamp(Instant.now());
-        return eb.build();
-    }
-
-    public static MessageEmbed bitbucketPrMerged(JSONObject json) throws JSONException {
-        String projectSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getJSONObject("project").getString("key");
-        String repoSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getString("slug");
-        long prId = json.getJSONObject("pullRequest").getLong("id");
-        String url = App.config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/pull-requests/" + prId + "/overview";
-        String fromBranchName = json.getJSONObject("pullRequest").getJSONObject("fromRef").getString("displayId");
-        String toBranchName = json.getJSONObject("pullRequest").getJSONObject("toRef").getString("displayId");
-        String repoName = json.getJSONObject("pullRequest").getJSONObject("toRef").getJSONObject("repository").getString("name");
-        String prTitle = json.getJSONObject("pullRequest").getString("title");
-        String author = json.getJSONObject("pullRequest").getJSONObject("author").getJSONObject("user").getString("name");
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(ATLASSIAN_COLOR);
-        eb.setTitle("Pull request merged: " + fromBranchName + " -> " + toBranchName, url);
-        eb.setDescription(
-                "**" + prTitle + "**\n" +
-                        "Author: " + author
-        );
-        eb.setFooter(repoName);
-        eb.setTimestamp(Instant.now());
-        return eb.build();
-    }
-
-    public static MessageEmbed bitbucketPrCreate(JSONObject json) throws JSONException {
-        String projectSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getJSONObject("project").getString("key");
-        String repoSlug = json.getJSONObject("pullRequest").getJSONObject("fromRef").getJSONObject("repository").getString("slug");
-        long prId = json.getJSONObject("pullRequest").getLong("id");
-        String url = App.config.getBitbucketURL() + "projects/" + projectSlug + "/repos/" + repoSlug + "/pull-requests/" + prId + "/overview";
-        String fromBranchName = json.getJSONObject("pullRequest").getJSONObject("fromRef").getString("displayId");
-        String toBranchName = json.getJSONObject("pullRequest").getJSONObject("toRef").getString("displayId");
-        String prTitle = json.getJSONObject("pullRequest").getString("title");
-        String repoName = json.getJSONObject("pullRequest").getJSONObject("toRef").getJSONObject("repository").getString("name");
-        String author = json.getJSONObject("pullRequest").getJSONObject("author").getJSONObject("user").getString("name");
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(ATLASSIAN_COLOR);
-        eb.setTitle("Pull request created: " + fromBranchName + " -> " + toBranchName, url);
-        eb.setDescription(
-                "**" + prTitle + "**\n" +
-                "Author: " + author
-        );
-        eb.setTimestamp(Instant.now());
-        eb.setFooter(repoName);
-        return eb.build();
-    }
-
-    public static MessageEmbed bitbucketBranchCreated(JSONObject json, int index) throws JSONException {
-        String branchName = json.getJSONArray("changes").getJSONObject(index).getJSONObject("ref").getString("displayId");
-        String creator = json.getJSONObject("actor").getString("name");
-        String repoName = json.getJSONObject("repository").getString("name");
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(ATLASSIAN_COLOR);
-        eb.setTitle("Branch created: " + branchName);
-        eb.setDescription("Created by: " + creator);
-        eb.setTimestamp(Instant.now());
-        eb.setFooter(repoName);
-        return eb.build();
-    }
-
-    public static MessageEmbed bitbucketPushMade(JSONObject json, JSONObject commit, int index) throws JSONException {
-        String branch = json.getJSONArray("changes").getJSONObject(index).getJSONObject("ref").getString("displayId");
-        String commitUrl = App.config.getBitbucketURL() + "projects/" +
-                json.getJSONObject("repository").getJSONObject("project").getString("key") +
-                "/repos/" + json.getJSONObject("repository").getString("slug") + "/commits/" +
-                json.getJSONArray("changes").getJSONObject(index).getString("toHash");
-        String message = commit.getString("message");
-        String author = json.getJSONObject("actor").getString("name");
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(ATLASSIAN_COLOR);
-        eb.setTitle("Push was made to branch: " + branch, commitUrl);
-        eb.setDescription(message + "\n" + author);
-        String repoName = json.getJSONObject("repository").getString("name");
-        eb.setFooter(repoName);
-        eb.setTimestamp(Instant.now());
-        return eb.build();
-    }
-
-    public static MessageEmbed jiraIssueCommented(JSONObject json) throws JSONException {
-        String key = json.getJSONObject("issue").getString("key");
-        String issueUrl = App.config.getJiraURL() + "browse/" + key;
-        String message = json.getJSONObject("comment").getString("body");
-        String author = json.getJSONObject("comment").getJSONObject("author").getString("name");
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(ATLASSIAN_COLOR);
-        eb.setTitle("Issue commented on: " + key, issueUrl);
-        eb.setDescription(
-                message  + "\nBy user: " + author
-        );
-        eb.setTimestamp(Instant.now());
-        return eb.build();
-    }
-
-    public static MessageEmbed jiraIssueCreated(JSONObject json) throws JSONException {
-        String summary = json.getJSONObject("issue").getJSONObject("fields").getString("summary");
-        String key = json.getJSONObject("issue").getString("key");
-        String issueUrl = App.config.getJiraURL() + "browse/" + key;
-        String desc = json.getJSONObject("issue").getJSONObject("fields").getString("description");
-        String createdBy = json.getJSONObject("user").getString("name");
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(ATLASSIAN_COLOR);
-        eb.setTitle("Issue created: " + key, issueUrl);
-        eb.setDescription(
-                "**" + summary + "**\nDescription: " + desc + "\nCreated by: " + createdBy
-        );
-        eb.setTimestamp(Instant.now());
-        return eb.build();
-    }
-
-    public static MessageEmbed jiraIssueUpdated(JiraAPIIssue issue) {
-        String key = issue.getIssue().getKey();
-        String summary = issue.getIssue().getFields().getSummary();
-        String issueUrl = App.config.getJiraURL() + "browse/" + key;
-        String from = "";
-        String to = "";
-        for(JiraAPIIssue.Changelog.Item item: issue.getChangelog().getItems()){
-            if(!item.getField().equals("status")) continue;
-            from = item.getFromString();
-            to = item.getToString();
-        }
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(ATLASSIAN_COLOR);
-        eb.setTitle("Issue updated: " + key, issueUrl);
-        eb.setDescription(
-                "**" + summary + "**\nIssue was moved from **" + from + "** to **" + to + "**."
-        );
         eb.setTimestamp(Instant.now());
         return eb.build();
     }

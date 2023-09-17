@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
@@ -51,28 +50,21 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
     @Autowired
     public CurseForgeBot(CurseforgeRepository checks) {
         this.checks = checks;
+        getCommands().add(Commands.slash("curseforge", "Slash command for curseforge related things")
+                .addSubcommands(
+                        new SubcommandData("listen", "Listens to a project")
+                                .addOption(OptionType.STRING, "project", "Project to watch", true)
+                                .addOption(OptionType.BOOLEAN, "mention", "Get mentioned when this updates", false),
+                        new SubcommandData("forget", "Stops listening to a project")
+                                .addOption(OptionType.STRING, "project", "Project to watch", true),
+                        new SubcommandData("list", "Lists all the projects currently followed in this channel"),
+                        new SubcommandData("updated", "Shows when the project was last updated")
+                                .addOption(OptionType.STRING, "project", "Project to check", true, true)
+                ));
     }
 
     @OnReady
     public void ready(ReadyEvent event) {
-        bot = event.getJDA();
-        new Thread(() -> {
-            for(Guild guild: bot.getGuilds()) {
-                guild.upsertCommand(Commands.slash("curseforge", "Slash command for curseforge related things")
-                        .addSubcommands(
-                                new SubcommandData("listen", "Listens to a project")
-                                        .addOption(OptionType.STRING, "project", "Project to watch", true)
-                                        .addOption(OptionType.BOOLEAN, "mention", "Get mentioned when this updates", false),
-                                new SubcommandData("forget", "Stops listening to a project")
-                                        .addOption(OptionType.STRING, "project", "Project to watch", true),
-                                new SubcommandData("list", "Lists all the projects currently followed in this channel"),
-                                new SubcommandData("updated", "Shows when the project was last updated")
-                                        .addOption(OptionType.STRING, "project", "Project to check", true, true)
-                        )
-                ).queue();
-                log.info("Adding curseforge command to " + guild.getName());
-            }
-        }, "Upsert command thread").start();
         update();
     }
 
