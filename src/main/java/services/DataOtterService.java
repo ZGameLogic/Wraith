@@ -1,4 +1,4 @@
-package interfaces.monitor;
+package services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import data.api.monitor.Monitor;
@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import java.net.URI;
 import java.util.LinkedList;
 
-public abstract class MonitorsInterfacer {
+public abstract class DataOtterService {
 
     public static LinkedList<Monitor> getMonitorStatus(){
         LinkedList<Monitor> monitors = new LinkedList<>();

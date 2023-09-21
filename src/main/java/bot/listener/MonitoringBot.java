@@ -5,7 +5,7 @@ import bot.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgamelogic.jda.AdvancedListenerAdapter;
 import data.serializable.MonitoringConfig;
-import interfaces.monitor.MonitorsInterfacer;
+import services.DataOtterService;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -42,9 +42,9 @@ public class MonitoringBot extends AdvancedListenerAdapter {
             try {
                 MonitoringConfig config = om.readValue(monitorConfigFile, MonitoringConfig.class);
                 String messageId = config.getMessageId();
-                message = channel.editMessageEmbedsById(messageId, EmbedMessageGenerator.monitorStatus(MonitorsInterfacer.getMonitorStatus())).complete();
+                message = channel.editMessageEmbedsById(messageId, EmbedMessageGenerator.monitorStatus(DataOtterService.getMonitorStatus())).complete();
             } catch (IOException ignored) {
-                message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(MonitorsInterfacer.getMonitorStatus())).complete();
+                message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(DataOtterService.getMonitorStatus())).complete();
                 try {
                     monitorConfigFile.getParentFile().mkdirs();
                     om.writeValue(monitorConfigFile, new MonitoringConfig(message.getId()));
@@ -53,7 +53,7 @@ public class MonitoringBot extends AdvancedListenerAdapter {
                 }
             }
         } else {
-            message = channel.editMessageEmbedsById(message.getId(), EmbedMessageGenerator.monitorStatus(MonitorsInterfacer.getMonitorStatus())).complete();
+            message = channel.editMessageEmbedsById(message.getId(), EmbedMessageGenerator.monitorStatus(DataOtterService.getMonitorStatus())).complete();
         }
     }
 }
