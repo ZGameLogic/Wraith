@@ -1,4 +1,5 @@
 /target/classes/*
+/target/maven-status/*
 .idea/*
 wraith.properties
 /data/*
