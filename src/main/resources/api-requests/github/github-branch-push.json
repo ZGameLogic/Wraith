@@ -1,73 +1,7 @@
 {
-  "action": "completed",
-  "workflow_job": {
-    "id": 16986489808,
-    "run_id": 6256118674,
-    "workflow_name": "Wraith",
-    "head_branch": "master",
-    "run_url": "https://api.github.com/repos/ZGameLogic/Wraith/actions/runs/6256118674",
-    "run_attempt": 1,
-    "node_id": "CR_kwDOKTRRr88AAAAD9HlD0A",
-    "head_sha": "3088794711596bea2357e6bc86953db935259c86",
-    "url": "https://api.github.com/repos/ZGameLogic/Wraith/actions/jobs/16986489808",
-    "html_url": "https://github.com/ZGameLogic/Wraith/actions/runs/6256118674/job/16986489808",
-    "status": "completed",
-    "conclusion": "success",
-    "created_at": "2023-09-21T01:41:15Z",
-    "started_at": "2023-09-21T01:41:18Z",
-    "completed_at": "2023-09-21T01:41:30Z",
-    "name": "Build",
-    "steps": [
-      {
-        "name": "Set up job",
-        "status": "completed",
-        "conclusion": "success",
-        "number": 1,
-        "started_at": "2023-09-21T01:41:19.000Z",
-        "completed_at": "2023-09-21T01:41:21.000Z"
-      },
-      {
-        "name": "Checkout",
-        "status": "completed",
-        "conclusion": "success",
-        "number": 2,
-        "started_at": "2023-09-21T01:41:21.000Z",
-        "completed_at": "2023-09-21T01:41:23.000Z"
-      },
-      {
-        "name": "build project",
-        "status": "completed",
-        "conclusion": "success",
-        "number": 3,
-        "started_at": "2023-09-21T01:41:22.000Z",
-        "completed_at": "2023-09-21T01:41:28.000Z"
-      },
-      {
-        "name": "Post Checkout",
-        "status": "completed",
-        "conclusion": "success",
-        "number": 6,
-        "started_at": "2023-09-21T01:41:27.000Z",
-        "completed_at": "2023-09-21T01:41:29.000Z"
-      },
-      {
-        "name": "Complete job",
-        "status": "completed",
-        "conclusion": "success",
-        "number": 7,
-        "started_at": "2023-09-21T01:41:29.000Z",
-        "completed_at": "2023-09-21T01:41:29.000Z"
-      }
-    ],
-    "check_run_url": "https://api.github.com/repos/ZGameLogic/Wraith/check-runs/16986489808",
-    "labels": [
-      "self-hosted"
-    ],
-    "runner_id": 22,
-    "runner_name": "ZGameLogic Runner",
-    "runner_group_id": 1,
-    "runner_group_name": "Default"
-  },
+  "ref": "refs/heads/development",
+  "before": "1392885636a31e97cb6be4f694a239866ebf8ccf",
+  "after": "4ecec3985b8defe93fa86914c3a0feb6e469e14c",
   "repository": {
     "id": 691294639,
     "node_id": "R_kgDOKTRRrw",
@@ -75,6 +9,8 @@
     "full_name": "ZGameLogic/Wraith",
     "private": false,
     "owner": {
+      "name": "ZGameLogic",
+      "email": null,
       "login": "ZGameLogic",
       "id": 144963060,
       "node_id": "O_kgDOCKP19A",
@@ -97,7 +33,7 @@
     "html_url": "https://github.com/ZGameLogic/Wraith",
     "description": null,
     "fork": false,
-    "url": "https://api.github.com/repos/ZGameLogic/Wraith",
+    "url": "https://github.com/ZGameLogic/Wraith",
     "forks_url": "https://api.github.com/repos/ZGameLogic/Wraith/forks",
     "keys_url": "https://api.github.com/repos/ZGameLogic/Wraith/keys{/key_id}",
     "collaborators_url": "https://api.github.com/repos/ZGameLogic/Wraith/collaborators{/collaborator}",
@@ -134,15 +70,15 @@
     "labels_url": "https://api.github.com/repos/ZGameLogic/Wraith/labels{/name}",
     "releases_url": "https://api.github.com/repos/ZGameLogic/Wraith/releases{/id}",
     "deployments_url": "https://api.github.com/repos/ZGameLogic/Wraith/deployments",
-    "created_at": "2023-09-13T22:23:38Z",
+    "created_at": 1694643818,
     "updated_at": "2023-09-14T01:22:29Z",
-    "pushed_at": "2023-09-21T01:41:11Z",
+    "pushed_at": 1696649197,
     "git_url": "git://github.com/ZGameLogic/Wraith.git",
     "ssh_url": "git@github.com:ZGameLogic/Wraith.git",
     "clone_url": "https://github.com/ZGameLogic/Wraith.git",
     "svn_url": "https://github.com/ZGameLogic/Wraith",
     "homepage": "",
-    "size": 153,
+    "size": 165,
     "stargazers_count": 0,
     "watchers_count": 0,
     "language": "Java",
@@ -168,7 +104,14 @@
     "forks": 0,
     "open_issues": 0,
     "watchers": 0,
-    "default_branch": "master"
+    "default_branch": "master",
+    "stargazers": 0,
+    "master_branch": "master",
+    "organization": "ZGameLogic"
+  },
+  "pusher": {
+    "name": "zabory",
+    "email": "benshabowski@gmail.com"
   },
   "organization": {
     "login": "ZGameLogic",
@@ -203,5 +146,68 @@
     "received_events_url": "https://api.github.com/users/zabory/received_events",
     "type": "User",
     "site_admin": false
+  },
+  "created": false,
+  "deleted": false,
+  "forced": false,
+  "base_ref": null,
+  "compare": "https://github.com/ZGameLogic/Wraith/compare/1392885636a3...4ecec3985b8d",
+  "commits": [
+    {
+      "id": "4ecec3985b8defe93fa86914c3a0feb6e469e14c",
+      "tree_id": "37f39224a948adfc4a3befce4550c7732d05ca0d",
+      "distinct": true,
+      "message": "Setting up more of DevopsBot",
+      "timestamp": "2023-10-06T22:26:33-05:00",
+      "url": "https://github.com/ZGameLogic/Wraith/commit/4ecec3985b8defe93fa86914c3a0feb6e469e14c",
+      "author": {
+        "name": "Ben Shabowski",
+        "email": "benshabowski@gmail.com",
+        "username": "zabory"
+      },
+      "committer": {
+        "name": "Ben Shabowski",
+        "email": "benshabowski@gmail.com",
+        "username": "zabory"
+      },
+      "added": [
+
+      ],
+      "removed": [
+
+      ],
+      "modified": [
+        "src/main/java/bot/listener/DevopsBot.java",
+        "src/main/java/data/database/github/GitRepo.java"
+      ]
+    }
+  ],
+  "head_commit": {
+    "id": "4ecec3985b8defe93fa86914c3a0feb6e469e14c",
+    "tree_id": "37f39224a948adfc4a3befce4550c7732d05ca0d",
+    "distinct": true,
+    "message": "Setting up more of DevopsBot",
+    "timestamp": "2023-10-06T22:26:33-05:00",
+    "url": "https://github.com/ZGameLogic/Wraith/commit/4ecec3985b8defe93fa86914c3a0feb6e469e14c",
+    "author": {
+      "name": "Ben Shabowski",
+      "email": "benshabowski@gmail.com",
+      "username": "zabory"
+    },
+    "committer": {
+      "name": "Ben Shabowski",
+      "email": "benshabowski@gmail.com",
+      "username": "zabory"
+    },
+    "added": [
+
+    ],
+    "removed": [
+
+    ],
+    "modified": [
+      "src/main/java/bot/listener/DevopsBot.java",
+      "src/main/java/data/database/github/GitRepo.java"
+    ]
   }
 }
