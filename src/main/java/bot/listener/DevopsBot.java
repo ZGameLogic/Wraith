@@ -1,7 +1,10 @@
 package bot.listener;
 
 import application.App;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgamelogic.jda.AdvancedListenerAdapter;
+import data.api.github.Repository;
 import data.database.github.GitRepo;
 import data.database.github.GithubRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -29,8 +32,9 @@ import static com.zgamelogic.jda.Annotations.*;
 @RestController
 public class DevopsBot extends AdvancedListenerAdapter {
 
-    private final GithubRepository githubRepositories;
+    private final GithubRepository gitHubRepositories;
     private final static File DATA_DIR = new File("jsons");
+    private final ObjectMapper mapper;
     private Guild glacies;
 
     @OnReady
@@ -39,8 +43,9 @@ public class DevopsBot extends AdvancedListenerAdapter {
     }
 
     @Autowired
-    public DevopsBot(GithubRepository githubRepositories){
-        this.githubRepositories = githubRepositories;
+    public DevopsBot(GithubRepository gitHubRepositories){
+        mapper = new ObjectMapper();
+        this.gitHubRepositories = gitHubRepositories;
         if(!DATA_DIR.exists()) {
             DATA_DIR.mkdirs();
         }
@@ -52,21 +57,29 @@ public class DevopsBot extends AdvancedListenerAdapter {
     }
 
     @PostMapping("github")
-    private void github(
-            @RequestHeader(name = "X-GitHub-Event") String githubEvent,
+    private void gitHub(
+            @RequestHeader(name = "X-GitHub-Event") String gitHubEvent,
             @RequestBody String body
     ) {
         for(Method method: getClass().getDeclaredMethods()){
             if(method.isAnnotationPresent(GithubEvent.class)){
                 GithubEvent annotation = method.getAnnotation(GithubEvent.class);
                 try {
-                    if(!annotation.value().equals(githubEvent)) continue;
+                    // check if this is the right event
+                    if(!annotation.value().equals(gitHubEvent)) continue;
+                    // check again if this is the right more specific event
                     if (!annotation.action().isEmpty() && !annotation.action().equals(
                             new JSONObject(body).getString("action")
                     )) continue;
+                    //
+                    if(method.isAnnotationPresent(CreateDiscordRepo.class)){
+                        JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
+                        Repository repo = mapper.readValue(jsonRepo.toString(), Repository.class);
+                        if(!gitHubRepositories.existsById(repo.getId())) createDiscordRepository(repo);
+                    }
                     method.invoke(this, body);
-                } catch (IllegalAccessException | InvocationTargetException | JSONException e) {
-                    log.error("Unable to run github method", e);
+                } catch (IllegalAccessException | InvocationTargetException | JSONException | JsonProcessingException e) {
+                    log.error("Unable to run gitHub method", e);
                 }
 
             }
@@ -74,43 +87,55 @@ public class DevopsBot extends AdvancedListenerAdapter {
     }
 
     @GithubEvent("push")
-    private void githubPush(String body){}
+    private void gitHubPush(String body){}
 
+    @CreateDiscordRepo
     @GithubEvent(value = "repository", action = "created")
-    private void githubRepositoryCreated(String body){}
+    private void gitHubRepositoryCreated(String body){}
 
     @GithubEvent(value = "repository", action = "deleted")
-    private void githubRepositoryDeleted(String body){}
+    private void gitHubRepositoryDeleted(String body){
+        deleteDiscordRepository(
+                new JSONObject(body).getJSONObject("repository").getLong("id")
+        );
+    }
 
     @GithubEvent(value = "workflow_job", action = "queued")
-    private void githubWorkflowQueued(String body){}
+    private void gitHubWorkflowQueued(String body){}
 
     @GithubEvent(value = "workflow_job", action = "completed")
-    private void githubWorkflowCompleted(String body){}
+    private void gitHubWorkflowCompleted(String body){}
 
     @GithubEvent(value = "workflow_job", action = "in_progress")
-    private void githubWorkflowInProgress(String body){}
+    private void gitHubWorkflowInProgress(String body){}
 
     @GithubEvent(value = "pull_request", action = "opened")
-    private void githubPullRequestOpened(String body){}
+    private void gitHubPullRequestOpened(String body){}
 
     @GithubEvent(value = "pull_request", action = "ready_for_review")
-    private void githubPullRequestReadyForReview(String body){}
+    private void gitHubPullRequestReadyForReview(String body){}
 
     @GithubEvent(value = "pull_request", action = "closed")
-    private void githubPullRequestClosed(String body){}
+    private void gitHubPullRequestClosed(String body){}
 
-    private void createDiscordRepository(long id, String repoUrl, String repoName){
+    /**
+     * Update the glacies discord server by creating new channels for the git repository
+     * @param repository GitHub repository to be updated
+     */
+    private void createDiscordRepository(Repository repository){
+        long id = repository.getId();
+        String repoName = repository.getName();
+        String repoUrl = repository.getHtml_url();
         repoName = repoName.replaceAll("-", " ");
-        GitRepo repo = new GitRepo(id, repoUrl, repoName);
+        GitRepo repo = new GitRepo(id, repoName, repoUrl);
         // cat
         Category cat = glacies.createCategory(repoName).complete();
         // general
         TextChannel general = cat.createTextChannel(repoName + " general").complete();
         general.getManager().setTopic("General channel for repository: " + repoName + ".").queue();
         // pull request
-        TextChannel prChannel = cat.createTextChannel(repoName + " general").complete();
-        prChannel.getManager().setTopic("General channel for repository: " + repoName + ".").queue();
+        TextChannel prChannel = cat.createTextChannel(repoName + " pull-requests").complete();
+        prChannel.getManager().setTopic("Pull request channel for repository: " + repoName + ".").queue();
         // forum
         ForumChannel forumChannel = cat.createForumChannel(repoName + "-issues").complete();
 
@@ -119,7 +144,21 @@ public class DevopsBot extends AdvancedListenerAdapter {
         repo.setPullRequestId(prChannel.getIdLong());
         repo.setForumChannelId(forumChannel.getIdLong());
 
-        githubRepositories.save(repo);
+        gitHubRepositories.save(repo);
+    }
+
+    /**
+     * Update the glacies discord server by deleting channels for a git repository
+     * @param id unique identifier of the GitHub repository
+     */
+    private void deleteDiscordRepository(long id){
+        gitHubRepositories.findById(id).ifPresent(repo -> {
+            glacies.getTextChannelById(repo.getPullRequestId()).delete().queue();
+            glacies.getTextChannelById(repo.getGeneralId()).delete().queue();
+            glacies.getForumChannelById(repo.getForumChannelId()).delete().queue();
+            glacies.getCategoryById(repo.getCategoryId()).delete().queue();
+            gitHubRepositories.delete(repo);
+        });
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -128,4 +167,8 @@ public class DevopsBot extends AdvancedListenerAdapter {
         String value();
         String action() default "";
     }
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.METHOD)
+    private @interface CreateDiscordRepo {}
 }

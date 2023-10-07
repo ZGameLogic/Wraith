@@ -23,7 +23,7 @@ public class GitRepo {
     private String repoUrl;
     private String repoName;
 
-    public GitRepo(Long id, String url, String name){
+    public GitRepo(Long id, String name, String url){
         this.id = id;
         repoUrl = url;
         repoName = name;
