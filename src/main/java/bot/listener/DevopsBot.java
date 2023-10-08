@@ -118,6 +118,21 @@ public class DevopsBot extends AdvancedListenerAdapter {
     @GithubEvent(value = "pull_request", action = "closed")
     private void gitHubPullRequestClosed(String body){}
 
+    @GithubEvent(value = "issues", action = "opened")
+    private void gitHubIssueOpened(String body){}
+
+    @GithubEvent(value = "issues", action = "labeled")
+    private void gitHubIssueLabeled(String body){}
+
+    @GithubEvent(value = "issues", action = "assigned")
+    private void gitHubIssueAssigned(String body){}
+
+    @GithubEvent(value = "issues", action = "closed")
+    private void gitHubIssueClosed(String body){}
+
+    @GithubEvent(value = "issue_comment", action = "created")
+    private void gitHubIssueCommentCreated(String body){}
+
     /**
      * Update the glacies discord server by creating new channels for the git repository
      * @param repository GitHub repository to be updated
