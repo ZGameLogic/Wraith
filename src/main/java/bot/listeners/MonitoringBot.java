@@ -1,4 +1,4 @@
-package bot.listener;
+package bot.listeners;
 
 import application.App;
 import bot.utils.EmbedMessageGenerator;

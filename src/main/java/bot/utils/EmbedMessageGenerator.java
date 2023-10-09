@@ -1,6 +1,6 @@
 package bot.utils;
 
-import bot.listener.CurseForgeBot;
+import bot.listeners.CurseForgeBot;
 import data.api.github.events.PushEvent;
 import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;

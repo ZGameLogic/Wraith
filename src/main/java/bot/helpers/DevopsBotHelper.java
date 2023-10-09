@@ -1,134 +1,69 @@
-package bot.listener;
+package bot.helpers;
 
-import application.App;
 import bot.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zgamelogic.jda.AdvancedListenerAdapter;
 import data.api.github.Label;
+import data.api.github.Repository;
 import data.api.github.events.LabelEvent;
 import data.api.github.events.PushEvent;
-import data.api.github.Repository;
 import data.database.github.GitRepo;
 import data.database.github.GithubRepository;
-import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.forums.ForumTagData;
-import net.dv8tion.jda.api.events.session.ReadyEvent;
-import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 import services.GitHubService;
 
-import java.io.File;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.LinkedList;
 
-import static com.zgamelogic.jda.Annotations.*;
-
-@Slf4j
-@RestController
-public class DevopsBot extends AdvancedListenerAdapter {
-
-    private final GithubRepository gitHubRepositories;
-    private final static File DATA_DIR = new File("jsons");
-    private final ObjectMapper mapper;
-    private Guild glacies;
-
-    @OnReady
-    private void ready(ReadyEvent event){
-        glacies = event.getJDA().getGuildById(App.config.getGuildId());
-    }
-
-    @Autowired
-    public DevopsBot(GithubRepository gitHubRepositories){
-        mapper = new ObjectMapper();
-        this.gitHubRepositories = gitHubRepositories;
-        if(!DATA_DIR.exists()) {
-            DATA_DIR.mkdirs();
-        }
-    }
-
-    @GetMapping("health")
-    private String healthCheck(){
-        return "Healthy";
-    }
-
-    @PostMapping("github")
-    private void gitHub(
-            @RequestHeader(name = "X-GitHub-Event") String gitHubEvent,
-            @RequestBody String body
-    ) {
-        for(Method method: getClass().getDeclaredMethods()){
-            if(method.isAnnotationPresent(GithubEvent.class)){
-                GithubEvent annotation = method.getAnnotation(GithubEvent.class);
-                try {
-                    // check if this is the right event
-                    if(!annotation.value().equals(gitHubEvent)) continue;
-                    // check again if this is the right more specific event
-                    if (!annotation.action().isEmpty() && !annotation.action().equals(
-                            new JSONObject(body).getString("action")
-                    )) continue;
-                    //
-                    if(method.isAnnotationPresent(CreateDiscordRepo.class)){
-                        JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
-                        Repository repo = mapper.readValue(jsonRepo.toString(), Repository.class);
-                        if(!gitHubRepositories.existsById(repo.getId())) createDiscordRepository(repo, true);
-                    }
-                    Class<?> parameterType = method.getParameterTypes()[0];
-                    if(parameterType == String.class){
-                        method.invoke(this, body);
-                    } else {
-                        method.invoke(this, mapper.readValue(body, parameterType));
-                    }
-                } catch (IllegalAccessException | InvocationTargetException | JSONException | JsonProcessingException e) {
-                    log.error("Unable to run gitHub method", e);
-                }
-
-            }
-        }
-    }
+public abstract class DevopsBotHelper {
 
     @CreateDiscordRepo
     @GithubEvent("push")
-    private void gitHubPush(PushEvent event){
+    public static void gitHubPush(PushEvent event, GithubRepository gitHubRepositories, Guild glacies){
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(discordGithubRepo ->
                 glacies.getTextChannelById(discordGithubRepo.getGeneralId()).sendMessageEmbeds(
-                EmbedMessageGenerator.gitHubPush(event)
-        ).queue());
+                        EmbedMessageGenerator.gitHubPush(event)
+                ).queue());
     }
 
     @CreateDiscordRepo
     @GithubEvent(value = "repository", action = "created")
-    private void gitHubRepositoryCreated(String body){
+    public static void gitHubRepositoryCreated(String body, GithubRepository gitHubRepositories, Guild glacies){
         JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
         try {
+            ObjectMapper mapper = new ObjectMapper();
             Repository repo = mapper.readValue(jsonRepo.toString(), Repository.class);
-            createDiscordRepository(repo, false);
+            createDiscordRepository(
+                repo, 
+                false,
+                gitHubRepositories,
+                glacies
+            );
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
     @GithubEvent(value = "repository", action = "deleted")
-    private void gitHubRepositoryDeleted(String body){
+    private static void gitHubRepositoryDeleted(String body, GithubRepository gitHubRepositories, Guild glacies){
         deleteDiscordRepository(
-                new JSONObject(body).getJSONObject("repository").getLong("id")
+                new JSONObject(body).getJSONObject("repository").getLong("id"),
+                gitHubRepositories,
+                glacies
         );
     }
 
     @CreateDiscordRepo
     @GithubEvent(value = "label", action = "created")
-    private void githubLabelCreated(LabelEvent event){
+    private static void githubLabelCreated(LabelEvent event, GithubRepository gitHubRepositories, Guild glacies){
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo -> {
             ForumChannel forum = glacies.getForumChannelById(repo.getForumChannelId());
             if(!forum.getAvailableTagsByName(event.getLabel().getName(), true).isEmpty()) return;
@@ -140,8 +75,27 @@ public class DevopsBot extends AdvancedListenerAdapter {
     }
 
     @CreateDiscordRepo
+    @GithubEvent(value = "label", action = "edited")
+    private static void githubLabelEdited(LabelEvent event, GithubRepository gitHubRepositories, Guild glacies){
+        gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo -> {
+            ForumChannel forum = glacies.getForumChannelById(repo.getForumChannelId());
+            LinkedList<ForumTagData> tags = new LinkedList<>();
+            forum.getAvailableTags().forEach(tag -> {
+                if(!tag.getName().equals(event.getFrom())) {
+                    tags.add(ForumTagData.from(tag));
+                } else {
+                    ForumTagData editedTag = ForumTagData.from(tag);
+                    editedTag.setName(event.getLabel().getName());
+                    tags.add(editedTag);
+                }
+            });
+            forum.getManager().setAvailableTags(tags).queue();
+        });
+    }
+
+    @CreateDiscordRepo
     @GithubEvent(value = "label", action = "deleted")
-    private void githubLabelDeleted(LabelEvent event){
+    public static void githubLabelDeleted(LabelEvent event, GithubRepository gitHubRepositories, Guild glacies){
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo -> {
             ForumChannel forum = glacies.getForumChannelById(repo.getForumChannelId());
             LinkedList<ForumTagData> tags = new LinkedList<>();
@@ -152,43 +106,43 @@ public class DevopsBot extends AdvancedListenerAdapter {
     }
 
     @GithubEvent(value = "workflow_job", action = "queued")
-    private void gitHubWorkflowQueued(String body){}
+    private static void gitHubWorkflowQueued(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "workflow_job", action = "completed")
-    private void gitHubWorkflowCompleted(String body){}
+    private static void gitHubWorkflowCompleted(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "workflow_job", action = "in_progress")
-    private void gitHubWorkflowInProgress(String body){}
+    private static void gitHubWorkflowInProgress(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "pull_request", action = "opened")
-    private void gitHubPullRequestOpened(String body){}
+    private static void gitHubPullRequestOpened(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "pull_request", action = "ready_for_review")
-    private void gitHubPullRequestReadyForReview(String body){}
+    private static void gitHubPullRequestReadyForReview(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "pull_request", action = "closed")
-    private void gitHubPullRequestClosed(String body){}
+    private static void gitHubPullRequestClosed(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "issues", action = "opened")
-    private void gitHubIssueOpened(String body){}
+    private static void gitHubIssueOpened(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "issues", action = "labeled")
-    private void gitHubIssueLabeled(String body){}
+    private static void gitHubIssueLabeled(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "issues", action = "assigned")
-    private void gitHubIssueAssigned(String body){}
+    private static void gitHubIssueAssigned(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "issues", action = "closed")
-    private void gitHubIssueClosed(String body){}
+    private static void gitHubIssueClosed(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "issue_comment", action = "created")
-    private void gitHubIssueCommentCreated(String body){}
+    private static void gitHubIssueCommentCreated(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     /**
      * Update the glacies discord server by creating new channels for the git repository
      * @param repository GitHub repository to be updated
      */
-    private void createDiscordRepository(Repository repository, boolean withLabels){
+    public static void createDiscordRepository(Repository repository, boolean withLabels, GithubRepository gitHubRepositories, Guild glacies){
         long id = repository.getId();
         String repoName = repository.getName();
         String repoUrl = repository.getHtml_url();
@@ -225,7 +179,7 @@ public class DevopsBot extends AdvancedListenerAdapter {
      * Update the glacies discord server by deleting channels for a git repository
      * @param id unique identifier of the GitHub repository
      */
-    private void deleteDiscordRepository(long id){
+    public static void deleteDiscordRepository(long id, GithubRepository gitHubRepositories, Guild glacies){
         gitHubRepositories.findById(id).ifPresent(repo -> {
             glacies.getTextChannelById(repo.getPullRequestId()).delete().queue();
             glacies.getTextChannelById(repo.getGeneralId()).delete().queue();
@@ -237,12 +191,12 @@ public class DevopsBot extends AdvancedListenerAdapter {
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    private @interface GithubEvent {
+    public @interface GithubEvent {
         String value();
         String action() default "";
     }
 
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.METHOD)
-    private @interface CreateDiscordRepo {}
+    public @interface CreateDiscordRepo {}
 }
