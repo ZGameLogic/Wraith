@@ -32,7 +32,6 @@ public abstract class EmbedMessageGenerator {
 
         eb.setColor(GITHUB_COLOR);
         eb.setTitle(event.getSender().getLogin() + " pushed to " + branch, event.getHeadCommit().getUrl());
-        eb.setThumbnail(event.getSender().getAvatar_url());
         StringBuilder desc = new StringBuilder();
         desc.append("> ").append(event.getHeadCommit().getMessage());
         desc.append("\n```diff\n");
