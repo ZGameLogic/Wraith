@@ -1,9 +1,13 @@
 package bot.listener;
 
 import application.App;
+import bot.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgamelogic.jda.AdvancedListenerAdapter;
+import data.api.github.Label;
+import data.api.github.events.LabelEvent;
+import data.api.github.events.PushEvent;
 import data.api.github.Repository;
 import data.database.github.GitRepo;
 import data.database.github.GithubRepository;
@@ -12,11 +16,13 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.forums.ForumTagData;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import services.GitHubService;
 
 import java.io.File;
 import java.lang.annotation.ElementType;
@@ -25,6 +31,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.LinkedList;
 
 import static com.zgamelogic.jda.Annotations.*;
 
@@ -75,9 +82,14 @@ public class DevopsBot extends AdvancedListenerAdapter {
                     if(method.isAnnotationPresent(CreateDiscordRepo.class)){
                         JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
                         Repository repo = mapper.readValue(jsonRepo.toString(), Repository.class);
-                        if(!gitHubRepositories.existsById(repo.getId())) createDiscordRepository(repo);
+                        if(!gitHubRepositories.existsById(repo.getId())) createDiscordRepository(repo, true);
                     }
-                    method.invoke(this, body);
+                    Class<?> parameterType = method.getParameterTypes()[0];
+                    if(parameterType == String.class){
+                        method.invoke(this, body);
+                    } else {
+                        method.invoke(this, mapper.readValue(body, parameterType));
+                    }
                 } catch (IllegalAccessException | InvocationTargetException | JSONException | JsonProcessingException e) {
                     log.error("Unable to run gitHub method", e);
                 }
@@ -86,18 +98,57 @@ public class DevopsBot extends AdvancedListenerAdapter {
         }
     }
 
+    @CreateDiscordRepo
     @GithubEvent("push")
-    private void gitHubPush(String body){}
+    private void gitHubPush(PushEvent event){
+        gitHubRepositories.findById(event.getRepository().getId()).ifPresent(discordGithubRepo ->
+                glacies.getTextChannelById(discordGithubRepo.getGeneralId()).sendMessageEmbeds(
+                EmbedMessageGenerator.gitHubPush(event)
+        ).queue());
+    }
 
     @CreateDiscordRepo
     @GithubEvent(value = "repository", action = "created")
-    private void gitHubRepositoryCreated(String body){}
+    private void gitHubRepositoryCreated(String body){
+        JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
+        try {
+            Repository repo = mapper.readValue(jsonRepo.toString(), Repository.class);
+            createDiscordRepository(repo, false);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @GithubEvent(value = "repository", action = "deleted")
     private void gitHubRepositoryDeleted(String body){
         deleteDiscordRepository(
                 new JSONObject(body).getJSONObject("repository").getLong("id")
         );
+    }
+
+    @CreateDiscordRepo
+    @GithubEvent(value = "label", action = "created")
+    private void githubLabelCreated(LabelEvent event){
+        gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo -> {
+            ForumChannel forum = glacies.getForumChannelById(repo.getForumChannelId());
+            if(!forum.getAvailableTagsByName(event.getLabel().getName(), true).isEmpty()) return;
+            LinkedList<ForumTagData> tags = new LinkedList<>();
+            forum.getAvailableTags().forEach(tag -> tags.add(ForumTagData.from(tag)));
+            tags.add(new ForumTagData(event.getLabel().getName()));
+            forum.getManager().setAvailableTags(tags).queue();
+        });
+    }
+
+    @CreateDiscordRepo
+    @GithubEvent(value = "label", action = "deleted")
+    private void githubLabelDeleted(LabelEvent event){
+        gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo -> {
+            ForumChannel forum = glacies.getForumChannelById(repo.getForumChannelId());
+            LinkedList<ForumTagData> tags = new LinkedList<>();
+            forum.getAvailableTags().forEach(tag -> tags.add(ForumTagData.from(tag)));
+            tags.removeIf(tag -> tag.getName().equals(event.getLabel().getName()));
+            forum.getManager().setAvailableTags(tags).queue();
+        });
     }
 
     @GithubEvent(value = "workflow_job", action = "queued")
@@ -137,7 +188,7 @@ public class DevopsBot extends AdvancedListenerAdapter {
      * Update the glacies discord server by creating new channels for the git repository
      * @param repository GitHub repository to be updated
      */
-    private void createDiscordRepository(Repository repository){
+    private void createDiscordRepository(Repository repository, boolean withLabels){
         long id = repository.getId();
         String repoName = repository.getName();
         String repoUrl = repository.getHtml_url();
@@ -153,6 +204,14 @@ public class DevopsBot extends AdvancedListenerAdapter {
         prChannel.getManager().setTopic("Pull request channel for repository: " + repoName + ".").queue();
         // forum
         ForumChannel forumChannel = cat.createForumChannel(repoName + "-issues").complete();
+        if(withLabels) {
+            new Thread(() -> {
+                LinkedList<Label> labels = GitHubService.getIssueLabels(repository.getLabels_url().replace("{/name}", ""));
+                LinkedList<ForumTagData> tags = new LinkedList<>();
+                labels.forEach(label -> tags.add(new ForumTagData(label.getName())));
+                forumChannel.getManager().setAvailableTags(tags).queue();
+            }, "Add labels").start();
+        }
 
         repo.setCategoryId(cat.getIdLong());
         repo.setGeneralId(general.getIdLong());

@@ -5,11 +5,9 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Repository {
+public class Label {
     private long id;
     private String name;
-    private String html_url;
-    private String labels_url;
-    private String visibility;
-    private int open_issues;
+    private String color;
+    private String description;
 }

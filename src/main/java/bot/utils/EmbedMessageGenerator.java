@@ -1,6 +1,7 @@
 package bot.utils;
 
 import bot.listener.CurseForgeBot;
+import data.api.github.events.PushEvent;
 import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -13,15 +14,53 @@ import java.util.LinkedList;
 
 public abstract class EmbedMessageGenerator {
 
-    // private final static Color GENERAL_COLOR = new Color(99, 42, 129);
+    private final static Color GENERAL_COLOR = new Color(99, 42, 129);
     private final static Color CURSEFORGE_COLOR = new Color(239, 99, 54);
-    private final static Color ATLASSIAN_COLOR = new Color(13, 71, 161);
+    private final static Color GITHUB_COLOR = new Color(4, 6, 10);
 
     private final static Color DATA_DOG_OK_COLOR = new Color(64, 194, 99);
     private final static Color DATA_DOG_ALERT_COLOR = new Color(233, 54, 74);
 
     private final static String DATA_DOG_OK = ":green_square:";
     private final static String DATA_DOG_ALERT = ":red_square:";
+
+    public static MessageEmbed gitHubPush(PushEvent event){
+        EmbedBuilder eb = new EmbedBuilder();
+
+        String ref = event.getRef();
+        String branch = ref.substring(ref.lastIndexOf("/") + 1);
+
+        eb.setColor(GITHUB_COLOR);
+        eb.setTitle(event.getSender().getLogin() + " pushed to " + branch, event.getHeadCommit().getUrl());
+        eb.setThumbnail(event.getSender().getAvatar_url());
+        StringBuilder desc = new StringBuilder();
+        desc.append("> ").append(event.getHeadCommit().getMessage());
+        desc.append("\n```diff\n");
+        event.getHeadCommit().getAdded().forEach(file -> {
+            String[] paths = file.split("/");
+            desc.append("+ ").append(paths[paths.length - 1]);
+            desc.append("\n");
+        });
+
+        event.getHeadCommit().getRemoved().forEach(file -> {
+            String[] paths = file.split("/");
+            desc.append("- ").append(paths[paths.length - 1]);
+            desc.append("\n");
+        });
+
+        event.getHeadCommit().getModified().forEach(file -> {
+            String[] paths = file.split("/");
+            desc.append("--- ").append(paths[paths.length - 1]);
+            desc.append("\n");
+        });
+
+        desc.append("```");
+        eb.setDescription(desc.toString());
+
+        eb.setFooter(event.getSender().getLogin(), event.getSender().getAvatar_url());
+        eb.setTimestamp(Instant.now());
+        return eb.build();
+    }
 
     public static MessageEmbed monitorStatus(LinkedList<Monitor> monitors){
         EmbedBuilder eb = new EmbedBuilder();
