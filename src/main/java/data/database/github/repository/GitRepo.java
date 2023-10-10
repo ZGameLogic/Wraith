@@ -1,4 +1,4 @@
-package data.database.github;
+package data.database.github.repository;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

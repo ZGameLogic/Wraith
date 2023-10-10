@@ -1,4 +1,4 @@
-package data.database.github;
+package data.database.github.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
