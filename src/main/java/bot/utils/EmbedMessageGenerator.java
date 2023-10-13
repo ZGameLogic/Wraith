@@ -69,7 +69,7 @@ public abstract class EmbedMessageGenerator {
         String branch = ref.substring(ref.lastIndexOf("/") + 1);
 
         eb.setColor(GITHUB_COLOR);
-        eb.setTitle(event.getSender().getLogin() + " pushed to " + branch, event.getHeadCommit().getUrl());
+        eb.setTitle("push to " + branch, event.getHeadCommit().getUrl());
         StringBuilder desc = new StringBuilder();
         desc.append("> ").append(event.getHeadCommit().getMessage());
         desc.append("\n```diff\n");
@@ -94,7 +94,7 @@ public abstract class EmbedMessageGenerator {
         desc.append("```");
         eb.setDescription(desc.toString());
 
-        eb.setFooter(event.getSender().getLogin(), event.getSender().getAvatar_url());
+        eb.setAuthor(event.getSender().getLogin(), event.getSender().getUrl(), event.getSender().getAvatar_url());
         eb.setTimestamp(Instant.now());
         return eb.build();
     }
