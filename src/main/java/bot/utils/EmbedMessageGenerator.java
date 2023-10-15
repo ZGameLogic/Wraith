@@ -1,27 +1,103 @@
 package bot.utils;
 
-import bot.listener.CurseForgeBot;
+import bot.listeners.CurseForgeBot;
+import data.api.github.events.PushEvent;
+import data.api.github.events.WorkflowEvent;
 import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.awt.*;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 public abstract class EmbedMessageGenerator {
 
-    // private final static Color GENERAL_COLOR = new Color(99, 42, 129);
+    private final static Color GENERAL_COLOR = new Color(99, 42, 129);
     private final static Color CURSEFORGE_COLOR = new Color(239, 99, 54);
-    private final static Color ATLASSIAN_COLOR = new Color(13, 71, 161);
+    private final static Color GITHUB_COLOR = new Color(4, 6, 10);
 
     private final static Color DATA_DOG_OK_COLOR = new Color(64, 194, 99);
     private final static Color DATA_DOG_ALERT_COLOR = new Color(233, 54, 74);
 
     private final static String DATA_DOG_OK = ":green_square:";
     private final static String DATA_DOG_ALERT = ":red_square:";
+
+    public static MessageEmbed workflowAddCompleted(WorkflowEvent workflowEvent, MessageEmbed messageEmbed, HashMap<String, Emoji> emojis){
+        EmbedBuilder eb = new EmbedBuilder(messageEmbed);
+        String[] lines = messageEmbed.getDescription().split("\n");
+        StringBuilder desc = new StringBuilder();
+        desc.append(messageEmbed.getDescription().replace(lines[lines.length - 1], ""));
+        // add back in the job
+        desc.append("\n<:")
+                .append(emojis.get(workflowEvent.getWorkflowJob().getConclusion()).getAsReactionCode())
+                .append("> `")
+                .append(workflowEvent.getWorkflowJob().getName())
+                .append("`");
+        // add in the steps
+        workflowEvent.getWorkflowJob().getSteps().forEach(step -> desc.append("\n<:")
+                .append(emojis.get(step.getConclusion()).getAsReactionCode())
+                .append("> `    ")
+                .append(step.getName())
+                .append("`"));
+        eb.setDescription(desc.toString());
+        return eb.build();
+    }
+
+    public static MessageEmbed workflowAddQueued(WorkflowEvent workflowEvent, MessageEmbed messageEmbed, Emoji emoji){
+        EmbedBuilder eb = new EmbedBuilder(messageEmbed);
+        eb.setDescription(messageEmbed.getDescription() + "\n<a:" + emoji.getAsReactionCode() + "> `" + workflowEvent.getWorkflowJob().getName() + "`");
+        return eb.build();
+    }
+
+    public static MessageEmbed workflowCreate(WorkflowEvent workflowEvent, Emoji emoji) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(GITHUB_COLOR);
+        eb.setTitle("Workflow: " + workflowEvent.getWorkflowJob().getName());
+        eb.setDescription("<a:" + emoji.getAsReactionCode() + "> `" + workflowEvent.getWorkflowJob().getName() + "`");
+        return eb.build();
+    }
+
+    public static MessageEmbed gitHubPush(PushEvent event){
+        EmbedBuilder eb = new EmbedBuilder();
+
+        String ref = event.getRef();
+        String branch = ref.substring(ref.lastIndexOf("/") + 1);
+
+        eb.setColor(GITHUB_COLOR);
+        eb.setTitle("push to " + branch, event.getHeadCommit().getUrl());
+        StringBuilder desc = new StringBuilder();
+        desc.append("> ").append(event.getHeadCommit().getMessage());
+        desc.append("\n```diff\n");
+        event.getHeadCommit().getAdded().forEach(file -> {
+            String[] paths = file.split("/");
+            desc.append("+ ").append(paths[paths.length - 1]);
+            desc.append("\n");
+        });
+
+        event.getHeadCommit().getRemoved().forEach(file -> {
+            String[] paths = file.split("/");
+            desc.append("- ").append(paths[paths.length - 1]);
+            desc.append("\n");
+        });
+
+        event.getHeadCommit().getModified().forEach(file -> {
+            String[] paths = file.split("/");
+            desc.append("--- ").append(paths[paths.length - 1]);
+            desc.append("\n");
+        });
+
+        desc.append("```");
+        eb.setDescription(desc.toString());
+
+        eb.setAuthor(event.getSender().getLogin(), event.getSender().getUrl(), event.getSender().getAvatar_url());
+        eb.setTimestamp(Instant.now());
+        return eb.build();
+    }
 
     public static MessageEmbed monitorStatus(LinkedList<Monitor> monitors){
         EmbedBuilder eb = new EmbedBuilder();
