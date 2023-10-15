@@ -94,7 +94,7 @@ public abstract class EmbedMessageGenerator {
         desc.append("```");
         eb.setDescription(desc.toString());
 
-        eb.setAuthor(event.getSender().getLogin(), event.getSender().getUrl(), event.getSender().getAvatar_url());
+        eb.setAuthor(event.getSender().getLogin(), event.getSender().getHtml_url(), event.getSender().getAvatar_url());
         eb.setTimestamp(Instant.now());
         return eb.build();
     }
