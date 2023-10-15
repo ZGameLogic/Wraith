@@ -116,7 +116,7 @@ public abstract class DevopsBotHelper {
     @GithubEvent(value = "workflow_job", action = "queued")
     private static void gitHubWorkflowQueued(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies){
         Emoji emoji = glacies.getEmojisByName("working", false).get(0);
-        workflowRepository.findById(workflowEvent.getWorkflowJob().getId()).ifPresentOrElse(workflow -> {
+        workflowRepository.findById(workflowEvent.getWorkflowJob().getRunId()).ifPresentOrElse(workflow -> {
             // add to existing workflow
             glacies.getTextChannelById(workflow.getTextChannelId()).retrieveMessageById(workflow.getMessageId()).queue(message -> {
                 MessageEmbed prev = message.getEmbeds().get(0);
@@ -129,7 +129,7 @@ public abstract class DevopsBotHelper {
                 glacies.getTextChannelById(repo.getGeneralId()).sendMessageEmbeds(embed).queue(message -> {
                     long channelId = message.getChannel().getIdLong();
                     long messageId = message.getIdLong();
-                    long id = workflowEvent.getWorkflowJob().getId();
+                    long id = workflowEvent.getWorkflowJob().getRunId();
                     Workflow wf = new Workflow(id, channelId, messageId);
                     workflowRepository.save(wf);
                 });
@@ -143,7 +143,7 @@ public abstract class DevopsBotHelper {
         emojiMap.put("success", glacies.getEmojisByName("success", false).get(0));
         emojiMap.put("failure", glacies.getEmojisByName("failure", false).get(0));
         emojiMap.put("nay", glacies.getEmojisByName("nay", false).get(0));
-        workflowRepository.findById(workflowEvent.getWorkflowJob().getId()).ifPresent(workflow -> {
+        workflowRepository.findById(workflowEvent.getWorkflowJob().getRunId()).ifPresent(workflow -> {
             // add to existing workflow
             glacies.getTextChannelById(workflow.getTextChannelId()).retrieveMessageById(workflow.getMessageId()).queue(message -> {
                 MessageEmbed prev = message.getEmbeds().get(0);
