@@ -3,6 +3,7 @@ package bot.listeners;
 import application.App;
 import bot.utils.EmbedMessageGenerator;
 import com.zgamelogic.jda.AdvancedListenerAdapter;
+import data.api.curseforge.CurseforgeMod;
 import data.database.curseforge.CurseforgeRecord;
 import data.database.curseforge.CurseforgeRepository;
 import lombok.Getter;
@@ -26,7 +27,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+import services.CurseforgeService;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,6 +64,11 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
                         new SubcommandData("updated", "Shows when the project was last updated")
                                 .addOption(OptionType.STRING, "project", "Project to check", true, true)
                 ));
+    }
+
+    @GetMapping("test")
+    private CurseforgeMod test(){
+        return CurseforgeService.getCurseforgeMod(715572L);
     }
 
     @OnReady
