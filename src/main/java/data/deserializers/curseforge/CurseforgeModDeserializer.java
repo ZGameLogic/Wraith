@@ -24,6 +24,9 @@ public class CurseforgeModDeserializer extends JsonDeserializer<CurseforgeMod> {
         mod.setDownloadCount(node.get("downloadCount").asLong());
         mod.setLogoUrl(node.get("logo").get("url").asText());
         mod.setUrl(node.get("links").get("websiteUrl").asText());
+        mod.setServerFileName("");
+        mod.setServerFileUrl("");
+        mod.setFileName("");
 
         node.get("latestFiles").forEach(file -> {
             if(file.get("id").asLong() != mod.getMainFileId()) return;
