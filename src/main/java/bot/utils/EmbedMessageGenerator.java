@@ -1,6 +1,6 @@
 package bot.utils;
 
-import bot.listeners.CurseForgeBot;
+import data.api.curseforge.CurseforgeMod;
 import data.api.github.events.PushEvent;
 import data.api.github.events.WorkflowEvent;
 import data.api.monitor.Monitor;
@@ -138,19 +138,19 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed curseforgeList(LinkedList<CurseForgeBot.CurseforgeProject> projects){
+    public static MessageEmbed curseforgeList(LinkedList<CurseforgeMod> projects){
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(CURSEFORGE_COLOR);
         eb.setTitle("Total projects: " + projects.size());
         StringBuilder desc = new StringBuilder();
-        for(CurseForgeBot.CurseforgeProject p: projects){
+        for(CurseforgeMod p: projects){
             desc.append(p.getName()).append("\n");
         }
         eb.setDescription(desc.toString());
         return eb.build();
     }
 
-    public static MessageEmbed curseforgeInitial(CurseForgeBot.CurseforgeProject project){
+    public static MessageEmbed curseforgeInitial(CurseforgeMod project){
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(CURSEFORGE_COLOR);
         eb.setTitle("Listening to " + project.getName(), project.getUrl());
@@ -160,7 +160,7 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed curseforgeUpdate(CurseForgeBot.CurseforgeProject project, Boolean mentionable){
+    public static MessageEmbed curseforgeUpdate(CurseforgeMod project, Boolean mentionable){
         EmbedBuilder eb = new EmbedBuilder();
         eb.setColor(CURSEFORGE_COLOR);
         eb.setTitle("File update for " + project.getName(), project.getUrl());
