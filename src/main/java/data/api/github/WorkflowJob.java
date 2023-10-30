@@ -23,6 +23,8 @@ public class WorkflowJob {
     private String name;
     @JsonProperty("html_url")
     private String htmlUrl;
+    @JsonProperty("run_url")
+    private String runUrl;
     private LinkedList<Step> steps;
 
     @Data
