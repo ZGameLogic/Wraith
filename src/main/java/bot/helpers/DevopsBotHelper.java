@@ -1,5 +1,6 @@
 package bot.helpers;
 
+import application.App;
 import bot.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,8 +13,8 @@ import data.database.github.repository.GitRepo;
 import data.database.github.repository.GithubRepository;
 import data.database.github.workflow.Workflow;
 import data.database.github.workflow.WorkflowRepository;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
@@ -30,6 +31,7 @@ import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+@Slf4j
 public abstract class DevopsBotHelper {
 
     @CreateDiscordRepo
@@ -135,6 +137,7 @@ public abstract class DevopsBotHelper {
                 });
             });
         });
+        log.info("Workflow queued\n" + GitHubService.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl(), App.config.getGithubToken()));
     }
 
     @GithubEvent(value = "workflow_job", action = "completed")
@@ -150,6 +153,7 @@ public abstract class DevopsBotHelper {
                 message.editMessageEmbeds(EmbedMessageGenerator.workflowAddCompleted(workflowEvent, prev, emojiMap)).queue();
             });
         });
+        log.info("Workflow completed\n" + GitHubService.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl(), App.config.getGithubToken()));
     }
 
     @GithubEvent(value = "pull_request", action = "opened")
@@ -198,7 +202,7 @@ public abstract class DevopsBotHelper {
         ForumChannel forumChannel = cat.createForumChannel(repoName + "-issues").complete();
         if(withLabels) {
             new Thread(() -> {
-                LinkedList<Label> labels = GitHubService.getIssueLabels(repository.getLabels_url().replace("{/name}", ""));
+                LinkedList<Label> labels = GitHubService.getIssueLabels(repository.getLabels_url().replace("{/name}", ""), App.config.getGithubToken());
                 LinkedList<ForumTagData> tags = new LinkedList<>();
                 labels.forEach(label -> tags.add(new ForumTagData(label.getName())));
                 forumChannel.getManager().setAvailableTags(tags).queue();
