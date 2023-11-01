@@ -34,9 +34,17 @@ public abstract class EmbedMessageGenerator {
         eb.setTitle(run.getJobs().getFirst().getWorkflowName(), run.getJobs().getFirst().getHtmlUrl());
         StringBuilder desc = new StringBuilder();
         for(WorkflowJob job: run.getJobs()){
-            desc.append("<:").append(emojis.get(job.getStatus()).getAsReactionCode()).append("> `").append(job.getName()).append("`\n");
+            desc.append("<:")
+                    .append(emojis.get(job.getStatus() + " " + job.getConclusion()).getAsReactionCode())
+                    .append("> `")
+                    .append(job.getName())
+                    .append("`\n");
             for(WorkflowJob.Step step: job.getSteps()){
-                desc.append("<:").append(emojis.get(step.getStatus()).getAsReactionCode()).append("> `    ").append(step.getName()).append("`\n");
+                desc.append("<:")
+                        .append(emojis.get(step.getStatus() + " " + step.getConclusion()).getAsReactionCode())
+                        .append("> `    ")
+                        .append(step.getName())
+                        .append("`\n");
             }
         }
 
