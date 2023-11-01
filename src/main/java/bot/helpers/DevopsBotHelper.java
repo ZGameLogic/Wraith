@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import data.api.github.Label;
 import data.api.github.Repository;
+import data.api.github.WorkflowRun;
 import data.api.github.events.LabelEvent;
 import data.api.github.events.PushEvent;
 import data.api.github.events.WorkflowEvent;
@@ -15,7 +16,6 @@ import data.database.github.workflow.Workflow;
 import data.database.github.workflow.WorkflowRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -115,45 +115,30 @@ public abstract class DevopsBotHelper {
     }
 
     @CreateDiscordRepo
-    @GithubEvent(value = "workflow_job", action = "queued")
-    private static void gitHubWorkflowQueued(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies){
-        Emoji emoji = glacies.getEmojisByName("working", false).get(0);
-        workflowRepository.findById(workflowEvent.getWorkflowJob().getRunId()).ifPresentOrElse(workflow -> {
-            // add to existing workflow
-            glacies.getTextChannelById(workflow.getTextChannelId()).retrieveMessageById(workflow.getMessageId()).queue(message -> {
-                MessageEmbed prev = message.getEmbeds().get(0);
-                message.editMessageEmbeds(EmbedMessageGenerator.workflowAddQueued(workflowEvent, prev, emoji)).queue();
-            });
-        }, () -> {
-            // create new workflow
-            gitHubRepositories.findById(workflowEvent.getRepository().getId()).ifPresent(repo -> {
-                MessageEmbed embed = EmbedMessageGenerator.workflowCreate(workflowEvent, emoji);
-                glacies.getTextChannelById(repo.getGeneralId()).sendMessageEmbeds(embed).queue(message -> {
-                    long channelId = message.getChannel().getIdLong();
-                    long messageId = message.getIdLong();
-                    long id = workflowEvent.getWorkflowJob().getRunId();
-                    Workflow wf = new Workflow(id, channelId, messageId);
-                    workflowRepository.save(wf);
-                });
-            });
-        });
-        log.info("Workflow queued\n" + GitHubService.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl(), App.config.getGithubToken()));
-    }
-
-    @GithubEvent(value = "workflow_job", action = "completed")
-    private static void gitHubWorkflowCompleted(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies){
-        HashMap<String, Emoji> emojiMap = new HashMap<>();
-        emojiMap.put("success", glacies.getEmojisByName("success", false).get(0));
-        emojiMap.put("failure", glacies.getEmojisByName("failure", false).get(0));
-        emojiMap.put("nay", glacies.getEmojisByName("nay", false).get(0));
-        workflowRepository.findById(workflowEvent.getWorkflowJob().getRunId()).ifPresent(workflow -> {
-            // add to existing workflow
-            glacies.getTextChannelById(workflow.getTextChannelId()).retrieveMessageById(workflow.getMessageId()).queue(message -> {
-                MessageEmbed prev = message.getEmbeds().get(0);
-                message.editMessageEmbeds(EmbedMessageGenerator.workflowAddCompleted(workflowEvent, prev, emojiMap)).queue();
-            });
-        });
-        log.info("Workflow completed\n" + GitHubService.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl(), App.config.getGithubToken()));
+    @GithubEvent(value = "workflow_job")
+    private static void gitHubWorkflow(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies){
+        WorkflowRun run = GitHubService.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl(), App.config.getGithubToken());
+        HashMap<String, Emoji> emojis = new HashMap<>();
+        emojis.put("success", glacies.getEmojisByName("success", false).get(0));
+        emojis.put("failure", glacies.getEmojisByName("failure", false).get(0));
+        emojis.put("nay", glacies.getEmojisByName("nay", false).get(0));
+        workflowRepository.findById(workflowEvent.getWorkflowJob().getRunId()).ifPresentOrElse(workflow ->
+            glacies.getTextChannelById(workflow.getTextChannelId())
+                    .editMessageEmbedsById(workflow.getMessageId(), EmbedMessageGenerator.workflow(run, emojis))
+                    .queue()
+        , () ->
+            gitHubRepositories.findById(workflowEvent.getRepository().getId()).ifPresent(discordRepo ->
+                glacies.getTextChannelById(discordRepo.getGeneralId())
+                        .sendMessageEmbeds(EmbedMessageGenerator.workflow(run, emojis))
+                        .queue(message ->
+                            workflowRepository.save(new Workflow(
+                                    run.getJobs().getFirst().getRunId(),
+                                    message.getChannelIdLong(),
+                                    message.getIdLong()
+                            ))
+                        )
+            )
+        );
     }
 
     @GithubEvent(value = "pull_request", action = "opened")
