@@ -30,8 +30,8 @@ public abstract class EmbedMessageGenerator {
 
     public static MessageEmbed workflow(WorkflowRun run, HashMap<String, Emoji> emojis){
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(CURSEFORGE_COLOR);
-        eb.setTitle(run.getJobs().getFirst().getWorkflowName(), run.getJobs().getFirst().getHtmlUrl());
+        eb.setColor(GITHUB_COLOR);
+        eb.setTitle("Github Action: " + run.getJobs().getFirst().getWorkflowName(), run.getJobs().getFirst().getHtmlUrl());
         StringBuilder desc = new StringBuilder();
         for(WorkflowJob job: run.getJobs()){
             desc.append("<:")
