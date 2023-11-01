@@ -2,6 +2,7 @@ package services;
 
 import data.api.github.Label;
 import data.api.github.WorkflowRun;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -11,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+@Slf4j
 public abstract class GitHubService {
 
     public static LinkedList<Label> getIssueLabels(String url, String githubToken){
@@ -21,7 +23,7 @@ public abstract class GitHubService {
             ResponseEntity<Label[]> response = restTemplate.exchange(url, HttpMethod.GET,  new HttpEntity<>(headers), Label[].class);
             return new LinkedList<>(Arrays.asList(response.getBody()));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error getting issue labels", e);
         }
         return new LinkedList<>();
     }
@@ -35,7 +37,7 @@ public abstract class GitHubService {
             ResponseEntity<WorkflowRun> response = restTemplate.exchange(url, HttpMethod.GET,  new HttpEntity<>(headers), WorkflowRun.class);
             return response.getBody();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error getting workflow run", e);
         }
         return null;
     }

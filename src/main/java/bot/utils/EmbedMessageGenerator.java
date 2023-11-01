@@ -1,8 +1,9 @@
 package bot.utils;
 
 import data.api.curseforge.CurseforgeMod;
+import data.api.github.WorkflowJob;
+import data.api.github.WorkflowRun;
 import data.api.github.events.PushEvent;
-import data.api.github.events.WorkflowEvent;
 import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -27,38 +28,19 @@ public abstract class EmbedMessageGenerator {
     private final static String DATA_DOG_OK = ":green_square:";
     private final static String DATA_DOG_ALERT = ":red_square:";
 
-    public static MessageEmbed workflowAddCompleted(WorkflowEvent workflowEvent, MessageEmbed messageEmbed, HashMap<String, Emoji> emojis){
-        EmbedBuilder eb = new EmbedBuilder(messageEmbed);
-        String[] lines = messageEmbed.getDescription().split("\n");
-        StringBuilder desc = new StringBuilder();
-        desc.append(messageEmbed.getDescription().replace(lines[lines.length - 1], ""));
-        // add back in the job
-        desc.append("\n<:")
-                .append(emojis.get(workflowEvent.getWorkflowJob().getConclusion()).getAsReactionCode())
-                .append("> `")
-                .append(workflowEvent.getWorkflowJob().getName())
-                .append("`");
-        // add in the steps
-        workflowEvent.getWorkflowJob().getSteps().forEach(step -> desc.append("\n<:")
-                .append(emojis.get(step.getConclusion()).getAsReactionCode())
-                .append("> `    ")
-                .append(step.getName())
-                .append("`"));
-        eb.setDescription(desc.toString());
-        return eb.build();
-    }
-
-    public static MessageEmbed workflowAddQueued(WorkflowEvent workflowEvent, MessageEmbed messageEmbed, Emoji emoji){
-        EmbedBuilder eb = new EmbedBuilder(messageEmbed);
-        eb.setDescription(messageEmbed.getDescription() + "\n<a:" + emoji.getAsReactionCode() + "> `" + workflowEvent.getWorkflowJob().getName() + "`");
-        return eb.build();
-    }
-
-    public static MessageEmbed workflowCreate(WorkflowEvent workflowEvent, Emoji emoji) {
+    public static MessageEmbed workflow(WorkflowRun run, HashMap<String, Emoji> emojis){
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(GITHUB_COLOR);
-        eb.setTitle("Workflow: " + workflowEvent.getWorkflowJob().getName());
-        eb.setDescription("<a:" + emoji.getAsReactionCode() + "> `" + workflowEvent.getWorkflowJob().getName() + "`");
+        eb.setColor(CURSEFORGE_COLOR);
+        eb.setTitle(run.getJobs().getFirst().getWorkflowName(), run.getJobs().getFirst().getHtmlUrl());
+        StringBuilder desc = new StringBuilder();
+        for(WorkflowJob job: run.getJobs()){
+            desc.append("<:").append(emojis.get(job.getStatus()).getAsReactionCode()).append("> `").append(job.getName()).append("`\n");
+            for(WorkflowJob.Step step: job.getSteps()){
+                desc.append("<:").append(emojis.get(step.getStatus()).getAsReactionCode()).append("> `    ").append(step.getName()).append("`\n");
+            }
+        }
+
+        eb.setDescription(desc);
         return eb.build();
     }
 
