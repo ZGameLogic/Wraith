@@ -119,9 +119,10 @@ public abstract class DevopsBotHelper {
     private static void gitHubWorkflow(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies){
         WorkflowRun run = GitHubService.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl(), App.config.getGithubToken());
         HashMap<String, Emoji> emojis = new HashMap<>();
-        emojis.put("success", glacies.getEmojisByName("success", false).get(0));
-        emojis.put("failure", glacies.getEmojisByName("failure", false).get(0));
-        emojis.put("nay", glacies.getEmojisByName("nay", false).get(0));
+        emojis.put("completed success", glacies.getEmojisByName("success", false).get(0));
+        emojis.put("completed failure", glacies.getEmojisByName("failure", false).get(0));
+        emojis.put("queued null", glacies.getEmojisByName("working", false).get(0));
+        emojis.put("completed skipped", glacies.getEmojisByName("nay", false).get(0));
         workflowRepository.findById(workflowEvent.getWorkflowJob().getRunId()).ifPresentOrElse(workflow ->
             glacies.getTextChannelById(workflow.getTextChannelId())
                     .editMessageEmbedsById(workflow.getMessageId(), EmbedMessageGenerator.workflow(run, emojis))
