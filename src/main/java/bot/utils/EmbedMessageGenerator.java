@@ -15,6 +15,7 @@ import java.awt.*;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 public abstract class EmbedMessageGenerator {
 
@@ -27,19 +28,28 @@ public abstract class EmbedMessageGenerator {
 
     private final static String DATA_DOG_OK = ":green_square:";
     private final static String DATA_DOG_ALERT = ":red_square:";
+    private final static Map<Integer, Color> GITHUB_STATUS_COLOR_MAP = Map.of(
+            -1, new Color(233, 54, 74),
+            0, new Color(13, 71, 161),
+            1, new Color(64, 194, 99)
+    );
 
     public static MessageEmbed workflow(WorkflowRun run, HashMap<String, Emoji> emojis){
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(GITHUB_COLOR);
+        eb.setColor(GITHUB_STATUS_COLOR_MAP.get(run.getRunStatus()));
         eb.setTitle("Github Action: " + run.getJobs().getFirst().getWorkflowName(), run.getJobs().getFirst().getHtmlUrl());
         StringBuilder desc = new StringBuilder();
         for(WorkflowJob job: run.getJobs()){
-            desc.append("<:")
-                    .append(emojis.get(job.getStatus() + " " + job.getConclusion()).getAsReactionCode())
+            String jobEmojiCode = job.getStatus() + " " + job.getConclusion();
+            String jobEmojiPrefix = jobEmojiCode.equals("queued null") ? "a" : "";
+            desc.append("<").append(jobEmojiPrefix).append(":")
+                    .append(emojis.get(jobEmojiCode).getAsReactionCode())
                     .append("> `")
                     .append(job.getName())
                     .append("`\n");
             for(WorkflowJob.Step step: job.getSteps()){
+                String emojiCode = job.getStatus() + " " + job.getConclusion();
+                String emojiPrefix = emojiCode.equals("queued null") ? "a" : "";
                 desc.append("<:")
                         .append(emojis.get(step.getStatus() + " " + step.getConclusion()).getAsReactionCode())
                         .append("> `    ")
