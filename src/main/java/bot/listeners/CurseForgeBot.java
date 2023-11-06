@@ -150,7 +150,6 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
                     EmbedMessageGenerator.curseforgeUpdate(current, mention)
                 );
                 message.queue();
-                if(mention != null && mention) message.mentionUsers(232675572772372481L).queue();
                 check.setProjectVersionId(current.getMainFileId() + "");
                 check.setLastUpdated(new Date());
                 check.setName(current.getName());
