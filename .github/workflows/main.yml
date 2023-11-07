@@ -1,8 +1,7 @@
-name: Wraith
+name: Deploy Wraith
 
 on:
-  push:
-    branches: [master]
+  deployment
 
 jobs:
   Build:
