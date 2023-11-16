@@ -7,9 +7,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import data.api.github.Label;
 import data.api.github.Repository;
 import data.api.github.WorkflowRun;
-import data.api.github.events.LabelEvent;
-import data.api.github.events.PushEvent;
-import data.api.github.events.WorkflowEvent;
+import data.api.github.events.*;
+import data.database.github.Issue.GithubIssue;
+import data.database.github.Issue.GithubIssueRepository;
 import data.database.github.repository.GitRepo;
 import data.database.github.repository.GithubRepository;
 import data.database.github.workflow.Workflow;
@@ -19,8 +19,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.ForumChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.forums.ForumTagData;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.json.JSONObject;
 import services.GitHubService;
 
@@ -152,19 +154,84 @@ public abstract class DevopsBotHelper {
     private static void gitHubPullRequestClosed(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
     @GithubEvent(value = "issues", action = "opened")
-    private static void gitHubIssueOpened(String body, GithubRepository gitHubRepositories, Guild glacies){}
+    private static void gitHubIssueOpened(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies){
+        gitHubRepositories.findById(event.getRepository().getId()).ifPresent(githubRepoConfig -> {
+            ForumChannel forumChannel = glacies.getForumChannelById(githubRepoConfig.getForumChannelId());
+            MessageCreateBuilder mcb = new MessageCreateBuilder();
+            mcb.setContent("Issue created: " + event.getIssue().getHtmlUrl() + "\n" + event.getIssue().getBody());
+            LinkedList<String> labelNames = new LinkedList<>();
+            event.getIssue().getLabels().forEach(label -> labelNames.add(label.getName().toLowerCase()));
+            forumChannel.createForumPost(event.getIssue().getTitle(), mcb.build()).setTags(
+                    forumChannel.getAvailableTags().stream().filter(
+                            tag -> labelNames.contains(tag.getName().toLowerCase())
+                    ).toList()
+            ).queue(forumPost -> {
+                GithubIssue ghIssue = new GithubIssue();
+                ghIssue.setId(event.getIssue().getId());
+                ghIssue.setForumPostId(forumPost.getThreadChannel().getIdLong());
+                githubIssueRepository.save(ghIssue);
+                if(event.getIssue().getAssignee() != null) gitHubIssueAssigned(event, githubIssueRepository, glacies);
+            });
+        });
+    }
 
     @GithubEvent(value = "issues", action = "labeled")
-    private static void gitHubIssueLabeled(String body, GithubRepository gitHubRepositories, Guild glacies){}
+    private static void gitHubIssueLabeled(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies){
+        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
+            gitHubRepositories.findById(event.getRepository().getId()).ifPresent(githubRepoConfig -> {
+                ForumChannel forumChannel = glacies.getForumChannelById(githubRepoConfig.getForumChannelId());
+                LinkedList<String> labelNames = new LinkedList<>();
+                event.getIssue().getLabels().forEach(label -> labelNames.add(label.getName().toLowerCase()));
+                glacies.getThreadChannelById(issueConfig.getForumPostId()).getManager().setAppliedTags(
+                        forumChannel.getAvailableTags().stream().filter(
+                                tag -> labelNames.contains(tag.getName().toLowerCase())
+                        ).toList()
+                ).queue();
+            });
+        });
+    }
 
     @GithubEvent(value = "issues", action = "assigned")
-    private static void gitHubIssueAssigned(String body, GithubRepository gitHubRepositories, Guild glacies){}
+    private static void gitHubIssueAssigned(IssueEvent event, GithubIssueRepository githubIssueRepository, Guild glacies){
+        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
+            glacies.getThreadChannelById(issueConfig.getForumPostId()).sendMessageEmbeds(
+                    EmbedMessageGenerator.githubIssueAssignedMessage(event.getIssue().getAssignee())
+            ).queue();
+        });
+    }
 
     @GithubEvent(value = "issues", action = "closed")
-    private static void gitHubIssueClosed(String body, GithubRepository gitHubRepositories, Guild glacies){}
+    private static void gitHubIssueClosed(IssueEvent event, GithubIssueRepository githubIssueRepository, Guild glacies){
+        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
+            ThreadChannel channel = glacies.getThreadChannelById(issueConfig.getForumPostId());
+            channel.sendMessageEmbeds(
+                    EmbedMessageGenerator.githubIssueClosedMessage(event.getIssue().getAssignee())
+            ).queue();
+            channel.getManager().setLocked(true).queue();
+        });
+    }
+
+    @GithubEvent(value = "issues", action = "reopened")
+    private static void gitHubIssueReopened(IssueEvent event, GithubIssueRepository githubIssueRepository, Guild glacies){
+        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
+            ThreadChannel channel = glacies.getThreadChannelById(issueConfig.getForumPostId());
+            channel.sendMessageEmbeds(
+                    EmbedMessageGenerator.githubIssueReopenedMessage(event.getIssue().getAssignee())
+            ).queue();
+            channel.getManager().setLocked(false).queue();
+        });
+    }
 
     @GithubEvent(value = "issue_comment", action = "created")
-    private static void gitHubIssueCommentCreated(String body, GithubRepository gitHubRepositories, Guild glacies){}
+    private static void gitHubIssueCommentCreated(IssueCommentEvent event, GithubIssueRepository githubIssueRepository, Guild glacies){
+        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
+            ThreadChannel channel = glacies.getThreadChannelById(issueConfig.getForumPostId());
+            channel.sendMessageEmbeds(
+                    EmbedMessageGenerator.githubIssueCommentedMessage(event.getComment())
+            ).queue();
+            channel.getManager().setLocked(false).queue();
+        });
+    }
 
     /**
      * Update the glacies discord server by creating new channels for the git repository

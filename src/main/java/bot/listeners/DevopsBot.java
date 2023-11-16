@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgamelogic.jda.AdvancedListenerAdapter;
 import data.api.github.Repository;
+import data.database.github.Issue.GithubIssueRepository;
 import data.database.github.repository.GithubRepository;
 import data.database.github.workflow.WorkflowRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class DevopsBot extends AdvancedListenerAdapter {
 
     private final GithubRepository gitHubRepositories;
     private final WorkflowRepository workflowRepository;
+    private final GithubIssueRepository githubIssueRepository;
     private final ObjectMapper mapper;
     private Guild glacies;
 
@@ -39,9 +41,10 @@ public class DevopsBot extends AdvancedListenerAdapter {
     }
 
     @Autowired
-    public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository){
+    public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository){
         this.workflowRepository = workflowRepository;
         this.gitHubRepositories = gitHubRepositories;
+        this.githubIssueRepository = githubIssueRepository;
         mapper = new ObjectMapper();
     }
 
@@ -59,6 +62,7 @@ public class DevopsBot extends AdvancedListenerAdapter {
         paramMap.put(String.class, body);
         paramMap.put(GithubRepository.class, gitHubRepositories);
         paramMap.put(WorkflowRepository.class, workflowRepository);
+        paramMap.put(GithubIssueRepository.class, githubIssueRepository);
         paramMap.put(Guild.class, glacies);
 
         for(Method method: DevopsBotHelper.class.getDeclaredMethods()){

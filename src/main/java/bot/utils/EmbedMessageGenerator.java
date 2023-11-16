@@ -1,6 +1,8 @@
 package bot.utils;
 
 import data.api.curseforge.CurseforgeMod;
+import data.api.github.Comment;
+import data.api.github.User;
 import data.api.github.WorkflowJob;
 import data.api.github.WorkflowRun;
 import data.api.github.events.PushEvent;
@@ -33,6 +35,39 @@ public abstract class EmbedMessageGenerator {
             0, new Color(13, 71, 161),
             1, new Color(64, 194, 99)
     );
+
+
+    public static MessageEmbed githubIssueCommentedMessage(Comment comment){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(GITHUB_COLOR);
+        eb.setDescription("```" + comment.getBody() + "```");
+        eb.setFooter(comment.getUser().getLogin(), comment.getUser().getAvatar_url());
+        return eb.build();
+    }
+
+    public static MessageEmbed githubIssueReopenedMessage(User user){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(GITHUB_COLOR);
+        eb.setTitle("This issue has been re-opened.");
+        eb.setAuthor(user.getLogin(), user.getUrl(), user.getAvatar_url());
+        return eb.build();
+    }
+
+    public static MessageEmbed githubIssueClosedMessage(User user){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(GITHUB_COLOR);
+        eb.setTitle("This issue has been closed.");
+        eb.setAuthor(user.getLogin(), user.getUrl(), user.getAvatar_url());
+        return eb.build();
+    }
+
+    public static MessageEmbed githubIssueAssignedMessage(User assignee){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(GITHUB_COLOR);
+        eb.setTitle(assignee.getLogin() + " has been assigned to this issue");
+        eb.setThumbnail(assignee.getAvatar_url());
+        return eb.build();
+    }
 
     public static MessageEmbed workflow(WorkflowRun run, HashMap<String, Emoji> emojis){
         EmbedBuilder eb = new EmbedBuilder();
