@@ -4,7 +4,7 @@ package data.api.github.events;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import data.api.github.Issue;
 import data.api.github.Repository;
-import data.api.github.Sender;
+import data.api.github.User;
 import lombok.Data;
 
 @Data
@@ -12,5 +12,5 @@ import lombok.Data;
 public class IssueEvent {
     private Issue issue;
     private Repository repository;
-    private Sender sender;
+    private User sender;
 }

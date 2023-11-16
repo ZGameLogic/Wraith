@@ -3,7 +3,7 @@ package data.api.github.events;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import data.api.github.Repository;
-import data.api.github.Sender;
+import data.api.github.User;
 import lombok.Data;
 
 import java.util.LinkedList;
@@ -17,7 +17,7 @@ public class PushEvent {
     @JsonProperty("head_commit")
     private Commit headCommit;
 
-    private Sender sender;
+    private User sender;
     private String ref;
 
     @Data

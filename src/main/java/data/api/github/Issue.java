@@ -18,4 +18,5 @@ public class Issue {
     private LinkedList<Label> labels;
     private String state;
     private String action;
+    private User assignee;
 }

@@ -5,10 +5,7 @@ import lombok.Data;
 
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Sender {
-    private String login;
-    private long id;
-    private String html_url;
-    private String url;
-    private String avatar_url;
+public class Comment {
+    private String body;
+    private User user;
 }
