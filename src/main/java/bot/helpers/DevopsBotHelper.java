@@ -177,7 +177,7 @@ public abstract class DevopsBotHelper {
 
     @GithubEvent(value = "issues", action = "labeled")
     private static void gitHubIssueLabeled(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies){
-        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
+        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig ->
             gitHubRepositories.findById(event.getRepository().getId()).ifPresent(githubRepoConfig -> {
                 ForumChannel forumChannel = glacies.getForumChannelById(githubRepoConfig.getForumChannelId());
                 LinkedList<String> labelNames = new LinkedList<>();
@@ -187,17 +187,17 @@ public abstract class DevopsBotHelper {
                                 tag -> labelNames.contains(tag.getName().toLowerCase())
                         ).toList()
                 ).queue();
-            });
-        });
+            })
+        );
     }
 
     @GithubEvent(value = "issues", action = "assigned")
     private static void gitHubIssueAssigned(IssueEvent event, GithubIssueRepository githubIssueRepository, Guild glacies){
-        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
+        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig ->
             glacies.getThreadChannelById(issueConfig.getForumPostId()).sendMessageEmbeds(
                     EmbedMessageGenerator.githubIssueAssignedMessage(event.getIssue().getAssignee())
-            ).queue();
-        });
+            ).queue()
+        );
     }
 
     @GithubEvent(value = "issues", action = "closed")
@@ -248,11 +248,8 @@ public abstract class DevopsBotHelper {
         // general
         TextChannel general = cat.createTextChannel(repoName + " general").complete();
         general.getManager().setTopic("General channel for repository: " + repoName + ".").queue();
-        // pull request
-        TextChannel prChannel = cat.createTextChannel(repoName + " pull-requests").complete();
-        prChannel.getManager().setTopic("Pull request channel for repository: " + repoName + ".").queue();
         // forum
-        ForumChannel forumChannel = cat.createForumChannel(repoName + "-issues").complete();
+        ForumChannel forumChannel = cat.createForumChannel(repoName).complete();
         if(withLabels) {
             new Thread(() -> {
                 LinkedList<Label> labels = GitHubService.getIssueLabels(repository.getLabels_url().replace("{/name}", ""), App.config.getGithubToken());
@@ -264,7 +261,6 @@ public abstract class DevopsBotHelper {
 
         repo.setCategoryId(cat.getIdLong());
         repo.setGeneralId(general.getIdLong());
-        repo.setPullRequestId(prChannel.getIdLong());
         repo.setForumChannelId(forumChannel.getIdLong());
 
         gitHubRepositories.save(repo);
@@ -276,7 +272,6 @@ public abstract class DevopsBotHelper {
      */
     public static void deleteDiscordRepository(long id, GithubRepository gitHubRepositories, Guild glacies){
         gitHubRepositories.findById(id).ifPresent(repo -> {
-            glacies.getTextChannelById(repo.getPullRequestId()).delete().queue();
             glacies.getTextChannelById(repo.getGeneralId()).delete().queue();
             glacies.getForumChannelById(repo.getForumChannelId()).delete().queue();
             glacies.getCategoryById(repo.getCategoryId()).delete().queue();
