@@ -17,7 +17,6 @@ public class GitRepo {
 
     private Long categoryId;
     private Long generalId;
-    private Long pullRequestId;
     private Long forumChannelId;
 
     private String repoUrl;
