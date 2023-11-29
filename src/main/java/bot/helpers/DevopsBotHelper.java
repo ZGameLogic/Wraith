@@ -161,7 +161,7 @@ public abstract class DevopsBotHelper {
             mcb.setContent("Issue created: " + event.getIssue().getHtmlUrl() + "\n" + event.getIssue().getBody());
             LinkedList<String> labelNames = new LinkedList<>();
             event.getIssue().getLabels().forEach(label -> labelNames.add(label.getName().toLowerCase()));
-            forumChannel.createForumPost(event.getIssue().getTitle(), mcb.build()).setTags(
+            forumChannel.createForumPost("Iss #" + event.getIssue().getNumber() + ":" + event.getIssue().getTitle(), mcb.build()).setTags(
                     forumChannel.getAvailableTags().stream().filter(
                             tag -> labelNames.contains(tag.getName().toLowerCase())
                     ).toList()
