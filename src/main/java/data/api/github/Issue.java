@@ -13,6 +13,7 @@ public class Issue {
     @JsonProperty("html_url")
     private String htmlUrl;
     private long id;
+    private long number;
     private String title;
     private String body;
     private LinkedList<Label> labels;
