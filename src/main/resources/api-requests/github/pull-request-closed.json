@@ -1,18 +1,18 @@
 {
   "action": "closed",
-  "number": 11,
+  "number": 30,
   "pull_request": {
-    "url": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/11",
-    "id": 1546167061,
-    "node_id": "PR_kwDOKTRRr85cKKMV",
-    "html_url": "https://github.com/ZGameLogic/Wraith/pull/11",
-    "diff_url": "https://github.com/ZGameLogic/Wraith/pull/11.diff",
-    "patch_url": "https://github.com/ZGameLogic/Wraith/pull/11.patch",
-    "issue_url": "https://api.github.com/repos/ZGameLogic/Wraith/issues/11",
-    "number": 11,
+    "url": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/30",
+    "id": 1622269213,
+    "node_id": "PR_kwDOKTRRr85gsd0d",
+    "html_url": "https://github.com/ZGameLogic/Wraith/pull/30",
+    "diff_url": "https://github.com/ZGameLogic/Wraith/pull/30.diff",
+    "patch_url": "https://github.com/ZGameLogic/Wraith/pull/30.patch",
+    "issue_url": "https://api.github.com/repos/ZGameLogic/Wraith/issues/30",
+    "number": 30,
     "state": "closed",
     "locked": false,
-    "title": "updating json recognition",
+    "title": "Adding in issue number to title",
     "user": {
       "login": "zabory",
       "id": 23252883,
@@ -33,12 +33,12 @@
       "type": "User",
       "site_admin": false
     },
-    "body": null,
-    "created_at": "2023-10-07T01:34:16Z",
-    "updated_at": "2023-10-07T01:34:27Z",
-    "closed_at": "2023-10-07T01:34:27Z",
-    "merged_at": "2023-10-07T01:34:27Z",
-    "merge_commit_sha": "2d9f5f6641ca41d14bb28d592a5db2c582d15df2",
+    "body": "This is a PR to add issue number into the title of the thread",
+    "created_at": "2023-11-29T17:14:51Z",
+    "updated_at": "2023-11-29T17:24:19Z",
+    "closed_at": "2023-11-29T17:24:18Z",
+    "merged_at": "2023-11-29T17:24:18Z",
+    "merge_commit_sha": "46f61ae7ce9fc0f4cb20d5b4a9b81398c8f50f8e",
     "assignee": null,
     "assignees": [
 
@@ -54,15 +54,15 @@
     ],
     "milestone": null,
     "draft": false,
-    "commits_url": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/11/commits",
-    "review_comments_url": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/11/comments",
+    "commits_url": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/30/commits",
+    "review_comments_url": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/30/comments",
     "review_comment_url": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/comments{/number}",
-    "comments_url": "https://api.github.com/repos/ZGameLogic/Wraith/issues/11/comments",
-    "statuses_url": "https://api.github.com/repos/ZGameLogic/Wraith/statuses/1392885636a31e97cb6be4f694a239866ebf8ccf",
+    "comments_url": "https://api.github.com/repos/ZGameLogic/Wraith/issues/30/comments",
+    "statuses_url": "https://api.github.com/repos/ZGameLogic/Wraith/statuses/01bfd70bda3178a4366cee18b9893e8123d56b80",
     "head": {
       "label": "ZGameLogic:development",
       "ref": "development",
-      "sha": "1392885636a31e97cb6be4f694a239866ebf8ccf",
+      "sha": "01bfd70bda3178a4366cee18b9893e8123d56b80",
       "user": {
         "login": "ZGameLogic",
         "id": 144963060,
@@ -150,14 +150,14 @@
         "releases_url": "https://api.github.com/repos/ZGameLogic/Wraith/releases{/id}",
         "deployments_url": "https://api.github.com/repos/ZGameLogic/Wraith/deployments",
         "created_at": "2023-09-13T22:23:38Z",
-        "updated_at": "2023-09-14T01:22:29Z",
-        "pushed_at": "2023-10-07T01:34:27Z",
+        "updated_at": "2023-11-29T17:17:22Z",
+        "pushed_at": "2023-11-29T17:24:18Z",
         "git_url": "git://github.com/ZGameLogic/Wraith.git",
         "ssh_url": "git@github.com:ZGameLogic/Wraith.git",
         "clone_url": "https://github.com/ZGameLogic/Wraith.git",
         "svn_url": "https://github.com/ZGameLogic/Wraith",
         "homepage": "",
-        "size": 162,
+        "size": 230,
         "stargazers_count": 0,
         "watchers_count": 0,
         "language": "Java",
@@ -200,7 +200,7 @@
     "base": {
       "label": "ZGameLogic:master",
       "ref": "master",
-      "sha": "170af325073425c54551b65ccf5b1b79c060bfc2",
+      "sha": "69668ad5fc9de70306a0962b590ebb6d7bb2f345",
       "user": {
         "login": "ZGameLogic",
         "id": 144963060,
@@ -288,14 +288,14 @@
         "releases_url": "https://api.github.com/repos/ZGameLogic/Wraith/releases{/id}",
         "deployments_url": "https://api.github.com/repos/ZGameLogic/Wraith/deployments",
         "created_at": "2023-09-13T22:23:38Z",
-        "updated_at": "2023-09-14T01:22:29Z",
-        "pushed_at": "2023-10-07T01:34:27Z",
+        "updated_at": "2023-11-29T17:17:22Z",
+        "pushed_at": "2023-11-29T17:24:18Z",
         "git_url": "git://github.com/ZGameLogic/Wraith.git",
         "ssh_url": "git@github.com:ZGameLogic/Wraith.git",
         "clone_url": "https://github.com/ZGameLogic/Wraith.git",
         "svn_url": "https://github.com/ZGameLogic/Wraith",
         "homepage": "",
-        "size": 162,
+        "size": 230,
         "stargazers_count": 0,
         "watchers_count": 0,
         "language": "Java",
@@ -337,28 +337,28 @@
     },
     "_links": {
       "self": {
-        "href": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/11"
+        "href": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/30"
       },
       "html": {
-        "href": "https://github.com/ZGameLogic/Wraith/pull/11"
+        "href": "https://github.com/ZGameLogic/Wraith/pull/30"
       },
       "issue": {
-        "href": "https://api.github.com/repos/ZGameLogic/Wraith/issues/11"
+        "href": "https://api.github.com/repos/ZGameLogic/Wraith/issues/30"
       },
       "comments": {
-        "href": "https://api.github.com/repos/ZGameLogic/Wraith/issues/11/comments"
+        "href": "https://api.github.com/repos/ZGameLogic/Wraith/issues/30/comments"
       },
       "review_comments": {
-        "href": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/11/comments"
+        "href": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/30/comments"
       },
       "review_comment": {
         "href": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/comments{/number}"
       },
       "commits": {
-        "href": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/11/commits"
+        "href": "https://api.github.com/repos/ZGameLogic/Wraith/pulls/30/commits"
       },
       "statuses": {
-        "href": "https://api.github.com/repos/ZGameLogic/Wraith/statuses/1392885636a31e97cb6be4f694a239866ebf8ccf"
+        "href": "https://api.github.com/repos/ZGameLogic/Wraith/statuses/01bfd70bda3178a4366cee18b9893e8123d56b80"
       }
     },
     "author_association": "CONTRIBUTOR",
@@ -388,12 +388,12 @@
       "type": "User",
       "site_admin": false
     },
-    "comments": 0,
-    "review_comments": 0,
+    "comments": 1,
+    "review_comments": 1,
     "maintainer_can_modify": false,
     "commits": 1,
-    "additions": 9,
-    "deletions": 10,
+    "additions": 2,
+    "deletions": 1,
     "changed_files": 2
   },
   "repository": {
@@ -463,14 +463,14 @@
     "releases_url": "https://api.github.com/repos/ZGameLogic/Wraith/releases{/id}",
     "deployments_url": "https://api.github.com/repos/ZGameLogic/Wraith/deployments",
     "created_at": "2023-09-13T22:23:38Z",
-    "updated_at": "2023-09-14T01:22:29Z",
-    "pushed_at": "2023-10-07T01:34:27Z",
+    "updated_at": "2023-11-29T17:17:22Z",
+    "pushed_at": "2023-11-29T17:24:18Z",
     "git_url": "git://github.com/ZGameLogic/Wraith.git",
     "ssh_url": "git@github.com:ZGameLogic/Wraith.git",
     "clone_url": "https://github.com/ZGameLogic/Wraith.git",
     "svn_url": "https://github.com/ZGameLogic/Wraith",
     "homepage": "",
-    "size": 162,
+    "size": 230,
     "stargazers_count": 0,
     "watchers_count": 0,
     "language": "Java",
@@ -496,7 +496,10 @@
     "forks": 0,
     "open_issues": 0,
     "watchers": 0,
-    "default_branch": "master"
+    "default_branch": "master",
+    "custom_properties": {
+
+    }
   },
   "organization": {
     "login": "ZGameLogic",
