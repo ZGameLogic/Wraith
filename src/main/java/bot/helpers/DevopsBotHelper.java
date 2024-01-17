@@ -153,6 +153,9 @@ public abstract class DevopsBotHelper {
     @GithubEvent(value = "pull_request", action = "closed")
     private static void gitHubPullRequestClosed(String body, GithubRepository gitHubRepositories, Guild glacies){}
 
+    @GithubEvent(value = "pull_request_review_comment", action = "created")
+    private static void gitHubPullRequestReviewSubmitted(String body, GithubRepository gitHubRepositories, Guild glacies){}
+
     @GithubEvent(value = "issues", action = "opened")
     private static void gitHubIssueOpened(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies){
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(githubRepoConfig -> {
@@ -239,6 +242,7 @@ public abstract class DevopsBotHelper {
      */
     public static void createDiscordRepository(Repository repository, boolean withLabels, GithubRepository gitHubRepositories, Guild glacies){
         long id = repository.getId();
+        if(gitHubRepositories.existsById(id)) return; // No need to make it if it's already there
         String repoName = repository.getName();
         String repoUrl = repository.getHtml_url();
         repoName = repoName.replaceAll("-", " ");
