@@ -39,6 +39,9 @@ public abstract class DevopsBotHelper {
     @CreateDiscordRepo
     @GithubEvent("push")
     public static void gitHubPush(PushEvent event, GithubRepository gitHubRepositories, Guild glacies){
+        glacies.getTextChannelById(App.config.getGeneralId()).sendMessageEmbeds(
+                EmbedMessageGenerator.gitHubPush(event)
+        ).queue();
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(discordGithubRepo ->
                 glacies.getTextChannelById(discordGithubRepo.getGeneralId()).sendMessageEmbeds(
                         EmbedMessageGenerator.gitHubPush(event)

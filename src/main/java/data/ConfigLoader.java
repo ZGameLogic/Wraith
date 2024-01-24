@@ -43,6 +43,9 @@ public class ConfigLoader {
     @Value("${monitoring.id}")
     private String monitoringId;
 
+    @Value("${general.id}")
+    private String generalId;
+
     @Value("${github.token}")
     private String githubToken;
 }
