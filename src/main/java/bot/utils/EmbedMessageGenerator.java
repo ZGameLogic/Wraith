@@ -131,6 +131,7 @@ public abstract class EmbedMessageGenerator {
 
         eb.setAuthor(event.getSender().getLogin(), event.getSender().getHtml_url(), event.getSender().getAvatar_url());
         eb.setTimestamp(Instant.now());
+        eb.setFooter(event.getRepository().getName());
         return eb.build();
     }
 
