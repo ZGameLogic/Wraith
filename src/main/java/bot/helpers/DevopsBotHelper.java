@@ -246,7 +246,7 @@ public abstract class DevopsBotHelper {
     public static void createDiscordRepository(Repository repository, boolean withLabels, GithubRepository gitHubRepositories, Guild glacies){
         long id = repository.getId();
         if(gitHubRepositories.existsById(id)) return; // No need to make it if it's already there
-        if(!glacies.getTextChannelsByName(repository.getName(), true).isEmpty()) return;
+        if(!glacies.getTextChannelsByName(repository.getName() + " general", true).isEmpty()) return;
         String repoName = repository.getName();
         String repoUrl = repository.getHtml_url();
         repoName = repoName.replaceAll("-", " ");
