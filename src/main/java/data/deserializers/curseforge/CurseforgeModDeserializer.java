@@ -33,7 +33,7 @@ public class CurseforgeModDeserializer extends JsonDeserializer<CurseforgeMod> {
             try {
                 mod.setFileName(file.get("displayName").asText());
                 long serverPackFileId = file.get("serverPackFileId").asLong();
-                CurseforgeFile serverFile = CurseforgeService.getCurseforgeFile(node.get("id").asLong(), serverPackFileId);
+                CurseforgeFile serverFile = CurseforgeService.getCurseforgeFile(node.get("id").asLong(), serverPackFileId, "");
                 mod.setServerFileName(serverFile.getDisplayName());
                 mod.setServerFileUrl(serverFile.getDownloadUrl());
             } catch (Exception ignored){}

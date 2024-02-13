@@ -1,7 +1,8 @@
 package bot.listeners;
 
 import bot.utils.EmbedMessageGenerator;
-import com.zgamelogic.jda.AdvancedListenerAdapter;
+import com.zgamelogic.annotations.DiscordController;
+import com.zgamelogic.annotations.DiscordMapping;
 import data.api.curseforge.CurseforgeMod;
 import data.database.curseforge.CurseforgeRecord;
 import data.database.curseforge.CurseforgeRepository;
@@ -11,11 +12,9 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,43 +27,44 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.zgamelogic.jda.Annotations.*;
-
 @Slf4j
 @RestController
-public class CurseForgeBot extends AdvancedListenerAdapter {
+@DiscordController
+public class CurseForgeBot {
 
     private final CurseforgeRepository checks;
+    @Value("${curseforge.api.token}")
+    private String curseforgeToken;
     private JDA bot;
 
     @Autowired
     public CurseForgeBot(CurseforgeRepository checks) {
         this.checks = checks;
-        getCommands().add(Commands.slash("curseforge", "Slash command for curseforge related things")
-                .addSubcommands(
-                        new SubcommandData("listen", "Listens to a project")
-                                .addOption(OptionType.STRING, "project", "Project to watch", true)
-                                .addOption(OptionType.BOOLEAN, "mention", "Get mentioned when this updates", false),
-                        new SubcommandData("forget", "Stops listening to a project")
-                                .addOption(OptionType.STRING, "project", "Project to watch", true),
-                        new SubcommandData("list", "Lists all the projects currently followed in this channel"),
-                        new SubcommandData("updated", "Shows when the project was last updated")
-                                .addOption(OptionType.STRING, "project", "Project to check", true, true)
-                ));
+//        getCommands().add(Commands.slash("curseforge", "Slash command for curseforge related things")
+//                .addSubcommands(
+//                        new SubcommandData("listen", "Listens to a project")
+//                                .addOption(OptionType.STRING, "project", "Project to watch", true)
+//                                .addOption(OptionType.BOOLEAN, "mention", "Get mentioned when this updates", false),
+//                        new SubcommandData("forget", "Stops listening to a project")
+//                                .addOption(OptionType.STRING, "project", "Project to watch", true),
+//                        new SubcommandData("list", "Lists all the projects currently followed in this channel"),
+//                        new SubcommandData("updated", "Shows when the project was last updated")
+//                                .addOption(OptionType.STRING, "project", "Project to check", true, true)
+//                ));
     }
 
     @GetMapping("test")
     private CurseforgeMod test(){
-        return CurseforgeService.getCurseforgeMod(715572L);
+        return CurseforgeService.getCurseforgeMod(715572L, curseforgeToken);
     }
 
-    @OnReady
+    @DiscordMapping
     public void ready(ReadyEvent event) {
         bot = event.getJDA();
         update();
     }
 
-    @AutoCompleteResponse(slashSubCommandId = "updated", slashCommandId = "curseforge", focusedOption = "project")
+    @DiscordMapping(SubId = "updated", Id = "curseforge", FocusedOption = "project")
     private void autoCompleteProject(CommandAutoCompleteInteractionEvent event){
         LinkedList<String> projects = new LinkedList<>();
         for(CurseforgeRecord record: checks.getProjectsByGuildAndChannel(event.getGuild().getIdLong(), event.getChannel().getIdLong())){
@@ -78,17 +78,17 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
         event.replyChoices(options).queue();
     }
 
-    @SlashResponse(value = "curseforge", subCommandName = "list")
+    @DiscordMapping(Id = "curseforge", SubId = "list")
     private void list(SlashCommandInteractionEvent event){
         event.deferReply().queue();
         LinkedList<CurseforgeMod> projects = new LinkedList<>();
         for(CurseforgeRecord record: checks.getProjectsByGuildAndChannel(event.getGuild().getIdLong(), event.getChannel().getIdLong())){
-            projects.add(CurseforgeService.getCurseforgeMod(Long.parseLong(record.getProjectId())));
+            projects.add(CurseforgeService.getCurseforgeMod(Long.parseLong(record.getProjectId()), curseforgeToken));
         }
         event.getHook().sendMessageEmbeds(EmbedMessageGenerator.curseforgeList(projects)).queue();
     }
 
-    @SlashResponse(value = "curseforge", subCommandName = "updated")
+    @DiscordMapping(Id = "curseforge", SubId = "updated")
     private void updated(SlashCommandInteractionEvent event){
         String projectName = event.getOption("project").getAsString();
         Optional<CurseforgeRecord> project = checks.getProjectByName(projectName);
@@ -99,7 +99,7 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
         }
     }
 
-    @SlashResponse(value = "curseforge", subCommandName = "listen")
+    @DiscordMapping(Id = "curseforge", SubId = "listen")
     private void follow(SlashCommandInteractionEvent event){
         event.deferReply().queue();
         String project = event.getOption("project").getAsString();
@@ -112,7 +112,7 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
                 event.getOption("mention") != null && event.getOption("mention").getAsBoolean()
         );
         cfr.setProjectId(project);
-        CurseforgeMod response = CurseforgeService.getCurseforgeMod(Long.parseLong(project));
+        CurseforgeMod response = CurseforgeService.getCurseforgeMod(Long.parseLong(project), curseforgeToken);
         if(!response.isValid()){
             event.getHook().sendMessage("No project with that ID found").queue();
             return;
@@ -123,7 +123,7 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
         checks.save(cfr);
     }
 
-    @SlashResponse(value = "curseforge", subCommandName = "forget")
+    @DiscordMapping(Id = "curseforge", SubId = "forget")
     private void forget(SlashCommandInteractionEvent event){
         String project = event.getOption("project").getAsString();
         Optional<CurseforgeRecord> dbProject = checks.getProjectById(project, event.getGuild().getIdLong(), event.getChannel().getIdLong());
@@ -143,7 +143,7 @@ public class CurseForgeBot extends AdvancedListenerAdapter {
 
     public void update(){
         for(CurseforgeRecord check: checks.findAll()){
-            CurseforgeMod current = CurseforgeService.getCurseforgeMod(Long.parseLong(check.getProjectId()));
+            CurseforgeMod current = CurseforgeService.getCurseforgeMod(Long.parseLong(check.getProjectId()), curseforgeToken);
             if(check.getProjectVersionId() == null || !check.getProjectVersionId().equals(current.getMainFileId() + "")){
                 Boolean mention = check.getMentionable();
                 MessageCreateAction message = bot.getGuildById(check.getGuildId()).getTextChannelById(check.getChannelId()).sendMessageEmbeds(

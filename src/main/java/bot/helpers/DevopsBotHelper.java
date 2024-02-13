@@ -1,6 +1,5 @@
 package bot.helpers;
 
-import application.App;
 import bot.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,8 +37,8 @@ public abstract class DevopsBotHelper {
 
     @CreateDiscordRepo
     @GithubEvent("push")
-    public static void gitHubPush(PushEvent event, GithubRepository gitHubRepositories, Guild glacies){
-        glacies.getTextChannelById(App.config.getGeneralId()).sendMessageEmbeds(
+    public static void gitHubPush(PushEvent event, GithubRepository gitHubRepositories, Guild glacies, long generalId){
+        glacies.getTextChannelById(generalId).sendMessageEmbeds(
                 EmbedMessageGenerator.gitHubPush(event)
         ).queue();
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(discordGithubRepo ->
@@ -50,7 +49,7 @@ public abstract class DevopsBotHelper {
 
     @CreateDiscordRepo
     @GithubEvent(value = "repository", action = "created")
-    public static void gitHubRepositoryCreated(String body, GithubRepository gitHubRepositories, Guild glacies){
+    public static void gitHubRepositoryCreated(String body, GithubRepository gitHubRepositories, Guild glacies, String githubToken){
         JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -59,7 +58,8 @@ public abstract class DevopsBotHelper {
                 repo, 
                 false,
                 gitHubRepositories,
-                glacies
+                glacies,
+                githubToken
             );
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -121,8 +121,8 @@ public abstract class DevopsBotHelper {
 
     @CreateDiscordRepo
     @GithubEvent(value = "workflow_job")
-    private static void gitHubWorkflow(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies){
-        WorkflowRun run = GitHubService.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl(), App.config.getGithubToken());
+    private static void gitHubWorkflow(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies, String githubToken){
+        WorkflowRun run = GitHubService.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl(), githubToken);
         HashMap<String, Emoji> emojis = new HashMap<>();
         emojis.put("completed success", glacies.getEmojisByName("success", false).get(0));
         emojis.put("completed failure", glacies.getEmojisByName("failure", false).get(0));
@@ -243,7 +243,7 @@ public abstract class DevopsBotHelper {
      * Update the glacies discord server by creating new channels for the git repository
      * @param repository GitHub repository to be updated
      */
-    public static void createDiscordRepository(Repository repository, boolean withLabels, GithubRepository gitHubRepositories, Guild glacies){
+    public static void createDiscordRepository(Repository repository, boolean withLabels, GithubRepository gitHubRepositories, Guild glacies, String githubToken){
         long id = repository.getId();
         if(gitHubRepositories.existsById(id)) return; // No need to make it if it's already there
         if(!glacies.getTextChannelsByName(repository.getName() + " general", true).isEmpty()) return;
@@ -260,7 +260,7 @@ public abstract class DevopsBotHelper {
         ForumChannel forumChannel = cat.createForumChannel(repoName).complete();
         if(withLabels) {
             new Thread(() -> {
-                LinkedList<Label> labels = GitHubService.getIssueLabels(repository.getLabels_url().replace("{/name}", ""), App.config.getGithubToken());
+                LinkedList<Label> labels = GitHubService.getIssueLabels(repository.getLabels_url().replace("{/name}", ""), githubToken);
                 LinkedList<ForumTagData> tags = new LinkedList<>();
                 labels.forEach(label -> tags.add(new ForumTagData(label.getName())));
                 forumChannel.getManager().setAvailableTags(tags).queue();

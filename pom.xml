@@ -28,12 +28,6 @@
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
     </repository>
-
-    <repository>
-      <id>zgamelogic</id>
-      <name>zgamelogic</name>
-      <url>https://zgamelogic.com:2006/maven</url>
-    </repository>
   </repositories>
 
   <parent>
@@ -45,8 +39,8 @@
   <dependencies>
     <dependency>
       <groupId>com.zgamelogic</groupId>
-      <artifactId>Spring-JDA</artifactId>
-      <version>1.1.4</version>
+      <artifactId>spring-boot-starter-discord</artifactId>
+      <version>1.0.1</version>
     </dependency>
 
     <dependency>
