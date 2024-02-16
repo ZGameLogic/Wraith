@@ -23,12 +23,15 @@ import java.io.IOException;
 @Slf4j
 public class MonitoringBot {
 
+    private final DataOtterService dataOtterService;
+
     private TextChannel channel;
     private Message message;
     private final Environment environment;
 
     @Autowired
-    public MonitoringBot(Environment environment) {
+    public MonitoringBot(DataOtterService dataOtterService, Environment environment) {
+        this.dataOtterService = dataOtterService;
         this.environment = environment;
     }
 
@@ -49,9 +52,9 @@ public class MonitoringBot {
             try {
                 MonitoringConfig config = om.readValue(monitorConfigFile, MonitoringConfig.class);
                 String messageId = config.getMessageId();
-                message = channel.editMessageEmbedsById(messageId, EmbedMessageGenerator.monitorStatus(DataOtterService.getMonitorStatus())).complete();
+                message = channel.editMessageEmbedsById(messageId, EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
             } catch (IOException ignored) {
-                message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(DataOtterService.getMonitorStatus())).complete();
+                message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
                 try {
                     monitorConfigFile.getParentFile().mkdirs();
                     om.writeValue(monitorConfigFile, new MonitoringConfig(message.getId()));
@@ -60,7 +63,7 @@ public class MonitoringBot {
                 }
             }
         } else {
-            message = channel.editMessageEmbedsById(message.getId(), EmbedMessageGenerator.monitorStatus(DataOtterService.getMonitorStatus())).complete();
+            message = channel.editMessageEmbedsById(message.getId(), EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
         }
     }
 }

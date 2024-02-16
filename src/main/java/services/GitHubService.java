@@ -3,19 +3,30 @@ package services;
 import data.api.github.Label;
 import data.api.github.WorkflowRun;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
 import java.util.LinkedList;
 
 @Slf4j
-public abstract class GitHubService {
+@Service
+public class GitHubService {
 
-    public static LinkedList<Label> getIssueLabels(String url, String githubToken){
+    private final String githubToken;
+
+    @Autowired
+    public GitHubService(@Value("${keyvault.url}") String githubToken){
+        this.githubToken = githubToken;
+    }
+
+    public LinkedList<Label> getIssueLabels(String url){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + githubToken);
@@ -28,7 +39,7 @@ public abstract class GitHubService {
         return new LinkedList<>();
     }
 
-    public static WorkflowRun getWorkflowRun(String url, String githubToken){
+    public WorkflowRun getWorkflowRun(String url){
         url += "/jobs";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

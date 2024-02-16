@@ -4,14 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import data.api.monitor.Monitor;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.LinkedList;
 
-public abstract class DataOtterService {
+@Service
+public class DataOtterService {
 
-    public static LinkedList<Monitor> getMonitorStatus(){
+    public LinkedList<Monitor> getMonitorStatus(){
         LinkedList<Monitor> monitors = new LinkedList<>();
         String URL = "http://54.211.139.84:8080/monitors";
         // String URL = "http://localhost:8080/monitors";

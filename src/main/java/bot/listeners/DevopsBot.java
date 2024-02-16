@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import services.GitHubService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -34,6 +35,7 @@ public class DevopsBot {
     private final WorkflowRepository workflowRepository;
     private final GithubIssueRepository githubIssueRepository;
     private final ObjectMapper mapper;
+    private final GitHubService gitHubService;
     private Guild glacies;
 
     @Value("${guild.id}")
@@ -48,10 +50,11 @@ public class DevopsBot {
     }
 
     @Autowired
-    public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository){
+    public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository, GitHubService gitHubService){
         this.workflowRepository = workflowRepository;
         this.gitHubRepositories = gitHubRepositories;
         this.githubIssueRepository = githubIssueRepository;
+        this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
     }
 
@@ -71,6 +74,7 @@ public class DevopsBot {
         paramMap.put(WorkflowRepository.class, workflowRepository);
         paramMap.put(GithubIssueRepository.class, githubIssueRepository);
         paramMap.put(Guild.class, glacies);
+        paramMap.put(GitHubService.class, gitHubService);
 
         for(Method method: DevopsBotHelper.class.getDeclaredMethods()){
             if(method.isAnnotationPresent(GithubEvent.class)){
@@ -86,11 +90,11 @@ public class DevopsBot {
                     if(method.isAnnotationPresent(CreateDiscordRepo.class)){
                         JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
                         Repository repo = mapper.readValue(jsonRepo.toString(), Repository.class);
-                        if(!gitHubRepositories.existsById(repo.getId())) createDiscordRepository(repo, true, gitHubRepositories, glacies, githubToken);
+                        if(!gitHubRepositories.existsById(repo.getId())) createDiscordRepository(repo, true, gitHubRepositories, glacies, gitHubService);
                     }
                     method.setAccessible(true);
                     LinkedList<Object> params = new LinkedList<>();
-                    for(Class type: method.getParameterTypes()) {
+                    for(Class<?> type: method.getParameterTypes()) {
                         if(paramMap.containsKey(type)) {
                             params.add(paramMap.get(type));
                         } else {

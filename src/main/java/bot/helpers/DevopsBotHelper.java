@@ -49,7 +49,7 @@ public abstract class DevopsBotHelper {
 
     @CreateDiscordRepo
     @GithubEvent(value = "repository", action = "created")
-    public static void gitHubRepositoryCreated(String body, GithubRepository gitHubRepositories, Guild glacies, String githubToken){
+    public static void gitHubRepositoryCreated(String body, GithubRepository gitHubRepositories, Guild glacies, GitHubService service){
         JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
         try {
             ObjectMapper mapper = new ObjectMapper();
@@ -59,7 +59,7 @@ public abstract class DevopsBotHelper {
                 false,
                 gitHubRepositories,
                 glacies,
-                githubToken
+                service
             );
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
@@ -121,8 +121,8 @@ public abstract class DevopsBotHelper {
 
     @CreateDiscordRepo
     @GithubEvent(value = "workflow_job")
-    private static void gitHubWorkflow(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies, String githubToken){
-        WorkflowRun run = GitHubService.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl(), githubToken);
+    private static void gitHubWorkflow(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies, GitHubService service){
+        WorkflowRun run = service.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl());
         HashMap<String, Emoji> emojis = new HashMap<>();
         emojis.put("completed success", glacies.getEmojisByName("success", false).get(0));
         emojis.put("completed failure", glacies.getEmojisByName("failure", false).get(0));
@@ -243,7 +243,7 @@ public abstract class DevopsBotHelper {
      * Update the glacies discord server by creating new channels for the git repository
      * @param repository GitHub repository to be updated
      */
-    public static void createDiscordRepository(Repository repository, boolean withLabels, GithubRepository gitHubRepositories, Guild glacies, String githubToken){
+    public static void createDiscordRepository(Repository repository, boolean withLabels, GithubRepository gitHubRepositories, Guild glacies, GitHubService service){
         long id = repository.getId();
         if(gitHubRepositories.existsById(id)) return; // No need to make it if it's already there
         if(!glacies.getTextChannelsByName(repository.getName() + " general", true).isEmpty()) return;
@@ -260,7 +260,7 @@ public abstract class DevopsBotHelper {
         ForumChannel forumChannel = cat.createForumChannel(repoName).complete();
         if(withLabels) {
             new Thread(() -> {
-                LinkedList<Label> labels = GitHubService.getIssueLabels(repository.getLabels_url().replace("{/name}", ""), githubToken);
+                LinkedList<Label> labels = service.getIssueLabels(repository.getLabels_url().replace("{/name}", ""));
                 LinkedList<ForumTagData> tags = new LinkedList<>();
                 labels.forEach(label -> tags.add(new ForumTagData(label.getName())));
                 forumChannel.getManager().setAvailableTags(tags).queue();

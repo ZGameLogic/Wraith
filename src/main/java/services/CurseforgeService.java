@@ -2,14 +2,25 @@ package services;
 
 import data.api.curseforge.CurseforgeFile;
 import data.api.curseforge.CurseforgeMod;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-public abstract class CurseforgeService {
-    public static CurseforgeMod getCurseforgeMod(long modId, String token){
+@Service
+public class CurseforgeService {
+    private final String token;
+
+    @Autowired
+    public CurseforgeService(@Value("${curseforge.api.token}") String curseforgeToken) {
+        token = curseforgeToken;
+    }
+
+    public CurseforgeMod getCurseforgeMod(long modId){
         String url = "https://api.curseforge.com/v1/mods/" + modId;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -18,7 +29,7 @@ public abstract class CurseforgeService {
         return response.getBody();
     }
 
-    public static CurseforgeFile getCurseforgeFile(long modId, long fileId, String token){
+    public CurseforgeFile getCurseforgeFile(long modId, long fileId){
         String url = "https://api.curseforge.com/v1/mods/" + modId + "/files/" + fileId;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
