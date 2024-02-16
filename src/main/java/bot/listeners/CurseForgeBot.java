@@ -53,15 +53,10 @@ public class CurseForgeBot {
 //                ));
     }
 
-    @GetMapping("test")
-    private CurseforgeMod test(){
-        return CurseforgeService.getCurseforgeMod(715572L, curseforgeToken);
-    }
-
     @DiscordMapping
     public void ready(ReadyEvent event) {
         bot = event.getJDA();
-        update();
+//        update();
     }
 
     @DiscordMapping(SubId = "updated", Id = "curseforge", FocusedOption = "project")
@@ -135,7 +130,7 @@ public class CurseForgeBot {
         event.reply("No project with that ID is being followed").queue();
     }
 
-    @Scheduled(cron = "0 */5 * * * *")
+//    @Scheduled(cron = "0 */5 * * * *")
     private void fiveMinuteTask() {
         update();
     }

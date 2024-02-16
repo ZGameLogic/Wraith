@@ -7,7 +7,10 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@SpringBootApplication(scanBasePackages = {"bot"})
+@SpringBootApplication(scanBasePackages = {
+        "bot.listeners",
+        "services"
+})
 @EnableJpaRepositories({"data.database"})
 @EntityScan({"data.database"})
 @EnableScheduling
