@@ -1,10 +1,10 @@
 package bot.listeners;
 
-import application.App;
 import bot.helpers.DevopsBotHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zgamelogic.jda.AdvancedListenerAdapter;
+import com.zgamelogic.annotations.DiscordController;
+import com.zgamelogic.annotations.DiscordMapping;
 import data.api.github.Repository;
 import data.database.github.Issue.GithubIssueRepository;
 import data.database.github.repository.GithubRepository;
@@ -15,36 +15,46 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+import services.GitHubService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import static com.zgamelogic.jda.Annotations.*;
 import static bot.helpers.DevopsBotHelper.*;
 
 @Slf4j
+@DiscordController
 @RestController
-public class DevopsBot extends AdvancedListenerAdapter {
+public class DevopsBot {
 
     private final GithubRepository gitHubRepositories;
     private final WorkflowRepository workflowRepository;
     private final GithubIssueRepository githubIssueRepository;
     private final ObjectMapper mapper;
+    private final GitHubService gitHubService;
     private Guild glacies;
 
-    @OnReady
+    @Value("${guild.id}")
+    private String guildId;
+
+    @Value("${github.token}")
+    private String githubToken;
+
+    @DiscordMapping
     private void ready(ReadyEvent event){
-        glacies = event.getJDA().getGuildById(App.config.getGuildId());
+        glacies = event.getJDA().getGuildById(guildId);
     }
 
     @Autowired
-    public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository){
+    public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository, GitHubService gitHubService){
         this.workflowRepository = workflowRepository;
         this.gitHubRepositories = gitHubRepositories;
         this.githubIssueRepository = githubIssueRepository;
+        this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
     }
 
@@ -64,6 +74,7 @@ public class DevopsBot extends AdvancedListenerAdapter {
         paramMap.put(WorkflowRepository.class, workflowRepository);
         paramMap.put(GithubIssueRepository.class, githubIssueRepository);
         paramMap.put(Guild.class, glacies);
+        paramMap.put(GitHubService.class, gitHubService);
 
         for(Method method: DevopsBotHelper.class.getDeclaredMethods()){
             if(method.isAnnotationPresent(GithubEvent.class)){
@@ -79,11 +90,11 @@ public class DevopsBot extends AdvancedListenerAdapter {
                     if(method.isAnnotationPresent(CreateDiscordRepo.class)){
                         JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
                         Repository repo = mapper.readValue(jsonRepo.toString(), Repository.class);
-                        if(!gitHubRepositories.existsById(repo.getId())) createDiscordRepository(repo, true, gitHubRepositories, glacies);
+                        if(!gitHubRepositories.existsById(repo.getId())) createDiscordRepository(repo, true, gitHubRepositories, glacies, gitHubService);
                     }
                     method.setAccessible(true);
                     LinkedList<Object> params = new LinkedList<>();
-                    for(Class type: method.getParameterTypes()) {
+                    for(Class<?> type: method.getParameterTypes()) {
                         if(paramMap.containsKey(type)) {
                             params.add(paramMap.get(type));
                         } else {

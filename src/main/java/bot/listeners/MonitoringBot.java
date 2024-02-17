@@ -1,10 +1,12 @@
 package bot.listeners;
 
-import application.App;
 import bot.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zgamelogic.jda.AdvancedListenerAdapter;
+import com.zgamelogic.annotations.DiscordController;
+import com.zgamelogic.annotations.DiscordMapping;
 import data.serializable.MonitoringConfig;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import services.DataOtterService;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Message;
@@ -16,18 +18,26 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.File;
 import java.io.IOException;
 
-import static com.zgamelogic.jda.Annotations.*;
-
 @RestController
+@DiscordController
 @Slf4j
-public class MonitoringBot extends AdvancedListenerAdapter {
+public class MonitoringBot {
+
+    private final DataOtterService dataOtterService;
 
     private TextChannel channel;
     private Message message;
+    private final Environment environment;
 
-    @OnReady
+    @Autowired
+    public MonitoringBot(DataOtterService dataOtterService, Environment environment) {
+        this.dataOtterService = dataOtterService;
+        this.environment = environment;
+    }
+
+    @DiscordMapping
     public void ready(ReadyEvent event) {
-        channel = event.getJDA().getGuildById(App.config.getGuildId()).getTextChannelById(App.config.getMonitoringId());
+        channel = event.getJDA().getGuildById(environment.getProperty("general.id")).getTextChannelById(environment.getProperty("monitoring.id"));
     }
 
     @Scheduled(cron = "0 */1 * * * *")
@@ -42,9 +52,9 @@ public class MonitoringBot extends AdvancedListenerAdapter {
             try {
                 MonitoringConfig config = om.readValue(monitorConfigFile, MonitoringConfig.class);
                 String messageId = config.getMessageId();
-                message = channel.editMessageEmbedsById(messageId, EmbedMessageGenerator.monitorStatus(DataOtterService.getMonitorStatus())).complete();
+                message = channel.editMessageEmbedsById(messageId, EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
             } catch (IOException ignored) {
-                message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(DataOtterService.getMonitorStatus())).complete();
+                message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
                 try {
                     monitorConfigFile.getParentFile().mkdirs();
                     om.writeValue(monitorConfigFile, new MonitoringConfig(message.getId()));
@@ -53,7 +63,7 @@ public class MonitoringBot extends AdvancedListenerAdapter {
                 }
             }
         } else {
-            message = channel.editMessageEmbedsById(message.getId(), EmbedMessageGenerator.monitorStatus(DataOtterService.getMonitorStatus())).complete();
+            message = channel.editMessageEmbedsById(message.getId(), EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
         }
     }
 }

@@ -7,8 +7,8 @@
   <name>Archetype - Wraith</name>
 
   <properties>
-    <maven.compiler.source>20</maven.compiler.source>
-    <maven.compiler.target>20</maven.compiler.target>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
   </properties>
 
   <repositories>
@@ -28,25 +28,19 @@
       <id>jitpack.io</id>
       <url>https://jitpack.io</url>
     </repository>
-
-    <repository>
-      <id>zgamelogic</id>
-      <name>zgamelogic</name>
-      <url>https://zgamelogic.com:2006/maven</url>
-    </repository>
   </repositories>
 
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.1.2</version>
+    <version>3.2.2</version>
   </parent>
 
   <dependencies>
     <dependency>
       <groupId>com.zgamelogic</groupId>
-      <artifactId>Spring-JDA</artifactId>
-      <version>1.1.4</version>
+      <artifactId>spring-boot-starter-discord</artifactId>
+      <version>1.1.1</version>
     </dependency>
 
     <dependency>
@@ -72,6 +66,18 @@
     </dependency>
 
     <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-security-keyvault-secrets</artifactId>
+      <version>4.6.3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.azure</groupId>
+      <artifactId>azure-identity</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <version>3.8.5</version>
@@ -80,7 +86,7 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.24</version>
+      <version>1.18.30</version>
     </dependency>
 
     <dependency>
