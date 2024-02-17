@@ -17,5 +17,6 @@ public class CurseforgeMod {
     private long mainFileId;
     private String fileName;
     private String serverFileUrl, serverFileName;
+    private long serverFileId;
     private boolean valid;
 }

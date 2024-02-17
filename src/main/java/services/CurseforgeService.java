@@ -26,6 +26,7 @@ public class CurseforgeService {
         HttpHeaders headers = new HttpHeaders();
         headers.add("x-api-key", token);
         ResponseEntity<CurseforgeMod> response = restTemplate.exchange(url, HttpMethod.GET,  new HttpEntity<>(headers), CurseforgeMod.class);
+
         return response.getBody();
     }
 

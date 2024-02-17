@@ -6,10 +6,13 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonNode;
 import data.api.curseforge.CurseforgeFile;
+import data.api.curseforge.CurseforgeLatestFile;
 import data.api.curseforge.CurseforgeMod;
 import services.CurseforgeService;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class CurseforgeModDeserializer extends JsonDeserializer<CurseforgeMod> {
     @Override
@@ -32,10 +35,10 @@ public class CurseforgeModDeserializer extends JsonDeserializer<CurseforgeMod> {
             if(file.get("id").asLong() != mod.getMainFileId()) return;
             try {
                 mod.setFileName(file.get("displayName").asText());
-                long serverPackFileId = file.get("serverPackFileId").asLong();
-                CurseforgeFile serverFile = CurseforgeService.getCurseforgeFile(node.get("id").asLong(), serverPackFileId, "");
-                mod.setServerFileName(serverFile.getDisplayName());
-                mod.setServerFileUrl(serverFile.getDownloadUrl());
+                mod.setServerFileId(file.get("serverPackFileId").asLong());
+//                CurseforgeFile serverFile = CurseforgeService.getCurseforgeFile(node.get("id").asLong(), serverPackFileId);
+//                mod.setServerFileName(serverFile.getDisplayName());
+//                mod.setServerFileUrl(serverFile.getDownloadUrl());
             } catch (Exception ignored){}
         });
         mod.setValid(true);
