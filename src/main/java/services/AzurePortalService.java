@@ -21,6 +21,7 @@ public class AzurePortalService {
             @Value("${keyvault.client.secret}") String keyVaultClientSecret,
             @Value("${keyvault.tenant.id}") String keyVaultTenantId
     ) {
+        log.info("Initializing Azure Service");
         secretClient = new SecretClientBuilder()
                 .vaultUrl(keyVaultUrl)
                 .credential(new ClientSecretCredentialBuilder()
@@ -29,6 +30,7 @@ public class AzurePortalService {
                         .tenantId(keyVaultTenantId)
                         .build()
                 ).buildClient();
+        log.info("Azure service initialized");
     }
 
     @Bean

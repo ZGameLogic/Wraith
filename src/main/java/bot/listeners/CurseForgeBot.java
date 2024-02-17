@@ -1,6 +1,7 @@
 package bot.listeners;
 
 import bot.utils.EmbedMessageGenerator;
+import com.zgamelogic.annotations.Bot;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
 import data.api.curseforge.CurseforgeMod;
@@ -38,6 +39,7 @@ public class CurseForgeBot {
     private final CurseforgeRepository checks;
     private final CurseforgeService curseforgeService;
 
+    @Bot
     private JDA bot;
 
     @Autowired
@@ -48,8 +50,7 @@ public class CurseForgeBot {
 
     @DiscordMapping
     public void ready(ReadyEvent event) {
-        bot = event.getJDA();
-        update();
+        new Thread(this::update, "Curseforge-startup").start();
     }
 
     @DiscordMapping(SubId = "updated", Id = "curseforge", FocusedOption = "project")
