@@ -12,4 +12,5 @@ public class GithubIssue {
     @Id
     private long id;
     private long forumPostId;
+    private Long number;
 }

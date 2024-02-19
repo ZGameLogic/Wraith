@@ -25,17 +25,13 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.json.JSONObject;
 import services.GitHubService;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 import java.util.HashMap;
 import java.util.LinkedList;
 
 @Slf4j
 public abstract class DevopsBotHelper {
 
-    @CreateDiscordRepo
     @GithubEvent("push")
     public static void gitHubPush(PushEvent event, GithubRepository gitHubRepositories, Guild glacies, long generalId){
         glacies.getTextChannelById(generalId).sendMessageEmbeds(
@@ -47,7 +43,6 @@ public abstract class DevopsBotHelper {
                 ).queue());
     }
 
-    @CreateDiscordRepo
     @GithubEvent(value = "repository", action = "created")
     public static void gitHubRepositoryCreated(String body, GithubRepository gitHubRepositories, Guild glacies, GitHubService service){
         JSONObject jsonRepo = new JSONObject(body).getJSONObject("repository");
@@ -75,7 +70,6 @@ public abstract class DevopsBotHelper {
         );
     }
 
-    @CreateDiscordRepo
     @GithubEvent(value = "label", action = "created")
     private static void githubLabelCreated(LabelEvent event, GithubRepository gitHubRepositories, Guild glacies){
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo -> {
@@ -88,7 +82,6 @@ public abstract class DevopsBotHelper {
         });
     }
 
-    @CreateDiscordRepo
     @GithubEvent(value = "label", action = "edited")
     private static void githubLabelEdited(LabelEvent event, GithubRepository gitHubRepositories, Guild glacies){
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo -> {
@@ -107,7 +100,6 @@ public abstract class DevopsBotHelper {
         });
     }
 
-    @CreateDiscordRepo
     @GithubEvent(value = "label", action = "deleted")
     public static void githubLabelDeleted(LabelEvent event, GithubRepository gitHubRepositories, Guild glacies){
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo -> {
@@ -119,7 +111,6 @@ public abstract class DevopsBotHelper {
         });
     }
 
-    @CreateDiscordRepo
     @GithubEvent(value = "workflow_job")
     private static void gitHubWorkflow(WorkflowEvent workflowEvent, GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, Guild glacies, GitHubService service){
         WorkflowRun run = service.getWorkflowRun(workflowEvent.getWorkflowJob().getRunUrl());
@@ -174,6 +165,7 @@ public abstract class DevopsBotHelper {
             ).queue(forumPost -> {
                 GithubIssue ghIssue = new GithubIssue();
                 ghIssue.setId(event.getIssue().getId());
+                ghIssue.setNumber(event.getIssue().getNumber());
                 ghIssue.setForumPostId(forumPost.getThreadChannel().getIdLong());
                 githubIssueRepository.save(ghIssue);
                 if(event.getIssue().getAssignee() != null) gitHubIssueAssigned(event, githubIssueRepository, glacies);
@@ -183,6 +175,7 @@ public abstract class DevopsBotHelper {
 
     @GithubEvent(value = "issues", action = "labeled")
     private static void gitHubIssueLabeled(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies){
+        if(event.getSender().getLogin().equals("ZGameLogicBot")) return;
         githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig ->
             gitHubRepositories.findById(event.getRepository().getId()).ifPresent(githubRepoConfig -> {
                 ForumChannel forumChannel = glacies.getForumChannelById(githubRepoConfig.getForumChannelId());
@@ -195,6 +188,11 @@ public abstract class DevopsBotHelper {
                 ).queue();
             })
         );
+    }
+
+    @GithubEvent(value = "issues", action = "unlabeled")
+    private static void gitHubIssueUnlabeled(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies){
+        gitHubIssueLabeled(event, gitHubRepositories, githubIssueRepository, glacies);
     }
 
     @GithubEvent(value = "issues", action = "assigned")
@@ -293,8 +291,4 @@ public abstract class DevopsBotHelper {
         String value();
         String action() default "";
     }
-
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.METHOD)
-    public @interface CreateDiscordRepo {}
 }

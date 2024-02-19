@@ -11,4 +11,5 @@ public class User {
     private String html_url;
     private String url;
     private String avatar_url;
+    private String type;
 }

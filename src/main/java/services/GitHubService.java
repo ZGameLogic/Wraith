@@ -1,6 +1,7 @@
 package services;
 
 import data.api.github.Label;
+import data.api.github.LabelsPayload;
 import data.api.github.WorkflowRun;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,21 @@ public class GitHubService {
     @Autowired
     public GitHubService(@Value("${keyvault.url}") String githubToken){
         this.githubToken = githubToken;
+    }
+
+    public void editIssueLabels(String repository, long issueNumber, LabelsPayload payload){
+        repository = "Discord-Bot";
+        issueNumber = 12;
+        String url = "https://api.github.com/repos/ZGameLogic/" + repository + "/issues/" + issueNumber + "/labels";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + githubToken);
+        try {
+            HttpEntity<LabelsPayload> requestEntity = new HttpEntity<>(payload, headers);
+            restTemplate.postForObject(url, requestEntity, String.class);
+        } catch (Exception e){
+            log.error("Canned edit issue labels", e);
+        }
     }
 
     public LinkedList<Label> getIssueLabels(String url){
