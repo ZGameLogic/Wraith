@@ -37,7 +37,7 @@ public class MonitoringBot {
 
     @DiscordMapping
     public void ready(ReadyEvent event) {
-        channel = event.getJDA().getGuildById(environment.getProperty("general.id")).getTextChannelById(environment.getProperty("monitoring.id"));
+        channel = event.getJDA().getGuildById(environment.getProperty("guild.id")).getTextChannelById(environment.getProperty("monitoring.id"));
     }
 
     @Scheduled(cron = "0 */1 * * * *")
