@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import data.api.github.Label;
 import data.api.github.Repository;
+import data.api.github.User;
 import data.deserializers.github.LabelEventDeserializer;
 import lombok.Data;
 
@@ -14,4 +15,5 @@ public class LabelEvent {
     private Repository repository;
     private Label label;
     private String from;
+    private User sender;
 }
