@@ -23,7 +23,7 @@ public class GitHubService {
     private final String githubToken;
 
     @Autowired
-    public GitHubService(@Value("${keyvault.url}") String githubToken){
+    public GitHubService(@Value("${github.token}") String githubToken){
         this.githubToken = githubToken;
     }
 
@@ -36,7 +36,7 @@ public class GitHubService {
         headers.add("Authorization", "Bearer " + githubToken);
         try {
             HttpEntity<LabelsPayload> requestEntity = new HttpEntity<>(payload, headers);
-            restTemplate.postForObject(url, requestEntity, String.class);
+            restTemplate.put(url, requestEntity);
         } catch (Exception e){
             log.error("Canned edit issue labels", e);
         }

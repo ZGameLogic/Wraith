@@ -59,24 +59,17 @@ public class DevopsBot {
         this.githubIssueRepository = githubIssueRepository;
         this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
-        gitHubService.getIssueLabels("https://api.github.com/repos/ZGameLogic/Discord-Bot/labels").forEach(label -> {
-            System.out.println(label.getName());
-        });
-        List<String> tags = new LinkedList<>(List.of("bug", "documentation"));
-        gitHubService.editIssueLabels("", 1, new LabelsPayload(tags));
     }
 
     @DiscordMapping
     private void forumTagUpdate(ChannelUpdateAppliedTagsEvent event){
-//        long forumChannelId = event.getChannel().asThreadChannel().getParentChannel().asForumChannel().getIdLong();
-//        long threadChannelId = event.getChannel().getIdLong();
-//        githubIssueRepository.getGithubIssueByForumPostId(threadChannelId).ifPresent(githubIssue ->
-//                gitHubRepositories.getByForumChannelId(forumChannelId).ifPresent(gitRepo -> {
-//                    String[] tags = (String[]) event.getNewTags().stream().map(BaseForumTag::getName).toList().toArray();
-//                    gitHubService.editIssueLabels(gitRepo.getRepoName(), githubIssue.getNumber(), tags);
-//        }));
-        List<String> tags = event.getNewTags().stream().map(BaseForumTag::getName).toList();
-        gitHubService.editIssueLabels("", 1, new LabelsPayload(tags));
+        long forumChannelId = event.getChannel().asThreadChannel().getParentChannel().asForumChannel().getIdLong();
+        long threadChannelId = event.getChannel().getIdLong();
+        githubIssueRepository.getGithubIssueByForumPostId(threadChannelId).ifPresent(githubIssue ->
+                gitHubRepositories.getByForumChannelId(forumChannelId).ifPresent(gitRepo -> {
+                    List<String> tags = event.getNewTags().stream().map(BaseForumTag::getName).toList();
+                    gitHubService.editIssueLabels(gitRepo.getRepoName(), githubIssue.getNumber(), new LabelsPayload(tags));
+        }));
     }
 
     @GetMapping("health")
