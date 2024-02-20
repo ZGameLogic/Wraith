@@ -4,7 +4,6 @@ import data.api.github.Label;
 import data.api.github.LabelsPayload;
 import data.api.github.WorkflowRun;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,16 +19,10 @@ import java.util.LinkedList;
 @Service
 public class GitHubService {
 
-    private final String githubToken;
-
-    @Autowired
-    public GitHubService(@Value("${github.token}") String githubToken){
-        this.githubToken = githubToken;
-    }
+    @Value("${github.token}")
+    private String githubToken;
 
     public void editIssueLabels(String repository, long issueNumber, LabelsPayload payload){
-        repository = "Discord-Bot";
-        issueNumber = 12;
         String url = "https://api.github.com/repos/ZGameLogic/" + repository + "/issues/" + issueNumber + "/labels";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
