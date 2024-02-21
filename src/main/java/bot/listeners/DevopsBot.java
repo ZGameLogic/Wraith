@@ -47,6 +47,9 @@ public class DevopsBot {
     @Value("${github.token}")
     private String githubToken;
 
+    @Value("${general.id}")
+    private long generalId;
+
     @DiscordMapping
     private void ready(ReadyEvent event){
         glacies = event.getJDA().getGuildById(guildId);
@@ -89,6 +92,7 @@ public class DevopsBot {
         paramMap.put(GithubIssueRepository.class, githubIssueRepository);
         paramMap.put(Guild.class, glacies);
         paramMap.put(GitHubService.class, gitHubService);
+        paramMap.put(long.class, generalId);
 
         for(Method method: DevopsBotHelper.class.getDeclaredMethods()){
             if(method.isAnnotationPresent(GithubEvent.class)){
