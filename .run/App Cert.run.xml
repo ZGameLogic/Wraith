@@ -1,0 +1,16 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="App Cert" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="cert" />
+    <module name="Wraith" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="application.App" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="application.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

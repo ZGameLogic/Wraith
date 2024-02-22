@@ -1,6 +1,4 @@
 /target
 /jsons
 .idea/*
-wraith.properties
 /data/*
-application.properties
