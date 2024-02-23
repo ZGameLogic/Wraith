@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
+import com.zgamelogic.annotations.EventProperty;
 import data.api.github.LabelsPayload;
 import data.database.github.Issue.GithubIssueRepository;
 import data.database.github.repository.GithubRepository;
@@ -16,6 +17,7 @@ import net.dv8tion.jda.api.events.channel.update.ChannelUpdateAppliedTagsEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -71,14 +73,25 @@ public class DevopsBot {
         mapper = new ObjectMapper();
     }
 
-    @DiscordMapping(Id = "Spring", SubId = "properties", FocusedOption = "file")
+    @DiscordMapping(Id = "spring", SubId = "properties", FocusedOption = "file")
     private void propertiesFilesAutoComplete(CommandAutoCompleteInteractionEvent event){
-        // TODO implement
+        List<Command.Choice> files = gitHubService.getPropertiesFileList().stream()
+                .filter(file -> file.getPath().contains(event.getFocusedOption().getValue()))
+                .map(file -> {
+                    String[] paths = file.getPath().split("/");
+                    return new Command.Choice(paths[paths.length - 1], file.getPath());
+                })
+                .toList();
+        event.replyChoices(files).queue();
     }
 
     @DiscordMapping(Id = "spring", SubId = "properties")
-    private void springProperties(SlashCommandInteractionEvent event){
-        // TODO implement
+    private void springProperties(
+            SlashCommandInteractionEvent event,
+            @EventProperty String file
+    ){
+        String content = gitHubService.getPropertiesFileContent(file);
+        event.reply("```\n" + content + "\n```").setEphemeral(true).queue();
     }
 
     @DiscordMapping

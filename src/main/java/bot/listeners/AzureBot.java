@@ -4,6 +4,7 @@ import com.azure.security.keyvault.secrets.SecretClient;
 import com.azure.security.keyvault.secrets.models.SecretProperties;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
+import com.zgamelogic.annotations.EventProperty;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -42,8 +43,11 @@ public class AzureBot {
     }
 
     @DiscordMapping(Id = "azure", SubId = "secret")
-    public void azureSecretSlashCommand(SlashCommandInteractionEvent event){
-        String value = secretClient.getSecret(event.getOption("name").getAsString()).getValue();
+    public void azureSecretSlashCommand(
+            SlashCommandInteractionEvent event,
+            @EventProperty String name
+    ){
+        String value = secretClient.getSecret(name).getValue();
         event.reply(value).setEphemeral(true).queue();
     }
 
