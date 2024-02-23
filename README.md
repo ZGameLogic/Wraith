@@ -6,7 +6,7 @@ This bot has azure functionality to allow me to create, read, or update secrets 
 <img width="894" alt="Screenshot 2024-02-22 at 6 10 39 PM" src="https://github.com/ZGameLogic/Wraith/assets/23252883/43ce6d41-4942-44ca-9c83-d9c8096c088b">
 
 ## Curseforge
-This bot integrates with curseforge projects by polling the API and compairing the most recent files. The bot will post a message when the mod has an update.
+This bot integrates with curseforge projects by polling the API and compairing the most recent files. The bot will post a message when the mod has an update. 
 <img width="416" alt="Screenshot 2024-02-22 at 6 15 58 PM" src="https://github.com/ZGameLogic/Wraith/assets/23252883/2438e23e-f64b-4558-9275-19e982b80840">
 
 ## Github
