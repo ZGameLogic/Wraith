@@ -22,6 +22,14 @@ public class GitHubService {
     @Value("${github.token}")
     private String githubToken;
 
+    public void getPropertiesFileList(){
+        // TODO implement
+    }
+
+    public void getPropertiesFile(){
+        // TODO implement
+    }
+
     public void editIssueLabels(String repository, long issueNumber, LabelsPayload payload){
         String url = "https://api.github.com/repos/ZGameLogic/" + repository + "/issues/" + issueNumber + "/labels";
         RestTemplate restTemplate = new RestTemplate();

@@ -13,11 +13,18 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.forums.BaseForumTag;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateAppliedTagsEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 import services.GitHubService;
 
@@ -62,6 +69,16 @@ public class DevopsBot {
         this.githubIssueRepository = githubIssueRepository;
         this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
+    }
+
+    @DiscordMapping(Id = "Spring", SubId = "properties", FocusedOption = "file")
+    private void propertiesFilesAutoComplete(CommandAutoCompleteInteractionEvent event){
+        // TODO implement
+    }
+
+    @DiscordMapping(Id = "spring", SubId = "properties")
+    private void springProperties(SlashCommandInteractionEvent event){
+        // TODO implement
     }
 
     @DiscordMapping
@@ -120,5 +137,13 @@ public class DevopsBot {
                 }
             }
         }
+    }
+
+    @Bean
+    private CommandData githubCommands(){
+        return Commands.slash("spring", "Github commands").addSubcommands(
+                new SubcommandData("properties", "Spring properties")
+                        .addOption(OptionType.STRING, "file", "File to get the properties of", true, true)
+        );
     }
 }
