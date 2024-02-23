@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
+import com.zgamelogic.annotations.EventProperty;
 import data.api.github.LabelsPayload;
 import data.database.github.Issue.GithubIssueRepository;
 import data.database.github.repository.GithubRepository;
@@ -13,11 +14,19 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.forums.BaseForumTag;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateAppliedTagsEvent;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.*;
 import services.GitHubService;
 
@@ -62,6 +71,27 @@ public class DevopsBot {
         this.githubIssueRepository = githubIssueRepository;
         this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
+    }
+
+    @DiscordMapping(Id = "spring", SubId = "properties", FocusedOption = "file")
+    private void propertiesFilesAutoComplete(CommandAutoCompleteInteractionEvent event){
+        List<Command.Choice> files = gitHubService.getPropertiesFileList().stream()
+                .filter(file -> file.getPath().contains(event.getFocusedOption().getValue()))
+                .map(file -> {
+                    String[] paths = file.getPath().split("/");
+                    return new Command.Choice(paths[paths.length - 1], file.getPath());
+                })
+                .toList();
+        event.replyChoices(files).queue();
+    }
+
+    @DiscordMapping(Id = "spring", SubId = "properties")
+    private void springProperties(
+            SlashCommandInteractionEvent event,
+            @EventProperty String file
+    ){
+        String content = gitHubService.getPropertiesFileContent(file);
+        event.reply("```\n" + content + "\n```").setEphemeral(true).queue();
     }
 
     @DiscordMapping
@@ -120,5 +150,13 @@ public class DevopsBot {
                 }
             }
         }
+    }
+
+    @Bean
+    private CommandData githubCommands(){
+        return Commands.slash("spring", "Github commands").addSubcommands(
+                new SubcommandData("properties", "Spring properties")
+                        .addOption(OptionType.STRING, "file", "File to get the properties of", true, true)
+        );
     }
 }
