@@ -101,7 +101,7 @@ public class DevopsBot {
         githubIssueRepository.getGithubIssueByForumPostId(threadChannelId).ifPresent(githubIssue ->
                 gitHubRepositories.getByForumChannelId(forumChannelId).ifPresent(gitRepo -> {
                     List<String> tags = event.getNewTags().stream().map(BaseForumTag::getName).toList();
-                    gitHubService.editIssueLabels(gitRepo.getRepoName(), githubIssue.getNumber(), new LabelsPayload(tags));
+                    gitHubService.editIssueLabels(gitRepo.getRepoName().replace(" ", "-"), githubIssue.getNumber(), new LabelsPayload(tags));
         }));
     }
 

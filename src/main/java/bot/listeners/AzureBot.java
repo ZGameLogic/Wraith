@@ -52,8 +52,12 @@ public class AzureBot {
     }
 
     @DiscordMapping(Id = "azure", SubId = "add_secret")
-    public void azureSecretAddSlashCommand(SlashCommandInteractionEvent event) {
-        secretClient.setSecret(event.getOption("name").getAsString(), event.getOption("value").getAsString());
+    public void azureSecretAddSlashCommand(
+            SlashCommandInteractionEvent event,
+            @EventProperty String name,
+            @EventProperty String value
+    ){
+        secretClient.setSecret(name, value);
         event.reply("Secret created").setEphemeral(true).queue();
     }
 
