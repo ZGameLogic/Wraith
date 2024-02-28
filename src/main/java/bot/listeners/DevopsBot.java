@@ -87,7 +87,7 @@ public class DevopsBot {
         long threadChannelId = event.getChannel().getIdLong();
         githubIssueRepository.getGithubIssueByForumPostId(threadChannelId).ifPresent(githubIssue ->
                 gitHubRepositories.getByForumChannelId(forumChannelId).ifPresent(gitRepo -> {
-                    String message = event.getMessage().getContentDisplay();
+                    String message = event.getMessage().getContentDisplay() + "\nThis message was posted from discord by: " + event.getAuthor().getName();
                     Optional<GithubUser> user = githubUserRepository.getGithubUserByDiscordId(event.getAuthor().getIdLong());
                     user.ifPresent(u -> blockGithubMessage.add(u.getGithubId()));
                     gitHubService.postIssueComment(
