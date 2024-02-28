@@ -7,8 +7,11 @@ import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
 import com.zgamelogic.annotations.EventProperty;
 import data.api.github.LabelsPayload;
+import data.api.github.User;
 import data.database.github.Issue.GithubIssueRepository;
 import data.database.github.repository.GithubRepository;
+import data.database.github.user.GithubUser;
+import data.database.github.user.GithubUserRepository;
 import data.database.github.workflow.WorkflowRepository;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,6 +19,7 @@ import net.dv8tion.jda.api.entities.channel.forums.BaseForumTag;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateAppliedTagsEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -32,9 +36,7 @@ import services.GitHubService;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static bot.helpers.DevopsBotHelper.*;
 
@@ -46,9 +48,12 @@ public class DevopsBot {
     private final GithubRepository gitHubRepositories;
     private final WorkflowRepository workflowRepository;
     private final GithubIssueRepository githubIssueRepository;
+    private final GithubUserRepository githubUserRepository;
     private final ObjectMapper mapper;
     private final GitHubService gitHubService;
     private Guild glacies;
+
+    private final Set<Long> blockGithubMessage;
 
     @Value("${guild.id}")
     private String guildId;
@@ -65,12 +70,50 @@ public class DevopsBot {
     }
 
     @Autowired
-    public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository, GitHubService gitHubService){
+    public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository, GithubUserRepository githubUserRepository, GitHubService gitHubService){
         this.workflowRepository = workflowRepository;
         this.gitHubRepositories = gitHubRepositories;
         this.githubIssueRepository = githubIssueRepository;
+        this.githubUserRepository = githubUserRepository;
         this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
+        blockGithubMessage = new HashSet<>();
+    }
+
+    @DiscordMapping
+    private void userMessage(MessageReceivedEvent event){
+        if(!event.isFromThread()) return;
+        long forumChannelId = event.getChannel().asThreadChannel().getParentChannel().asForumChannel().getIdLong();
+        long threadChannelId = event.getChannel().getIdLong();
+        githubIssueRepository.getGithubIssueByForumPostId(threadChannelId).ifPresent(githubIssue ->
+                gitHubRepositories.getByForumChannelId(forumChannelId).ifPresent(gitRepo -> {
+                    String message = event.getMessage().getContentDisplay();
+                    Optional<GithubUser> user = githubUserRepository.getGithubUserByDiscordId(event.getAuthor().getIdLong());
+                    user.ifPresent(u -> blockGithubMessage.add(u.getGithubId()));
+                    gitHubService.postIssueComment(
+                            gitRepo.getUrlFriendlyName(),
+                            githubIssue.getNumber(),
+                            user.map(GithubUser::getGithubToken).orElse(null),
+                            message
+                    );
+        }));
+    }
+
+    @DiscordMapping(Id = "github", SubId = "add_token")
+    private void addGithubToken(SlashCommandInteractionEvent event, @EventProperty String token){
+        User githubUser = gitHubService.getGithubAuthenticatedUser(token);
+        if(githubUser == null){
+            event.reply("We were unable to authenticate with that github token. Please check your access token and try again.").setEphemeral(true).queue();
+            return;
+        }
+        githubUserRepository.getGithubUserByDiscordId(event.getUser().getIdLong()).ifPresentOrElse(gdUser -> {
+            gdUser.setGithubToken(token);
+            githubUserRepository.save(gdUser);
+        }, () -> {
+            GithubUser newGitUser = new GithubUser(event.getUser().getIdLong(), githubUser.getId(), token);
+            githubUserRepository.save(newGitUser);
+        });
+        event.reply("Linked github token to this account").setEphemeral(true).queue();
     }
 
     @DiscordMapping(Id = "spring", SubId = "properties", FocusedOption = "file")
@@ -123,6 +166,7 @@ public class DevopsBot {
         paramMap.put(Guild.class, glacies);
         paramMap.put(GitHubService.class, gitHubService);
         paramMap.put(long.class, generalId);
+        paramMap.put(HashSet.class, blockGithubMessage);
 
         for(Method method: DevopsBotHelper.class.getDeclaredMethods()){
             if(method.isAnnotationPresent(GithubEvent.class)){
@@ -153,10 +197,16 @@ public class DevopsBot {
     }
 
     @Bean
-    private CommandData githubCommands(){
-        return Commands.slash("spring", "Github commands").addSubcommands(
+    private List<CommandData> githubCommands(){
+        return List.of(
+            Commands.slash("spring", "Spring commands").addSubcommands(
                 new SubcommandData("properties", "Spring properties")
                         .addOption(OptionType.STRING, "file", "File to get the properties of", true, true)
+            ),
+            Commands.slash("github", "Github related commands").addSubcommands(
+                new SubcommandData("add_token", "Add a github token to make comments under your user on issues you comment on in discord.")
+                        .addOption(OptionType.STRING, "token", "Github token with repo access", true)
+            )
         );
     }
 }

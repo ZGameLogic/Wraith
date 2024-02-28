@@ -27,4 +27,8 @@ public class GitRepo {
         repoUrl = url;
         repoName = name;
     }
+
+    public String getUrlFriendlyName(){
+        return repoName.replace(" ", "-");
+    }
 }
