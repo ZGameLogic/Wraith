@@ -2,8 +2,10 @@ package services;
 
 import data.api.github.Label;
 import data.api.github.LabelsPayload;
+import data.api.github.User;
 import data.api.github.WorkflowRun;
 import data.api.github.responses.FilePayload;
+import data.api.github.responses.MessagePayload;
 import data.api.github.responses.Tree;
 import data.api.github.responses.TreePayload;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +26,36 @@ import java.util.List;
 public class GitHubService {
 
     @Value("${github.token}")
-    private String githubToken;
+    private String githubBotToken;
 
     @Value("${github.admin.token}")
     private String githubAdminToken;
+
+    public void postIssueComment(String repository, long issue, String userToken, String message){
+        String url = String.format("https://api.github.com/repos/ZGameLogic/%s/issues/%d/comments", repository, issue);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + (userToken != null ? userToken : githubBotToken));
+        try {
+            HttpEntity<MessagePayload> requestEntity = new HttpEntity<>(new MessagePayload(message), headers);
+            String resp = restTemplate.postForObject(url, requestEntity, String.class);
+        } catch(Exception e){
+            log.error("Unable to post comment", e);
+        }
+    }
+
+    public User getGithubAuthenticatedUser(String userToken){
+        String url = "https://api.github.com/user";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + githubAdminToken);
+        try {
+            return restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), User.class).getBody();
+        } catch (Exception e){
+            log.error("Unable to get list of properties files", e);
+        }
+        return null;
+    }
 
     public List<Tree> getPropertiesFileList(){
         String url = "https://api.github.com/repos/ZGameLogic/properties/git/trees/master?recursive=true";
@@ -61,7 +89,7 @@ public class GitHubService {
         String url = "https://api.github.com/repos/ZGameLogic/" + repository + "/issues/" + issueNumber + "/labels";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + githubToken);
+        headers.add("Authorization", "Bearer " + githubBotToken);
         try {
             HttpEntity<LabelsPayload> requestEntity = new HttpEntity<>(payload, headers);
             restTemplate.put(url, requestEntity);

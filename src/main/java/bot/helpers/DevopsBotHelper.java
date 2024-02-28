@@ -27,6 +27,7 @@ import services.GitHubService;
 
 import java.lang.annotation.*;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 
 @Slf4j
@@ -174,8 +175,12 @@ public abstract class DevopsBotHelper {
     }
 
     @GithubEvent(value = "issues", action = "labeled")
-    private static void gitHubIssueLabeled(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies){
+    private static void gitHubIssueLabeled(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies, HashSet<Long> blockedMessages){
         if(event.getSender().getLogin().equals("ZGameLogicBot")) return;
+        if(blockedMessages.contains(event.getSender().getId())){
+            blockedMessages.remove(event.getSender().getId());
+            return;
+        }
         githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig ->
             gitHubRepositories.findById(event.getRepository().getId()).ifPresent(githubRepoConfig -> {
                 ForumChannel forumChannel = glacies.getForumChannelById(githubRepoConfig.getForumChannelId());
@@ -191,8 +196,8 @@ public abstract class DevopsBotHelper {
     }
 
     @GithubEvent(value = "issues", action = "unlabeled")
-    private static void gitHubIssueUnlabeled(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies){
-        gitHubIssueLabeled(event, gitHubRepositories, githubIssueRepository, glacies);
+    private static void gitHubIssueUnlabeled(IssueEvent event, GithubRepository gitHubRepositories, GithubIssueRepository githubIssueRepository, Guild glacies, HashSet<Long> blockedMessages){
+        gitHubIssueLabeled(event, gitHubRepositories, githubIssueRepository, glacies, blockedMessages);
     }
 
     @GithubEvent(value = "issues", action = "assigned")
@@ -227,7 +232,12 @@ public abstract class DevopsBotHelper {
     }
 
     @GithubEvent(value = "issue_comment", action = "created")
-    private static void gitHubIssueCommentCreated(IssueCommentEvent event, GithubIssueRepository githubIssueRepository, Guild glacies){
+    private static void gitHubIssueCommentCreated(IssueCommentEvent event, GithubIssueRepository githubIssueRepository, Guild glacies, HashSet<Long> blockedMessages){
+        if(event.getSender().getLogin().equals("ZGameLogicBot")) return;
+        if(blockedMessages.contains(event.getSender().getId())){
+            blockedMessages.remove(event.getSender().getId());
+            return;
+        }
         githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
             ThreadChannel channel = glacies.getThreadChannelById(issueConfig.getForumPostId());
             channel.sendMessageEmbeds(
