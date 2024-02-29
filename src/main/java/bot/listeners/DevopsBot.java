@@ -82,7 +82,7 @@ public class DevopsBot {
 
     @DiscordMapping
     private void userMessage(MessageReceivedEvent event){
-        if(!event.isFromThread()) return;
+        if(!event.isFromThread() || event.getAuthor().isBot()) return;
         long forumChannelId = event.getChannel().asThreadChannel().getParentChannel().asForumChannel().getIdLong();
         long threadChannelId = event.getChannel().getIdLong();
         githubIssueRepository.getGithubIssueByForumPostId(threadChannelId).ifPresent(githubIssue ->
