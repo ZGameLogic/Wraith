@@ -1,6 +1,7 @@
 package bot.listeners;
 
 import com.azure.security.keyvault.secrets.SecretClient;
+import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
 import com.azure.security.keyvault.secrets.models.SecretProperties;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
@@ -14,8 +15,10 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -24,6 +27,9 @@ import java.util.List;
 public class AzureBot {
 
     private final SecretClient secretClient;
+
+    @Value("${admin.id}")
+    private long adminId;
 
     @Autowired
     public AzureBot(SecretClient secretClient) {
@@ -35,6 +41,13 @@ public class AzureBot {
         List<Command.Choice> names = secretClient
                 .listPropertiesOfSecrets()
                 .stream()
+                .filter(secret -> {
+                    if(secret.getTags() == null || !secret.getTags().containsKey("discord")) return false;
+                    String tagValue = secret.getTags().get("discord");
+                    if(tagValue.equals("public")) return true;
+                    if(tagValue.equals("admin") && event.getMember().getRoles().stream().anyMatch(role -> role.getIdLong() == adminId)) return true;
+                    return tagValue.equals(event.getUser().getId());
+                })
                 .map(SecretProperties::getName)
                 .filter(word -> word.startsWith(event.getFocusedOption().getValue()))
                 .map(word -> new Command.Choice(word, word))
@@ -57,8 +70,14 @@ public class AzureBot {
             @EventProperty String name,
             @EventProperty String value
     ){
-        secretClient.setSecret(name, value);
-        event.reply("Secret created").setEphemeral(true).queue();
+        KeyVaultSecret secret = new KeyVaultSecret(name, value);
+        secret.setProperties(new SecretProperties().setTags(Collections.singletonMap("discord", event.getUser().getId())));
+        try {
+            secretClient.setSecret(secret);
+            event.reply("Secret created").setEphemeral(true).queue();
+        } catch(Exception e){
+            event.reply(e.getMessage()).setEphemeral(true).queue();
+        }
     }
 
     @Bean
