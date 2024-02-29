@@ -71,6 +71,18 @@ public abstract class DevopsBotHelper {
         );
     }
 
+    @GithubEvent(value = "release", action = "published")
+    private static void githubReleasePublished(PublishReleasedEvent event, GithubRepository gitHubRepositories, Guild glacies, long generalId){
+        glacies.getTextChannelById(generalId).sendMessageEmbeds(
+                EmbedMessageGenerator.githubPublishedReleaseMessage(event)
+        ).queue();
+        gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo ->
+            glacies.getTextChannelById(repo.getGeneralId()).sendMessageEmbeds(
+                    EmbedMessageGenerator.githubPublishedReleaseMessage(event)
+            ).queue()
+        );
+    }
+
     @GithubEvent(value = "label", action = "created")
     private static void githubLabelCreated(LabelEvent event, GithubRepository gitHubRepositories, Guild glacies){
         gitHubRepositories.findById(event.getRepository().getId()).ifPresent(repo -> {

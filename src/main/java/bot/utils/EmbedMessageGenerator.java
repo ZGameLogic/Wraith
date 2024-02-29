@@ -1,10 +1,8 @@
 package bot.utils;
 
 import data.api.curseforge.CurseforgeMod;
-import data.api.github.Comment;
-import data.api.github.User;
-import data.api.github.WorkflowJob;
-import data.api.github.WorkflowRun;
+import data.api.github.*;
+import data.api.github.events.PublishReleasedEvent;
 import data.api.github.events.PushEvent;
 import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;
@@ -36,6 +34,20 @@ public abstract class EmbedMessageGenerator {
             1, new Color(64, 194, 99)
     );
 
+    public static MessageEmbed githubPublishedReleaseMessage(PublishReleasedEvent release){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(GENERAL_COLOR);
+        eb.setTitle(String.format(
+                "%s release: %s",
+                release.getRepository().getName(),
+                release.getRelease().getName()
+        ), release.getRelease().getHtml_url());
+        eb.setDescription(release.getRelease().getBody());
+        User releasedUser = release.getRelease().getAuthor();
+        eb.setFooter(releasedUser.getLogin(), releasedUser.getAvatar_url());
+        eb.setTimestamp(Instant.now());
+        return eb.build();
+    }
 
     public static MessageEmbed githubIssueCommentedMessage(Comment comment){
         EmbedBuilder eb = new EmbedBuilder();
