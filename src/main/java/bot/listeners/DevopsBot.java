@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.forums.BaseForumTag;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateAppliedTagsEvent;
+import net.dv8tion.jda.api.events.channel.update.ChannelUpdateArchivedEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -78,6 +79,17 @@ public class DevopsBot {
         this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
         blockGithubMessage = new HashSet<>();
+    }
+
+    @DiscordMapping
+    private void closedIssue(ChannelUpdateArchivedEvent event){
+        if(event.getNewValue()){
+            githubIssueRepository.getGithubIssueByForumPostId(event.getChannel().getIdLong()).ifPresent(githubIssue ->
+                    gitHubRepositories.getByForumChannelId(event.getChannel().getIdLong()).ifPresent(gitRepo ->
+                            gitHubService.closeIssue(gitRepo.getUrlFriendlyName(), githubIssue.getId(), null)
+                    )
+            );
+        }
     }
 
     @DiscordMapping
