@@ -70,11 +70,6 @@ public class DevopsBot {
     @Value("${general.id}")
     private long generalId;
 
-    @DiscordMapping
-    private void ready(ReadyEvent event){
-        glacies = event.getJDA().getGuildById(guildId);
-    }
-
     @Autowired
     public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository, GithubUserRepository githubUserRepository, GitHubService gitHubService){
         this.workflowRepository = workflowRepository;
@@ -84,6 +79,11 @@ public class DevopsBot {
         this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
         blockGithubMessage = new HashSet<>();
+    }
+
+    @DiscordMapping
+    private void ready(ReadyEvent event){
+        glacies = event.getJDA().getGuildById(guildId);
     }
 
     @DiscordMapping(Id = "github", SubId = "create_issue")
