@@ -158,7 +158,7 @@ public class DevopsBot {
             @RequestHeader(name = "X-GitHub-Event") String gitHubEvent,
             @RequestBody String body
     ) {
-        HashMap<Class, Object> paramMap = new HashMap<>();
+        HashMap<Class<?>, Object> paramMap = new HashMap<>();
         paramMap.put(String.class, body);
         paramMap.put(GithubRepository.class, gitHubRepositories);
         paramMap.put(WorkflowRepository.class, workflowRepository);
