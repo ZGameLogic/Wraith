@@ -243,6 +243,14 @@ public abstract class DevopsBotHelper {
         });
     }
 
+    @GithubEvent(value = "issues", action = "deleted")
+    private static void gitHubIssueDelete(IssueEvent event, GithubIssueRepository githubIssueRepository, Guild glacies){
+        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
+            glacies.getThreadChannelById(issueConfig.getForumPostId()).delete().queue();
+            githubIssueRepository.delete(issueConfig);
+        });
+    }
+
     @GithubEvent(value = "issue_comment", action = "created")
     private static void gitHubIssueCommentCreated(IssueCommentEvent event, GithubIssueRepository githubIssueRepository, Guild glacies, HashSet<Long> blockedMessages){
         if(event.getSender().getLogin().equals("ZGameLogicBot")) return;
