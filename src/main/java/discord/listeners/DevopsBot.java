@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.forums.BaseForumTag;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateAppliedTagsEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
+import net.dv8tion.jda.api.events.channel.update.ChannelUpdateArchivedEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -70,11 +71,6 @@ public class DevopsBot {
     @Value("${general.id}")
     private long generalId;
 
-    @DiscordMapping
-    private void ready(ReadyEvent event){
-        glacies = event.getJDA().getGuildById(guildId);
-    }
-
     @Autowired
     public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository, GithubUserRepository githubUserRepository, GitHubService gitHubService){
         this.workflowRepository = workflowRepository;
@@ -84,6 +80,11 @@ public class DevopsBot {
         this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
         blockGithubMessage = new HashSet<>();
+    }
+
+    @DiscordMapping
+    private void ready(ReadyEvent event){
+        glacies = event.getJDA().getGuildById(guildId);
     }
 
     @DiscordMapping(Id = "github", SubId = "create_issue")
@@ -113,6 +114,17 @@ public class DevopsBot {
                 event.reply("Unable to create issue.").setEphemeral(true).queue();
             }
         });
+    }
+
+    @DiscordMapping
+    private void closedIssue(ChannelUpdateArchivedEvent event){
+        if(event.getNewValue()){
+            githubIssueRepository.getGithubIssueByForumPostId(event.getChannel().getIdLong()).ifPresent(githubIssue ->
+                    gitHubRepositories.getByForumChannelId(event.getChannel().getIdLong()).ifPresent(gitRepo ->
+                            gitHubService.closeIssue(gitRepo.getUrlFriendlyName(), githubIssue.getId(), null)
+                    )
+            );
+        }
     }
 
     @DiscordMapping
@@ -193,7 +205,7 @@ public class DevopsBot {
             @RequestHeader(name = "X-GitHub-Event") String gitHubEvent,
             @RequestBody String body
     ) {
-        HashMap<Class<?>, Object> paramMap = new HashMap<>();
+        HashMap<Class, Object> paramMap = new HashMap<>();
         paramMap.put(String.class, body);
         paramMap.put(GithubRepository.class, gitHubRepositories);
         paramMap.put(WorkflowRepository.class, workflowRepository);
@@ -240,8 +252,7 @@ public class DevopsBot {
             ),
             Commands.slash("github", "Github related commands").addSubcommands(
                 new SubcommandData("add_token", "Add a github token to make comments under your user on issues you comment on in discord.")
-                        .addOption(OptionType.STRING, "token", "Github token with repo access", true),
-                    new SubcommandData("create_issue", "Add a github issue to the repository that you are sending this command in.")
+                        .addOption(OptionType.STRING, "token", "Github token with repo access", true)
             )
         );
     }

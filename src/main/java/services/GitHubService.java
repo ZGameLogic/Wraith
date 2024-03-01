@@ -25,6 +25,19 @@ public class GitHubService {
     @Value("${github.admin.token}")
     private String githubAdminToken;
 
+    public void closeIssue(String repository, long issue, String userToken){
+        String url = String.format("https://api.github.com/repos/ZGameLogic/%s/issues/%d", repository, issue);
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + (userToken != null ? userToken : githubBotToken));
+        try {
+            HttpEntity<String> requestEntity = new HttpEntity<>("{\"state\":\"closed\"}", headers);
+            String resp = restTemplate.patchForObject(url, requestEntity, String.class);
+        } catch(Exception e){
+            log.error("Unable to post comment", e);
+        }
+    }
+
     public Issue createIssue(String title, String desc, String repo, String userToken){
         String url = String.format("https://api.github.com/repos/ZGameLogic/%s/issues", repo);
         RestTemplate restTemplate = new RestTemplate();
