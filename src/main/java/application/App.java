@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication(scanBasePackages = {
-        "bot.listeners",
+        "discord.listeners",
         "services"
 })
 @EnableJpaRepositories({"data.database"})

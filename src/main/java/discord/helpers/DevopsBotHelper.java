@@ -1,6 +1,6 @@
-package bot.helpers;
+package discord.helpers;
 
-import bot.utils.EmbedMessageGenerator;
+import discord.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import data.api.github.Label;
@@ -240,6 +240,14 @@ public abstract class DevopsBotHelper {
                     EmbedMessageGenerator.githubIssueReopenedMessage(event.getIssue().getAssignee())
             ).queue();
             channel.getManager().setLocked(false).queue();
+        });
+    }
+
+    @GithubEvent(value = "issues", action = "deleted")
+    private static void gitHubIssueDelete(IssueEvent event, GithubIssueRepository githubIssueRepository, Guild glacies){
+        githubIssueRepository.findById(event.getIssue().getId()).ifPresent(issueConfig -> {
+            glacies.getThreadChannelById(issueConfig.getForumPostId()).delete().queue();
+            githubIssueRepository.delete(issueConfig);
         });
     }
 

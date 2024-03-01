@@ -1,4 +1,4 @@
-package data.api.github.responses;
+package data.api.github.payloads;
 
 import lombok.Data;
 

@@ -20,4 +20,5 @@ public class Issue {
     private String state;
     private String action;
     private User assignee;
+    private User user;
 }

@@ -1,22 +1,25 @@
-package bot.listeners;
+package discord.listeners;
 
-import bot.helpers.DevopsBotHelper;
+import data.api.github.Issue;
+import discord.helpers.DevopsBotHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
 import com.zgamelogic.annotations.EventProperty;
-import data.api.github.LabelsPayload;
+import data.api.github.payloads.LabelsPayload;
 import data.api.github.User;
 import data.database.github.Issue.GithubIssueRepository;
 import data.database.github.repository.GithubRepository;
 import data.database.github.user.GithubUser;
 import data.database.github.user.GithubUserRepository;
 import data.database.github.workflow.WorkflowRepository;
+import discord.utils.EmbedMessageGenerator;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.forums.BaseForumTag;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateAppliedTagsEvent;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateArchivedEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -27,6 +30,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +45,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-import static bot.helpers.DevopsBotHelper.*;
+import static discord.helpers.DevopsBotHelper.*;
 
 @Slf4j
 @DiscordController
@@ -65,11 +71,6 @@ public class DevopsBot {
     @Value("${general.id}")
     private long generalId;
 
-    @DiscordMapping
-    private void ready(ReadyEvent event){
-        glacies = event.getJDA().getGuildById(guildId);
-    }
-
     @Autowired
     public DevopsBot(GithubRepository gitHubRepositories, WorkflowRepository workflowRepository, GithubIssueRepository githubIssueRepository, GithubUserRepository githubUserRepository, GitHubService gitHubService){
         this.workflowRepository = workflowRepository;
@@ -79,6 +80,40 @@ public class DevopsBot {
         this.gitHubService = gitHubService;
         mapper = new ObjectMapper();
         blockGithubMessage = new HashSet<>();
+    }
+
+    @DiscordMapping
+    private void ready(ReadyEvent event){
+        glacies = event.getJDA().getGuildById(guildId);
+    }
+
+    @DiscordMapping(Id = "github", SubId = "create_issue")
+    private void addIssueCommand(SlashCommandInteractionEvent event){
+        gitHubRepositories.getByGeneralId(event.getChannel().getIdLong()).ifPresentOrElse(channel -> event.replyModal(
+            Modal.create("add_issue_modal", "Add github issue")
+                .addActionRow(TextInput.create("issue_title", "Title", TextInputStyle.SHORT).setRequired(true).build())
+                .addActionRow(TextInput.create("issue_desc", "Description", TextInputStyle.PARAGRAPH).setRequired(true).build())
+                .build()
+        ).queue(), () -> event.reply("This channel is not linked to a repository. Make sure you are in a general channel for the repository.").setEphemeral(true).queue());
+    }
+
+    @DiscordMapping(Id = "add_issue_modal")
+    private void addIssueModal(
+            ModalInteractionEvent event,
+            @EventProperty(name = "issue_title") String title,
+            @EventProperty(name = "issue_desc") String desc
+    ){
+        gitHubRepositories.getByGeneralId(event.getChannelIdLong()).ifPresent(gitRepo -> {
+            Optional<GithubUser> user = githubUserRepository.getGithubUserByDiscordId(event.getUser().getIdLong());
+            Issue created = gitHubService.createIssue(title, desc, gitRepo.getUrlFriendlyName(), user.map(GithubUser::getGithubToken).orElse(null));
+            if(created != null){
+                event.replyEmbeds(
+                        EmbedMessageGenerator.githubCreatedIssue(created)
+                ).queue();
+            } else {
+                event.reply("Unable to create issue.").setEphemeral(true).queue();
+            }
+        });
     }
 
     @DiscordMapping

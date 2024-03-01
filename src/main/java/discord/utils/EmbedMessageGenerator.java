@@ -1,4 +1,4 @@
-package bot.utils;
+package discord.utils;
 
 import data.api.curseforge.CurseforgeMod;
 import data.api.github.*;
@@ -33,6 +33,16 @@ public abstract class EmbedMessageGenerator {
             0, new Color(13, 71, 161),
             1, new Color(64, 194, 99)
     );
+
+    public static MessageEmbed githubCreatedIssue(Issue issue){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(GITHUB_COLOR);
+        eb.setTitle(issue.getTitle(), issue.getHtmlUrl());
+        eb.setDescription(issue.getBody());
+        eb.setFooter(issue.getUser().getLogin(), issue.getUser().getAvatar_url());
+        eb.setTimestamp(Instant.now());
+        return eb.build();
+    }
 
     public static MessageEmbed githubPublishedReleaseMessage(PublishReleasedEvent release){
         EmbedBuilder eb = new EmbedBuilder();
