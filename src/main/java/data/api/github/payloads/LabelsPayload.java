@@ -1,4 +1,4 @@
-package data.api.github;
+package data.api.github.payloads;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

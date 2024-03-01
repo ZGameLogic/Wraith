@@ -1,6 +1,6 @@
-package bot.listeners;
+package discord.listeners;
 
-import bot.utils.EmbedMessageGenerator;
+import discord.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;

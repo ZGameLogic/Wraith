@@ -1,6 +1,6 @@
-package bot.helpers;
+package discord.helpers;
 
-import bot.utils.EmbedMessageGenerator;
+import discord.utils.EmbedMessageGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import data.api.github.Label;

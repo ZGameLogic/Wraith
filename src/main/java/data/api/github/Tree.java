@@ -1,4 +1,4 @@
-package data.api.github.responses;
+package data.api.github;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

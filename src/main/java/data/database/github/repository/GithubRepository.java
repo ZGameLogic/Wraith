@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface GithubRepository extends JpaRepository<GitRepo, Long> {
     Optional<GitRepo> getByForumChannelId(Long forumChannelId);
+    Optional<GitRepo> getByGeneralId(Long generalId);
 }
