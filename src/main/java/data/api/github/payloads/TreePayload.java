@@ -1,5 +1,6 @@
-package data.api.github.responses;
+package data.api.github.payloads;
 
+import data.api.github.Tree;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
