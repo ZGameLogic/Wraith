@@ -15,4 +15,4 @@ This bot integrates with curseforge projects by polling the API and compairing t
 This bot integrates with github to post messages about pushes, issues, labels, and actions. 
 
 <img width="434" alt="Screenshot 2024-02-22 at 6 19 41 PM" src="https://github.com/ZGameLogic/Wraith/assets/23252883/8e5c03e1-5413-49ff-a1a8-a994bb43ad51">
-![Screenshot 2024-03-03 082642](https://github.com/ZGameLogic/Wraith/assets/23252883/290b5d27-e1fd-4bd0-b17b-42100b4cb277)
+<img width="434" alt="Screenshot 2024-02-22 at 6 19 41 PM" src="https://github.com/ZGameLogic/Wraith/assets/23252883/290b5d27-e1fd-4bd0-b17b-42100b4cb277">
