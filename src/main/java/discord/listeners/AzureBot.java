@@ -18,9 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @DiscordController
 @Slf4j
@@ -71,7 +69,10 @@ public class AzureBot {
             @EventProperty String value
     ){
         KeyVaultSecret secret = new KeyVaultSecret(name, value);
-        secret.setProperties(new SecretProperties().setTags(Collections.singletonMap("discord", event.getUser().getId())));
+        Map<String, String> tags = new HashMap<>();
+        tags.put("username", event.getUser().getEffectiveName());
+        tags.put("discord", event.getUser().getId());
+        secret.setProperties(new SecretProperties().setTags(tags));
         try {
             secretClient.setSecret(secret);
             event.reply("Secret created").setEphemeral(true).queue();
