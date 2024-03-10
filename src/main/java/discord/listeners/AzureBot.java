@@ -59,7 +59,7 @@ public class AzureBot {
             @EventProperty String name
     ){
         String value = secretClient.getSecret(name).getValue();
-        event.reply(value).setEphemeral(true).queue();
+        event.reply("```" + value + "```").setEphemeral(true).queue();
     }
 
     @DiscordMapping(Id = "azure", SubId = "add_secret")
