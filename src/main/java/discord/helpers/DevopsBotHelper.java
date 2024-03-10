@@ -62,6 +62,11 @@ public abstract class DevopsBotHelper {
         }
     }
 
+    @GithubEvent(value = "repository", action = "transferred")
+    public static void githubRepositoryTransferred(String body, GithubRepository gitHubRepositories, Guild glacies, GitHubService service){
+        gitHubRepositoryCreated(body, gitHubRepositories, glacies, service);
+    }
+
     @GithubEvent(value = "repository", action = "deleted")
     private static void gitHubRepositoryDeleted(String body, GithubRepository gitHubRepositories, Guild glacies){
         deleteDiscordRepository(
