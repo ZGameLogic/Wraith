@@ -7,8 +7,8 @@ spec:
     app: wraith
   ports:
     - protocol: TCP
-      port: 2000
-      targetPort: 2000
+      port: 2002
+      targetPort: 2002
       nodePort: 30010
   type: NodePort
   externalTrafficPolicy: Local
