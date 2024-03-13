@@ -8,4 +8,4 @@ COPY /target/Wraith-1.0.0.jar /app/Wraith-1.0.0.jar
 
 EXPOSE 2002
 
-CMD ["java", "-jar", "-Dspring.profiles.active=prod", "Wraith-1.0.0.jar"]
+CMD ["java", "-jar", "-Dspring.profiles.active=cluster", "Wraith-1.0.0.jar"]
