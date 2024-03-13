@@ -11,5 +11,4 @@ spec:
       targetPort: 2002
       nodePort: 30010
   type: NodePort
-  externalTrafficPolicy: Local
   

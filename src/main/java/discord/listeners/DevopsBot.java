@@ -200,6 +200,11 @@ public class DevopsBot {
         return "Healthy";
     }
 
+    @GetMapping("health-check")
+    private String healthCheck2(){
+        return "I am so healthy";
+    }
+
     @PostMapping("github")
     private void gitHub(
             @RequestHeader(name = "X-GitHub-Event") String gitHubEvent,
