@@ -9,7 +9,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.tls.passthrough: "true"
 spec:
   rules:
-    - host: cluster.zgamelogic.com
+    - host: zgamelogic.com
       http:
         paths:
           - path: /
