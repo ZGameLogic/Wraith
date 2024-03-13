@@ -65,9 +65,6 @@ public class DevopsBot {
     @Value("${guild.id}")
     private String guildId;
 
-    @Value("${github.token}")
-    private String githubToken;
-
     @Value("${general.id}")
     private long generalId;
 
@@ -200,17 +197,12 @@ public class DevopsBot {
         return "Healthy";
     }
 
-    @GetMapping("health-check")
-    private String healthCheck2(){
-        return "I am so healthy";
-    }
-
     @PostMapping("github")
     private void gitHub(
             @RequestHeader(name = "X-GitHub-Event") String gitHubEvent,
             @RequestBody String body
     ) {
-        HashMap<Class, Object> paramMap = new HashMap<>();
+        HashMap<Class<?>, Object> paramMap = new HashMap<>();
         paramMap.put(String.class, body);
         paramMap.put(GithubRepository.class, gitHubRepositories);
         paramMap.put(WorkflowRepository.class, workflowRepository);
