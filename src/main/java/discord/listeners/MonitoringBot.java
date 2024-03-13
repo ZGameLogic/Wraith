@@ -1,10 +1,11 @@
 package discord.listeners;
 
-import discord.utils.EmbedMessageGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import data.database.discord.DiscordRepository;
+import data.database.discord.ServerConfig;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
-import data.serializable.MonitoringConfig;
+import discord.utils.EmbedMessageGenerator;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import services.DataOtterService;
@@ -15,9 +16,6 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.File;
-import java.io.IOException;
-
 @RestController
 @DiscordController
 @Slf4j
@@ -26,18 +24,23 @@ public class MonitoringBot {
     private final DataOtterService dataOtterService;
 
     private TextChannel channel;
-    private Message message;
     private final Environment environment;
 
+    @Value("${guild.id}")
+    private long guildId;
+
+    private final DiscordRepository discordRepository;
+
     @Autowired
-    public MonitoringBot(DataOtterService dataOtterService, Environment environment) {
+    public MonitoringBot(DataOtterService dataOtterService, Environment environment, DiscordRepository discordRepository) {
         this.dataOtterService = dataOtterService;
         this.environment = environment;
+        this.discordRepository = discordRepository;
     }
 
     @DiscordMapping
     public void ready(ReadyEvent event) {
-        channel = event.getJDA().getGuildById(environment.getProperty("guild.id")).getTextChannelById(environment.getProperty("monitoring.id"));
+        channel = event.getJDA().getGuildById(guildId).getTextChannelById(environment.getProperty("monitoring.id"));
     }
 
     @Scheduled(cron = "0 */1 * * * *")
@@ -46,24 +49,13 @@ public class MonitoringBot {
     }
 
     public void update(){
-        if(message == null){
-            File monitorConfigFile = new File("data/monitoring/config.json");
-            ObjectMapper om = new ObjectMapper();
-            try {
-                MonitoringConfig config = om.readValue(monitorConfigFile, MonitoringConfig.class);
-                String messageId = config.getMessageId();
-                message = channel.editMessageEmbedsById(messageId, EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
-            } catch (IOException ignored) {
-                message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
-                try {
-                    monitorConfigFile.getParentFile().mkdirs();
-                    om.writeValue(monitorConfigFile, new MonitoringConfig(message.getId()));
-                } catch (IOException e) {
-                    log.error("error when writing to monitoring config", e);
-                }
-            }
+        ServerConfig config = discordRepository.findById(guildId).orElseGet(() -> new ServerConfig(guildId));
+        if(!config.hasMonitoringMessage()){
+            Message message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
+            config.setMonitoringMessageId(message.getIdLong());
+            discordRepository.save(config);
         } else {
-            message = channel.editMessageEmbedsById(message.getId(), EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
+            channel.editMessageEmbedsById(config.getMonitoringMessageId(), EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).queue();
         }
     }
 }
