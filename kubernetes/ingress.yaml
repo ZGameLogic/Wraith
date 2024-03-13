@@ -9,7 +9,7 @@ metadata:
     traefik.ingress.kubernetes.io/router.tls.passthrough: "true"
 spec:
   rules:
-    - host: cluster.zgamelogic.com
+    - host: zgamelogic.com
       http:
         paths:
           - path: /
@@ -18,4 +18,4 @@ spec:
               service:
                 name: wraith
                 port:
-                  number: 2000
+                  number: 2002
