@@ -1,7 +1,7 @@
 FROM ubuntu:latest
 LABEL authors="Ben Shabowski"
 
-FROM arm64v8/openjdk:21-jdk-oracle
+FROM arm64v8/openjdk:21-jdk-buster
 
 WORKDIR /app
 COPY /target/Wraith-1.0.0.jar /app/Wraith-1.0.0.jar
