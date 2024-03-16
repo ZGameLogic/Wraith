@@ -20,6 +20,7 @@ public class WorkflowRun {
         for(WorkflowJob job: jobs) {
             for(WorkflowJob.Step step: job.getSteps()) {
                 if (step.getStatus().equals("queued")) return 0;
+                if (step.getConclusion() == null) return 0;
                 if (step.getConclusion().equals("failed")) return -1;
             }
         }
