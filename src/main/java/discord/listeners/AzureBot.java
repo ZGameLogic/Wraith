@@ -32,6 +32,7 @@ public class AzureBot {
     @Autowired
     public AzureBot(SecretClient secretClient) {
         this.secretClient = secretClient;
+        new Thread(() -> secretClient.listPropertiesOfSecrets().stream().forEach(secret -> log.info(secret.getName())), "Azure pre-cache").start();
     }
 
     @DiscordMapping(Id = "azure", SubId = "secret", FocusedOption = "name")
@@ -50,7 +51,11 @@ public class AzureBot {
                 .filter(word -> word.startsWith(event.getFocusedOption().getValue()))
                 .map(word -> new Command.Choice(word, word))
                 .toList();
-        event.replyChoices(names).queue();
+        try {
+            event.replyChoices(names).queue();
+        } catch (Exception e){
+            log.error("Azure secrets took too long to get...");
+        }
     }
 
     @DiscordMapping(Id = "azure", SubId = "secret")
