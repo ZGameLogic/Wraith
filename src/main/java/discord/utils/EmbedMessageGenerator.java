@@ -100,7 +100,7 @@ public abstract class EmbedMessageGenerator {
             String jobEmojiCode = job.getStatus() + " " + job.getConclusion();
             String jobEmojiPrefix = jobEmojiCode.equals("queued null") ? "a" : "";
             desc.append("<").append(jobEmojiPrefix).append(":")
-                    .append(emojis.get(jobEmojiCode).getAsReactionCode())
+                    .append((emojis.containsKey(jobEmojiCode) ? emojis.get(jobEmojiCode) : emojis.get("working")).getAsReactionCode())
                     .append("> `")
                     .append(job.getName())
                     .append("`\n");
