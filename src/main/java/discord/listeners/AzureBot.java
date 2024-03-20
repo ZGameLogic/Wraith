@@ -32,7 +32,7 @@ public class AzureBot {
     @Autowired
     public AzureBot(SecretClient secretClient) {
         this.secretClient = secretClient;
-        new Thread(() -> secretClient.listPropertiesOfSecrets().stream().forEach(secret -> log.info(secret.getName())), "Azure pre-cache").start();
+        new Thread(() -> secretClient.listPropertiesOfSecrets().stream().forEach(secret -> log.debug(secret.getName())), "Azure pre-cache").start();
     }
 
     @DiscordMapping(Id = "azure", SubId = "secret", FocusedOption = "name")
