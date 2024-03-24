@@ -16,6 +16,7 @@ import data.database.github.user.GithubUserRepository;
 import data.database.github.workflow.WorkflowRepository;
 import discord.utils.EmbedMessageGenerator;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.forums.BaseForumTag;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateAppliedTagsEvent;
@@ -178,7 +179,10 @@ public class DevopsBot {
             @EventProperty String file
     ){
         String content = gitHubService.getPropertiesFileContent(file);
-        event.reply("```\n" + content + "\n```").setEphemeral(true).queue();
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle(file);
+        eb.setDescription("```\n" + content + "\n```");
+        event.replyEmbeds(eb.build()).setEphemeral(true).queue();
     }
 
     @DiscordMapping

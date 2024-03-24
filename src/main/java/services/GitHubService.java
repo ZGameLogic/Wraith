@@ -32,7 +32,7 @@ public class GitHubService {
         headers.add("Authorization", "Bearer " + (userToken != null ? userToken : githubBotToken));
         try {
             HttpEntity<String> requestEntity = new HttpEntity<>("{\"state\":\"closed\"}", headers);
-            String resp = restTemplate.patchForObject(url, requestEntity, String.class);
+            restTemplate.patchForObject(url, requestEntity, String.class);
         } catch(Exception e){
             log.error("Unable to post comment", e);
         }
@@ -59,7 +59,7 @@ public class GitHubService {
         headers.add("Authorization", "Bearer " + (userToken != null ? userToken : githubBotToken));
         try {
             HttpEntity<MessagePayload> requestEntity = new HttpEntity<>(new MessagePayload(message), headers);
-            String resp = restTemplate.postForObject(url, requestEntity, String.class);
+            restTemplate.postForObject(url, requestEntity, String.class);
         } catch(Exception e){
             log.error("Unable to post comment", e);
         }
@@ -69,11 +69,11 @@ public class GitHubService {
         String url = "https://api.github.com/user";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + githubAdminToken);
+        headers.add("Authorization", "Bearer " + userToken);
         try {
             return restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), User.class).getBody();
         } catch (Exception e){
-            log.error("Unable to get list of properties files", e);
+            log.error("Unable to authenticate user", e);
         }
         return null;
     }
