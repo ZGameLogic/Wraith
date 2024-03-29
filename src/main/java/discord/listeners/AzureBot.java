@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.*;
 
@@ -25,6 +26,8 @@ import java.util.*;
 public class AzureBot {
 
     private final SecretClient secretClient;
+    private final List<SecretProperties> azureSecrets;
+
 
     @Value("${admin.id}")
     private long adminId;
@@ -32,15 +35,13 @@ public class AzureBot {
     @Autowired
     public AzureBot(SecretClient secretClient) {
         this.secretClient = secretClient;
-        new Thread(() -> secretClient.listPropertiesOfSecrets().stream().forEach(secret -> log.debug(secret.getName())), "Azure pre-cache").start();
+        azureSecrets = new ArrayList<>();
+        new Thread(this::fiveMinuteUpdate, "Azure pre-cache").start();
     }
 
     @DiscordMapping(Id = "azure", SubId = "secret", FocusedOption = "name")
     public void azureAutoFill(CommandAutoCompleteInteractionEvent event){
-        List<Command.Choice> names = secretClient
-                .listPropertiesOfSecrets()
-                .stream()
-                .filter(secret -> {
+        List<Command.Choice> names = azureSecrets.stream().filter(secret -> {
                     if(secret.getTags() == null || !secret.getTags().containsKey("discord")) return false;
                     String tagValue = secret.getTags().get("discord");
                     if(tagValue.equals("public")) return true;
@@ -49,6 +50,7 @@ public class AzureBot {
                 })
                 .map(SecretProperties::getName)
                 .filter(word -> word.startsWith(event.getFocusedOption().getValue()))
+                .sorted(Comparator.comparing(String::toLowerCase))
                 .map(word -> new Command.Choice(word, word))
                 .toList();
         try {
@@ -63,8 +65,16 @@ public class AzureBot {
             SlashCommandInteractionEvent event,
             @EventProperty String name
     ){
-        String value = secretClient.getSecret(name).getValue();
-        event.reply("```" + value + "```").setEphemeral(true).queue();
+        azureSecrets.stream().filter(secret -> {
+            if(secret.getTags() == null || !secret.getTags().containsKey("discord")) return false;
+            String tagValue = secret.getTags().get("discord");
+            if(tagValue.equals("public")) return true;
+            if(tagValue.equals("admin") && event.getMember().getRoles().stream().anyMatch(role -> role.getIdLong() == adminId)) return true;
+            return tagValue.equals(event.getUser().getId());
+        }).filter(secret -> secret.getName().equals(name)).findFirst().ifPresentOrElse(
+                secret -> event.reply("```" + secretClient.getSecret(secret.getName()).getValue() + "```").setEphemeral(true).queue(),
+                () -> event.reply("You do not have permissions to see this secret").setEphemeral(true).queue()
+        );
     }
 
     @DiscordMapping(Id = "azure", SubId = "add_secret")
@@ -81,9 +91,16 @@ public class AzureBot {
         try {
             secretClient.setSecret(secret);
             event.reply("Secret created").setEphemeral(true).queue();
+            azureSecrets.add(secret.getProperties());
         } catch(Exception e){
             event.reply(e.getMessage()).setEphemeral(true).queue();
         }
+    }
+
+    @Scheduled(cron = "0 */5 * * * *")
+    private void fiveMinuteUpdate(){
+        azureSecrets.clear();
+        azureSecrets.addAll(secretClient.listPropertiesOfSecrets().stream().toList());
     }
 
     @Bean

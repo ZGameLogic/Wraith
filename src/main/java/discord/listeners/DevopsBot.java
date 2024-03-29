@@ -39,6 +39,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 import services.GitHubService;
 
@@ -59,6 +60,7 @@ public class DevopsBot {
     private final GithubUserRepository githubUserRepository;
     private final ObjectMapper mapper;
     private final GitHubService gitHubService;
+    private final List<Command.Choice> githubPropertyFiles;
     private Guild glacies;
 
     private final Set<Long> blockGithubMessage;
@@ -76,6 +78,8 @@ public class DevopsBot {
         this.githubIssueRepository = githubIssueRepository;
         this.githubUserRepository = githubUserRepository;
         this.gitHubService = gitHubService;
+        githubPropertyFiles = new ArrayList<>();
+        new Thread(this::fiveMinuteUpdate, "Fetch github properties").start();
         mapper = new ObjectMapper();
         blockGithubMessage = new HashSet<>();
     }
@@ -163,13 +167,8 @@ public class DevopsBot {
 
     @DiscordMapping(Id = "spring", SubId = "properties", FocusedOption = "file")
     private void propertiesFilesAutoComplete(CommandAutoCompleteInteractionEvent event){
-        List<Command.Choice> files = gitHubService.getPropertiesFileList().stream()
-                .filter(file -> file.getPath().contains(event.getFocusedOption().getValue()))
-                .map(file -> {
-                    String[] paths = file.getPath().split("/");
-                    return new Command.Choice(paths[paths.length - 1], file.getPath());
-                })
-                .toList();
+        List<Command.Choice> files = githubPropertyFiles.stream()
+                .filter(file -> file.getName().contains(event.getFocusedOption().getValue())).toList();
         event.replyChoices(files).queue();
     }
 
@@ -183,6 +182,16 @@ public class DevopsBot {
         eb.setTitle(file);
         eb.setDescription("```\n" + content + "\n```");
         event.replyEmbeds(eb.build()).setEphemeral(true).queue();
+    }
+
+    @Scheduled(cron = "0 */5 * * * *")
+    private void fiveMinuteUpdate(){
+        githubPropertyFiles.clear();
+        githubPropertyFiles.addAll(gitHubService.getPropertiesFileList().stream()
+                .map(file -> {
+                    String[] paths = file.getPath().split("/");
+                    return new Command.Choice(paths[paths.length - 1], file.getPath());
+                }).toList());
     }
 
     @DiscordMapping
