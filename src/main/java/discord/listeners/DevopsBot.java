@@ -1,6 +1,7 @@
 package discord.listeners;
 
 import data.api.github.Issue;
+import data.api.github.Tree;
 import discord.helpers.DevopsBotHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -60,7 +61,7 @@ public class DevopsBot {
     private final GithubUserRepository githubUserRepository;
     private final ObjectMapper mapper;
     private final GitHubService gitHubService;
-    private final List<Command.Choice> githubPropertyFiles;
+    private final List<String> githubPropertyFiles;
     private Guild glacies;
 
     private final Set<Long> blockGithubMessage;
@@ -165,21 +166,47 @@ public class DevopsBot {
         event.reply("Linked github token to this account").setEphemeral(true).queue();
     }
 
-    @DiscordMapping(Id = "spring", SubId = "properties", FocusedOption = "file")
-    private void propertiesFilesAutoComplete(CommandAutoCompleteInteractionEvent event){
+    @DiscordMapping(Id = "spring", SubId = "properties", FocusedOption = "project")
+    private void propertiesProjectAutoComplete(CommandAutoCompleteInteractionEvent event){
         List<Command.Choice> files = githubPropertyFiles.stream()
-                .filter(file -> file.getName().contains(event.getFocusedOption().getValue())).toList();
+                .map(path -> path.split("/")[0])
+                .distinct()
+                .filter(file -> file.contains(event.getFocusedOption().getValue()))
+                .sorted()
+                .map(file -> {
+                    String[] paths = file.split("/");
+                    return new Command.Choice(paths[paths.length - 1], file);
+                }).toList();
         event.replyChoices(files).queue();
+    }
+
+    @DiscordMapping(Id = "spring", SubId = "properties", FocusedOption = "env")
+    private void propertiesEnvAutoComplete(
+            CommandAutoCompleteInteractionEvent event,
+            @EventProperty String project,
+            @EventProperty String env
+    ) {
+        if(project == null || project.isEmpty()){
+            event.replyChoices().queue();
+            return;
+        }
+        List<Command.Choice> envs = githubPropertyFiles.stream()
+                .filter(file -> file.split("/")[0].contains(project))
+                .filter(enviro -> enviro.split("/")[1].contains(env))
+                .sorted()
+                .map(e -> new Command.Choice(e.split("/")[1].split("-")[1].replace(".properties", ""), e)).toList();
+        event.replyChoices(envs).queue();
     }
 
     @DiscordMapping(Id = "spring", SubId = "properties")
     private void springProperties(
             SlashCommandInteractionEvent event,
-            @EventProperty String file
+            @EventProperty String project,
+            @EventProperty String env
     ){
-        String content = gitHubService.getPropertiesFileContent(file);
+        String content = gitHubService.getPropertiesFileContent(env);
         EmbedBuilder eb = new EmbedBuilder();
-        eb.setTitle(file);
+        eb.setTitle(project);
         eb.setDescription("```\n" + content + "\n```");
         event.replyEmbeds(eb.build()).setEphemeral(true).queue();
     }
@@ -187,11 +214,7 @@ public class DevopsBot {
     @Scheduled(cron = "0 */5 * * * *")
     private void fiveMinuteUpdate(){
         githubPropertyFiles.clear();
-        githubPropertyFiles.addAll(gitHubService.getPropertiesFileList().stream()
-                .map(file -> {
-                    String[] paths = file.getPath().split("/");
-                    return new Command.Choice(paths[paths.length - 1], file.getPath());
-                }).toList());
+        githubPropertyFiles.addAll(gitHubService.getPropertiesFileList().stream().map(Tree::getPath).toList());
     }
 
     @DiscordMapping
@@ -258,7 +281,8 @@ public class DevopsBot {
         return List.of(
             Commands.slash("spring", "Spring commands").addSubcommands(
                 new SubcommandData("properties", "Spring properties")
-                        .addOption(OptionType.STRING, "file", "File to get the properties of", true, true)
+                        .addOption(OptionType.STRING, "project", "Project to get the properties of", true, true)
+                        .addOption(OptionType.STRING, "env", "Environment to get the properties of", true, true)
             ),
             Commands.slash("github", "Github related commands").addSubcommands(
                 new SubcommandData("add_token", "Add a github token to make comments under your user on issues you comment on in discord.")
