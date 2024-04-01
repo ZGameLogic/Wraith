@@ -204,11 +204,12 @@ public class DevopsBot {
             @EventProperty String project,
             @EventProperty String env
     ){
+        event.deferReply().setEphemeral(true).queue();
         String content = gitHubService.getPropertiesFileContent(env);
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle(project);
         eb.setDescription("```\n" + content + "\n```");
-        event.replyEmbeds(eb.build()).setEphemeral(true).queue();
+        event.getHook().sendMessageEmbeds(eb.build()).setEphemeral(true).queue();
     }
 
     @Scheduled(cron = "0 */5 * * * *")
