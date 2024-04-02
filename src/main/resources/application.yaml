@@ -1,0 +1,10 @@
+spring:
+  config:
+    import: "configserver:http://192.168.1.15:30050"
+  application:
+    name: wraith
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        max-attempts: 200
