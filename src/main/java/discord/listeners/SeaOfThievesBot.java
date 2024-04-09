@@ -2,20 +2,31 @@ package discord.listeners;
 
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
+import com.zgamelogic.annotations.EventProperty;
+import data.discord.SeaOfThievesEventData;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.springframework.context.annotation.Bean;
+import services.ZGameLogicService;
 
 @DiscordController
 public class SeaOfThievesBot {
 
+    private final ZGameLogicService zGameLogicService;
+
+    public SeaOfThievesBot(ZGameLogicService zGameLogicService) {
+        this.zGameLogicService = zGameLogicService;
+    }
+
     @DiscordMapping(Id = "sea-of-thieves")
     private void addData(
-            SlashCommandInteractionEvent event
+            SlashCommandInteractionEvent event,
+            @EventProperty SeaOfThievesEventData data
     ){
-
+        boolean success = zGameLogicService.postSeoOfThievesData(data);
+        event.reply("Data " + (success ? "recorded" : "not recorded")).setEphemeral(true).queue();
     }
 
     @Bean
