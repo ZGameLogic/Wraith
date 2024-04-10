@@ -5,7 +5,7 @@ on:
     branches: [ "master" ]
 jobs:
     build:
-        uses: ZGameLogic/kubernetes-action@v0.0.1
+        uses: ZGameLogic/kubernetes-action/.github/workflows/deploy.yml@master
         secrets: inherit
         with:
             KUBERNETES_DEPLOY: wraith
