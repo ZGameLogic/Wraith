@@ -6,7 +6,6 @@ on:
 jobs:
     Kubernetes:
         runs-on: PiServer
-        needs: build
         steps:
             - name: Checkout Kubernetes Directory
               uses: actions/checkout@v4
