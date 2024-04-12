@@ -14,7 +14,7 @@ jobs:
             - name: Apply Kubernetes Configuration
               id: apply
               run: |
-                output=$(sudo kubectl apply -f kubernetes/ | tee /dev/tty)
+                output=$(sudo kubectl apply -f kubernetes/)
                 echo "##[set-output name=result;]$(echo $output)"
 
             - name: Check Deployment Status
