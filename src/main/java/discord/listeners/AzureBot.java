@@ -28,7 +28,6 @@ public class AzureBot {
     private final SecretClient secretClient;
     private final List<SecretProperties> azureSecrets;
 
-
     @Value("${admin.id}")
     private long adminId;
 

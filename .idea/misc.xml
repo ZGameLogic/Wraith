@@ -5,6 +5,9 @@
       <item index="0" class="java.lang.String" itemvalue="com.zgamelogic.annotations.DiscordMapping" />
       <item index="1" class="java.lang.String" itemvalue="discord.helpers.DevopsBotHelper.GithubEvent" />
     </list>
+    <writeAnnotations>
+      <writeAnnotation name="com.zgamelogic.annotations.Bot" />
+    </writeAnnotations>
   </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="MavenProjectsManager">

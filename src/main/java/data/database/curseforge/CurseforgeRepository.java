@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-@Component
 public interface CurseforgeRepository extends JpaRepository<CurseforgeRecord, Long> {
 
     @Query(value = "select * from curseforge c where c.project_id = :id AND c.guild_id = :guild AND c.channel_id = :channel", nativeQuery = true)
