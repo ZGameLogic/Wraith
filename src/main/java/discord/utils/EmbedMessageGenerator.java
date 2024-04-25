@@ -6,6 +6,7 @@ import data.api.github.events.PublishReleasedEvent;
 import data.api.github.events.PushEvent;
 import data.api.monitor.Monitor;
 import data.database.curseforge.CurseforgeRecord;
+import data.discord.SeaOfThievesIslandData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -26,6 +27,8 @@ public abstract class EmbedMessageGenerator {
     private final static Color DATA_DOG_OK_COLOR = new Color(64, 194, 99);
     private final static Color DATA_DOG_ALERT_COLOR = new Color(233, 54, 74);
 
+    private final static Color SEA_OF_THIEVES_COLOR = new Color(21, 230, 154);
+
     private final static String DATA_DOG_OK = ":green_square:";
     private final static String DATA_DOG_ALERT = ":red_square:";
     private final static Map<Integer, Color> GITHUB_STATUS_COLOR_MAP = Map.of(
@@ -33,6 +36,15 @@ public abstract class EmbedMessageGenerator {
             0, new Color(13, 71, 161),
             1, new Color(64, 194, 99)
     );
+
+    public static MessageEmbed sotIslandDataMessage(SeaOfThievesIslandData data){
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(SEA_OF_THIEVES_COLOR);
+        eb.setTitle("Island: " + data.name());
+        eb.setImage("attachment://" + data.islandPng().getName());
+        eb.addField("Location", data.chords(), true);
+        return eb.build();
+    }
 
     public static MessageEmbed githubCreatedIssue(Issue issue){
         EmbedBuilder eb = new EmbedBuilder();
