@@ -1,0 +1,424 @@
+[
+  {
+    "name": "Barnacle Cay",
+    "region": "The Ancient Isles",
+    "grid": "O-15",
+    "island_png_name": "barnacle-cay.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Black Sand Atoll",
+    "region": "The Wilds",
+    "grid": "O-3",
+    "island_png_name": "black-sand-atoll.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Black Water Enclave",
+    "region": "The Wilds",
+    "grid": "R-5",
+    "island_png_name": "black-water-enclave.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Blind Man's Lagoon",
+    "region": "The Wilds",
+    "grid": "N-6",
+    "island_png_name": "blind-mans-lagoon.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Booty Isle",
+    "region": "The Ancient Isles",
+    "grid": "K-20",
+    "island_png_name": "booty-isle.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Boulder Cay",
+    "region": "The Shores of Plenty",
+    "grid": "G-5",
+    "island_png_name": "boulder-cay.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Brimstone Rock",
+    "region": "The Devil's Roar",
+    "grid": "X-18",
+    "island_png_name": "brimstone-rock.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Castaway Isle",
+    "region": "The Ancient Isles",
+    "grid": "K-14",
+    "island_png_name": "castaway-isle.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Chicken Isle",
+    "region": "The Ancient Isles",
+    "grid": "I-16",
+    "island_png_name": "chicken-isle.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Cinder Islet",
+    "region": "The Devil's Roar",
+    "grid": "U-14",
+    "island_png_name": "cinder-islet.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Cursewater Shores",
+    "region": "The Devil's Roar",
+    "grid": "Y-13",
+    "island_png_name": "cursewater-shores.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Cutlass Cay",
+    "region": "The Ancient Isles",
+    "grid": "M-18",
+    "island_png_name": "cutlass-cay.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Flame's End",
+    "region": "The Devil's Roar",
+    "grid": "V-19",
+    "island_png_name": "flames-end.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Fools Lagoon",
+    "region": "The Ancient Isles",
+    "grid": "I-14",
+    "island_png_name": "fools-lagoon.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Forsaken Brink",
+    "region": "The Devil's Roar",
+    "grid": "U-16",
+    "island_png_name": "forsaken-brink.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Glowstone Cay",
+    "region": "The Devil's Roar",
+    "grid": "Z-18",
+    "island_png_name": "glowstone-cay.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Isle of Last Words",
+    "region": "The Wilds",
+    "grid": "O-9",
+    "island_png_name": "isle-of-last-words.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Lagoon of Whispers",
+    "region": "The Shores of Plenty",
+    "grid": "D-12",
+    "island_png_name": "lagoon-of-whispers.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Liar's Backbone",
+    "region": "The Wilds",
+    "grid": "S-11",
+    "island_png_name": "liars-backbone.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Lonely Isle",
+    "region": "The Shores of Plenty",
+    "grid": "G-8",
+    "island_png_name": "lonely-isle.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Lookout Point",
+    "region": "The Ancient Isles",
+    "grid": "I-20",
+    "island_png_name": "lookout-point.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Magma's Tide",
+    "region": "The Devil's Roar",
+    "grid": "Y-20",
+    "island_png_name": "magmas-tide.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Mutineer Rock",
+    "region": "The Ancient Isles",
+    "grid": "N-19",
+    "island_png_name": "mutineer-rock.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Old Salts Atoll",
+    "region": "The Ancient Isles",
+    "grid": "F-18",
+    "island_png_name": "old-salts-atoll.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Paradise Spring",
+    "region": "The Ancient Isles",
+    "grid": "L-17",
+    "island_png_name": "paradise-spring.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Picaroon Palms",
+    "region": "The Shores of Plenty",
+    "grid": "I-4",
+    "island_png_name": "picaroon-palms.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Plunderer's Plight",
+    "region": "The Wilds",
+    "grid": "Q-6",
+    "island_png_name": "plunderers-plight.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Rapier Cay",
+    "region": "The Shores of Plenty",
+    "grid": "D-8",
+    "island_png_name": "rapier-cay.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Roaring Sands",
+    "region": "The Devil's Roar",
+    "grid": "U-21",
+    "island_png_name": "roaring-sands.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Rum Runner Isle",
+    "region": "The Shores of Plenty",
+    "grid": "H-9",
+    "island_png_name": "rum-runner-isle.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Salty Sands",
+    "region": "The Shores of Plenty",
+    "grid": "G-3",
+    "island_png_name": "salty-sands.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Sandy Shallows",
+    "region": "The Shores of Plenty",
+    "grid": "D-5",
+    "island_png_name": "sandy-shallows.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Scorched Pass",
+    "region": "The Devil's Roar",
+    "grid": "X-11",
+    "island_png_name": "scorched-pass.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Scurvy Isle",
+    "region": "The Wilds",
+    "grid": "K-4",
+    "island_png_name": "scurvy-isle.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Sea Dog's Rest",
+    "region": "The Shores of Plenty",
+    "grid": "C-11",
+    "island_png_name": "sea-dogs-rest.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Shark Tooth Key",
+    "region": "The Wilds",
+    "grid": "P-13",
+    "island_png_name": "shark-tooth-key.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Shiver Retreat",
+    "region": "The Wilds",
+    "grid": "Q-11",
+    "island_png_name": "shiver-retreat.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Tri-Rock Isle",
+    "region": "The Wilds",
+    "grid": "R-10",
+    "island_png_name": "tri-rock-isle.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Twin Groves",
+    "region": "The Shores of Plenty",
+    "grid": "H-11",
+    "island_png_name": "twin-groves.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+  },{
+  "name": "Sanctuary Outpost",
+  "region": "The Shores of Plenty",
+  "grid": "F-7",
+  "island_png_name": "sanctuary-outpost.png",
+  "area_png_name": "the-shores-of-plenty-icon.png"
+},
+  {
+    "name": "Port Merrick",
+    "region": "The Shores of Plenty",
+    "grid": "D-10",
+    "island_png_name": "port-merrick.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Plunder Outpost",
+    "region": "The Ancient Isles",
+    "grid": "J-18",
+    "island_png_name": "plunder-outpost.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Ancient Spire Outpost",
+    "region": "The Ancient Isles",
+    "grid": "Q-17",
+    "island_png_name": "ancient-spire-outpost.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Galleon's Grave Outpost",
+    "region": "The Wilds",
+    "grid": "R-8",
+    "island_png_name": "galleons-grave-outpost.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Dagger Tooth Outpost",
+    "region": "The Wilds",
+    "grid": "M-8",
+    "island_png_name": "dagger-tooth-outpost.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Morrow's Peak Outpost",
+    "region": "The Devil's Roar",
+    "grid": "V-17",
+    "island_png_name": "morrows-peak-outpost.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "The Spoils of Plenty Store",
+    "region": "The Shores of Plenty",
+    "grid": "B-7",
+    "island_png_name": "the-spoils-of-plenty-store.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "The North Star Seapost",
+    "region": "The Shores of Plenty",
+    "grid": "H-10",
+    "island_png_name": "the-north-star-seapost.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "The Finest Trading Post",
+    "region": "The Ancient Isles",
+    "grid": "F-17",
+    "island_png_name": "the-finest-trading-post.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Stephen's Spoils",
+    "region": "The Ancient Isles",
+    "grid": "L-15",
+    "island_png_name": "stephens-spoils.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Three Paces East Seapost",
+    "region": "The Wilds",
+    "grid": "S-10",
+    "island_png_name": "three-paces-east-seapost.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "The Wild Treasures Store",
+    "region": "The Wilds",
+    "grid": "O-4",
+    "island_png_name": "the-wild-treasures-store.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Brian's Bazaar",
+    "region": "The Devil's Roar",
+    "grid": "Y-12",
+    "island_png_name": "brians-bazaar.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Roaring Traders",
+    "region": "The Devil's Roar",
+    "grid": "U-20",
+    "island_png_name": "roaring-traders.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Keel Haul Fort",
+    "region": "The Shores of Plenty",
+    "grid": "C-6",
+    "island_png_name": "keel-haul-fort.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Hidden Spring Keep",
+    "region": "The Shores of Plenty",
+    "grid": "I-8",
+    "island_png_name": "hidden-spring-keep.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Sailor's Knot Stronghold",
+    "region": "The Shores of Plenty",
+    "grid": "E-14",
+    "island_png_name": "sailors-knot-stronghold.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Lost Gold Fort",
+    "region": "The Ancient Isles",
+    "grid": "H-17",
+    "island_png_name": "lost-gold-fort.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Fort of the Damned",
+    "region": "The Ancient Isles",
+    "grid": "L-14",
+    "island_png_name": "fort-of-the-damned.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "The Crow's Nest Fortress",
+    "region": "The Ancient Isles",
+    "grid": "O-17",
+    "island_png_name": "the-crows-nest-fortress.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Skull Keep",
+    "region": "The Wilds",
+    "grid": "P-9",
+    "island_png_name": "skull-keep.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Kraken Watchtower",
+    "region": "The Wilds",
+    "grid": "L-6",
+    "island_png_name": "kraken-watchtower.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Shark Fin Camp",
+    "region": "The Wilds",
+    "grid": "P-5",
+    "island_png_name": "shark-fin-camp.png",
+    "area_png_name": "the-wilds-icon.png"
+},{
+    "name": "Molten Sands Fortress",
+    "region": "The Devil's Roar",
+    "grid": "Z-11",
+    "island_png_name": "molten-sands-fortress.png",
+    "area_png_name": "the-devils-roar-icon.png"
+},{
+    "name": "Royal Crest Fortress",
+    "region": "The Shores of Plenty",
+    "grid": "J-6",
+    "island_png_name": "royal-crest-fortress.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Imperial Crown Fortress",
+    "region": "The Shores of Plenty",
+    "grid": "B-11",
+    "island_png_name": "imperial-crown-fortress.png",
+    "area_png_name": "the-shores-of-plenty-icon.png"
+},{
+    "name": "Ancient Gold Fortress",
+    "region": "The Ancient Isles",
+    "grid": "F-19",
+    "island_png_name": "ancient-gold-fortress.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+},{
+    "name": "Old Brinestone Fortress",
+    "region": "The Ancient Isles",
+    "grid": "K-21",
+    "island_png_name": "old-brinestone-fortress.png",
+    "area_png_name": "the-ancient-isles-icon.png"
+  },{
+    "name": "Traitor's Fate Fortress",
+    "region": "The Wilds",
+    "grid": "S-6",
+    "island_png_name": "traitors-fate-fortress.png",
+    "area_png_name": "the-wilds-icon.png"
+  },{
+    "name": "Mercy's End Fortress",
+    "region": "The Wilds",
+    "grid": "P-14",
+    "island_png_name": "mercys-end-fortress.png",
+    "area_png_name": "the-wilds-icon.png"
+  }
+]

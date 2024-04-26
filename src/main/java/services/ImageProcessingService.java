@@ -1,5 +1,6 @@
 package services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import data.discord.SeaOfThievesIslandData;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -18,13 +19,18 @@ import org.opencv.core.MatOfByte;
 @Service
 @Slf4j
 public class ImageProcessingService {
-    private final static String SOT_ISLAND_ASSETS_DIR = "assets\\sot-islands";
+    public final static String SOT_ISLAND_ASSETS_DIR = "assets\\sot";
     private final List<SeaOfThievesIslandData> islands;
     private final SeaOfThievesIslandData noIsland;
 
     public ImageProcessingService() throws IOException {
-        this.noIsland = new SeaOfThievesIslandData(new ClassPathResource(SOT_ISLAND_ASSETS_DIR + "\\unknown.png").getFile(), "Unknown", "??");
-        this.islands = List.of();
+        this.noIsland = new SeaOfThievesIslandData(getClassPathFile("islands\\unknown.png"), "Unknown", null, "", "?-?");
+        ObjectMapper om = new ObjectMapper();
+        islands = List.of(om.readValue(getClassPathFile("sot-island-data.json"), SeaOfThievesIslandData[].class));
+    }
+
+    private File getClassPathFile(String file) throws IOException {
+        return new ClassPathResource(SOT_ISLAND_ASSETS_DIR + "\\" + file).getFile();
     }
 
     private Mat readImageFromStream(InputStream inputStream) {
