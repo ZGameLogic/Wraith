@@ -234,6 +234,11 @@ public class DevopsBot {
         return "Healthy";
     }
 
+    @GetMapping("about")
+    private String about(){
+        return "Wraith v1.0.0";
+    }
+
     @PostMapping("github")
     private void gitHub(
             @RequestHeader(name = "X-GitHub-Event") String gitHubEvent,
