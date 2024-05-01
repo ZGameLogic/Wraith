@@ -32,7 +32,7 @@ public class SeaOfThievesBot {
         this.imageProcessingService = imageProcessingService;
     }
 
-    @DiscordMapping(Id = "sot", SubId = "data")
+    @DiscordMapping(Id = "sot", SubId = "data-point")
     private void addData(
             SlashCommandInteractionEvent event,
             @EventProperty SeaOfThievesEventData data
@@ -71,9 +71,10 @@ public class SeaOfThievesBot {
                                 .addOption(OptionType.BOOLEAN, "jj", "Did JJ join", true)
                                 .addOption(OptionType.BOOLEAN, "patrick", "Did Patrick join", true)
                                 .addOption(OptionType.BOOLEAN, "success", "Did this event happen", true)
-                                .addOption(OptionType.STRING, "time", "What time did this take place", true),
-                        new SubcommandData("island", "Find an island")
-                                .addOption(OptionType.ATTACHMENT, "image", "Image of the island", true)
+                                .addOption(OptionType.STRING, "time", "What time did this take place", true)
+//                        ,
+//                        new SubcommandData("island", "Find an island")
+//                                .addOption(OptionType.ATTACHMENT, "image", "Image of the island", true)
                 )
         );
     }

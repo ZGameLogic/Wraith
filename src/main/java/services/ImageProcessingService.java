@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.opencv.core.Mat;
@@ -24,9 +25,11 @@ public class ImageProcessingService {
     private final SeaOfThievesIslandData noIsland;
 
     public ImageProcessingService() throws IOException {
-        this.noIsland = new SeaOfThievesIslandData(getClassPathFile("islands\\unknown.png"), "Unknown", null, "", "?-?");
-        ObjectMapper om = new ObjectMapper();
-        islands = List.of(om.readValue(getClassPathFile("sot-island-data.json"), SeaOfThievesIslandData[].class));
+        islands = new ArrayList<>();
+        noIsland = null;
+//        this.noIsland = new SeaOfThievesIslandData(getClassPathFile("islands\\unknown.png"), "Unknown", null, "", "?-?");
+//        ObjectMapper om = new ObjectMapper();
+//        islands = List.of(om.readValue(getClassPathFile("sot-island-data.json"), SeaOfThievesIslandData[].class));
     }
 
     private File getClassPathFile(String file) throws IOException {
