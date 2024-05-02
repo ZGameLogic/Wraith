@@ -15,7 +15,7 @@ public class DataOtterService {
 
     public LinkedList<Monitor> getMonitorStatus(){
         LinkedList<Monitor> monitors = new LinkedList<>();
-        String URL = "http://54.211.139.84:8080/monitors";
+        String URL = "http://20.40.218.161:8080/monitors";
         // String URL = "http://localhost:8080/monitors";
         RestTemplate restTemplate = new RestTemplate();
         String response;
