@@ -15,18 +15,17 @@ public class ZGameLogicService {
     @Value("${zgamelogic.api-key}")
     private String API_KEY;
 
-    public boolean postSeoOfThievesData(SeaOfThievesEventData data){
+    public SOTData postSeoOfThievesData(SeaOfThievesEventData data){
         String url = "https://zgamelogic.com/api/sot";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("api-key", API_KEY);
         try {
             HttpEntity<SOTData> requestEntity = new HttpEntity<>(new SOTData(data), headers);
-            restTemplate.postForObject(url, requestEntity, String.class);
-            return true;
+            return restTemplate.postForObject(url, requestEntity, SOTData.class);
         } catch(Exception e){
             log.error("Unable to post SOT data", e);
-            return false;
+            return null;
         }
     }
 }

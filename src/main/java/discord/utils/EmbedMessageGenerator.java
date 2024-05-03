@@ -5,6 +5,7 @@ import data.api.github.*;
 import data.api.github.events.PublishReleasedEvent;
 import data.api.github.events.PushEvent;
 import data.api.monitor.Monitor;
+import data.api.zGameLogic.SOTData;
 import data.database.curseforge.CurseforgeRecord;
 import data.discord.SeaOfThievesIslandData;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,6 +15,7 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 
 import java.awt.*;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -36,6 +38,16 @@ public abstract class EmbedMessageGenerator {
             0, new Color(13, 71, 161),
             1, new Color(64, 194, 99)
     );
+
+    public static MessageEmbed sotDataMessage(SOTData returnData) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setColor(SEA_OF_THIEVES_COLOR);
+        eb.setTitle("Data recorded");
+        eb.appendDescription(String.format("Time for event: <t:%d:F>\n", returnData.getProposed().atZone(ZoneId.systemDefault()).toEpochSecond()));
+        eb.appendDescription(String.format("Ben: `%b`\nGreg: `%b`\nJJ: `%b`\nPatrick `%b`\n", returnData.isBen(), returnData.isGreg(), returnData.isJj(), returnData.isPatrick()));
+        eb.appendDescription(String.format("Success: `%b`", returnData.isSuccess()));
+        return eb.build();
+    }
 
     public static MessageEmbed sotIslandDataMessage(SeaOfThievesIslandData data){
         EmbedBuilder eb = new EmbedBuilder();
