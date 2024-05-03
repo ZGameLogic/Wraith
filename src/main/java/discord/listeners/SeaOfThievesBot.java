@@ -3,6 +3,7 @@ package discord.listeners;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
 import com.zgamelogic.annotations.EventProperty;
+import data.api.zGameLogic.SOTData;
 import data.discord.SeaOfThievesEventData;
 import data.discord.SeaOfThievesIslandData;
 import discord.utils.EmbedMessageGenerator;
@@ -37,8 +38,8 @@ public class SeaOfThievesBot {
             SlashCommandInteractionEvent event,
             @EventProperty SeaOfThievesEventData data
     ){
-        boolean success = zGameLogicService.postSeoOfThievesData(data);
-        event.reply("Data " + (success ? "recorded" : "not recorded")).setEphemeral(true).queue();
+        SOTData returnData = zGameLogicService.postSeoOfThievesData(data);
+        event.replyEmbeds(EmbedMessageGenerator.sotDataMessage(returnData)).queue();
     }
 
     @DiscordMapping(Id = "sot", SubId = "island")
