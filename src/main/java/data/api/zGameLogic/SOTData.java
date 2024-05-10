@@ -6,7 +6,6 @@ import com.joestelmach.natty.Parser;
 import data.discord.SeaOfThievesEventData;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
