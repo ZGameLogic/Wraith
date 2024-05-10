@@ -6,7 +6,6 @@ import com.joestelmach.natty.Parser;
 import data.discord.SeaOfThievesEventData;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -16,6 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(force = true)
 public class SOTData {
+    private final long id;
     private final boolean ben;
     private final boolean greg;
     private final boolean jj;
@@ -25,6 +25,7 @@ public class SOTData {
     private final LocalDateTime proposed;
 
     public SOTData(SeaOfThievesEventData data){
+        id = 0;
         ben = data.isBen();
         greg = data.isGreg();
         jj = data.isJj();
