@@ -5,6 +5,8 @@ import com.joestelmach.natty.DateGroup;
 import com.joestelmach.natty.Parser;
 import data.discord.SeaOfThievesEventData;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -12,6 +14,7 @@ import java.util.Date;
 import java.util.List;
 
 @Getter
+@NoArgsConstructor(force = true)
 public class SOTData {
     private final boolean ben;
     private final boolean greg;
