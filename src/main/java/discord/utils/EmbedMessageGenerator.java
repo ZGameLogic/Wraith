@@ -44,8 +44,10 @@ public abstract class EmbedMessageGenerator {
         eb.setColor(SEA_OF_THIEVES_COLOR);
         eb.setTitle("Data recorded");
         eb.appendDescription(String.format("Time for event: <t:%d:F>\n", returnData.getProposed().atZone(ZoneId.systemDefault()).toEpochSecond()));
-        eb.appendDescription(String.format("Ben: `%b`\nGreg: `%b`\nJJ: `%b`\nPatrick `%b`\n", returnData.isBen(), returnData.isGreg(), returnData.isJj(), returnData.isPatrick()));
+        eb.appendDescription(String.format("\nBen: `%b`\nGreg: `%b`\nJJ: `%b`\nPatrick `%b`\n", returnData.isBen(), returnData.isGreg(), returnData.isJj(), returnData.isPatrick()));
         eb.appendDescription(String.format("Success: `%b`", returnData.isSuccess()));
+        eb.setFooter("ID: " + returnData.getId());
+        eb.setTimestamp(Instant.now());
         return eb.build();
     }
 
