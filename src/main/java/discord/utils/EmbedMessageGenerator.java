@@ -1,10 +1,10 @@
 package discord.utils;
 
 import data.api.curseforge.CurseforgeMod;
+import data.api.dataOtter.Monitor;
 import data.api.github.*;
 import data.api.github.events.PublishReleasedEvent;
 import data.api.github.events.PushEvent;
-import data.api.monitor.Monitor;
 import data.api.zGameLogic.SOTData;
 import data.database.curseforge.CurseforgeRecord;
 import data.discord.SeaOfThievesIslandData;
@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.List;
 
 public abstract class EmbedMessageGenerator {
 
@@ -181,7 +182,7 @@ public abstract class EmbedMessageGenerator {
         return eb.build();
     }
 
-    public static MessageEmbed monitorStatus(LinkedList<Monitor> monitors){
+    public static MessageEmbed monitorStatus(List<Monitor> monitors){
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Monitors status");
         StringBuilder desc = new StringBuilder();
@@ -189,20 +190,8 @@ public abstract class EmbedMessageGenerator {
         boolean good = true;
 
         for(Monitor m: monitors){
-            if(!m.getStatus()) good = false;
-            if(m.getType().equals("minecraft")){
-                desc.append(m.getStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
-                if(m.getStatus() && m.getOnline() > 0) {
-                    desc.append("**Online: **").append(m.getOnline()).append("\n");
-                    LinkedList<String> players = new LinkedList<>(m.getOnlinePlayers());
-                    players.sort(String::compareTo);
-                    for (String name : players) {
-                        desc.append("-").append(name).append("\n");
-                    }
-                }
-            } else {
-                desc.append(m.getStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
-            }
+            if(!m.getStatus().isStatus()) good = false;
+            desc.append(m.getStatus().isStatus() ? DATA_DOG_OK : DATA_DOG_ALERT).append(": ").append(m.getName()).append("\n");
         }
 
         eb.setColor(good ? DATA_DOG_OK_COLOR : DATA_DOG_ALERT_COLOR);

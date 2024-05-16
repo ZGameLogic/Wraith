@@ -1,36 +1,25 @@
 package services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import data.api.monitor.Monitor;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import data.api.dataOtter.Monitor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.util.LinkedList;
+import java.util.List;
 
 @Service
+@Slf4j
 public class DataOtterService {
 
-    public LinkedList<Monitor> getMonitorStatus(){
-        LinkedList<Monitor> monitors = new LinkedList<>();
-        String URL = "http://20.40.218.161:8080/monitors";
-        // String URL = "http://localhost:8080/monitors";
+    public List<Monitor> getMonitorStatus(){
+        String URL = "http://20.40.218.161:8080/monitors?include-status=true";
         RestTemplate restTemplate = new RestTemplate();
-        String response;
         try {
-            response = restTemplate.getForObject(new URI(URL), String.class);
-            ObjectMapper om = new ObjectMapper();
-            JSONArray jsonArray = new JSONArray(response);
-            for(int i = 0; i < jsonArray.length(); i++){
-                JSONObject monitor = jsonArray.getJSONObject(i);
-                monitors.add(om.readValue(monitor.toString(), Monitor.class));
-            }
+            return List.of(restTemplate.getForObject(new URI(URL), Monitor[].class));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Error fetching monitors", e);
         }
-
-        return monitors;
+        return List.of();
     }
 }
