@@ -38,9 +38,13 @@ public class SeaOfThievesBot {
             SlashCommandInteractionEvent event,
             @EventProperty SeaOfThievesEventData data
     ){
+        log.info("Event received");
         event.deferReply().queue();
+        log.info("Event deferred");
         SOTData returnData = zGameLogicService.postSeoOfThievesData(data);
+        log.info("Post request finished");
         event.getHook().sendMessageEmbeds(EmbedMessageGenerator.sotDataMessage(returnData)).queue();
+        log.info("Event responded to");
     }
 
     @DiscordMapping(Id = "sot", SubId = "island")
