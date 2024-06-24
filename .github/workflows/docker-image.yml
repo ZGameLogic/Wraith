@@ -53,12 +53,22 @@ jobs:
               uses: actions/checkout@v4
               with:
                   sparse-checkout: 'kubernetes/'
+            - name: Check if kubernetes/deployment.yaml is modified
+              id: check_changes
+              uses: actions/github-script@v6
+              with:
+                script: |
+                  const { execSync } = require('child_process');
+                  const changedFiles = execSync('git diff --name-only HEAD^ HEAD').toString().split('\n');
+                  return { changed: changedFiles.includes('kubernetes/deployment.yaml') };
             - name: Apply Kubernetes Configuration
               run: sudo kubectl apply -f kubernetes/
             - name: Rolling update
-              run: |
-                sudo kubectl rollout restart deployment wraith
-                sudo kubectl rollout status deployment wraith --timeout=600s
+              if: steps.check_changes.outputs.changed == 'false'
+              run: sudo kubectl rollout restart deployment wraith
+            - name: Wait for readiness probe
+              run: sudo kubectl rollout status deployment wraith --timeout=600s
+
     enable-monitor:
       uses: zgamelogic/data-otter-monitor-active/.github/workflows/action.yml@v1.0.0
       needs: [ build, disable-monitor, Kubernetes ]
