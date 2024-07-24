@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class DataOtterService {
+public class DataOtterMonitorsService {
 
     public List<Monitor> getMonitorStatus(){
         String URL = "http://20.40.218.161:8080/monitors?include-status=true";

@@ -8,7 +8,7 @@ import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import com.zgamelogic.services.DataOtterService;
+import com.zgamelogic.services.DataOtterMonitorsService;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class MonitoringBot {
 
-    private final DataOtterService dataOtterService;
+    private final DataOtterMonitorsService dataOtterMonitorsService;
 
     private TextChannel channel;
     private final Environment environment;
@@ -32,8 +32,8 @@ public class MonitoringBot {
     private final DiscordRepository discordRepository;
 
     @Autowired
-    public MonitoringBot(DataOtterService dataOtterService, Environment environment, DiscordRepository discordRepository) {
-        this.dataOtterService = dataOtterService;
+    public MonitoringBot(DataOtterMonitorsService dataOtterMonitorsService, Environment environment, DiscordRepository discordRepository) {
+        this.dataOtterMonitorsService = dataOtterMonitorsService;
         this.environment = environment;
         this.discordRepository = discordRepository;
     }
@@ -51,11 +51,11 @@ public class MonitoringBot {
     public void update(){
         ServerConfig config = discordRepository.findById(guildId).orElseGet(() -> new ServerConfig(guildId));
         if(!config.hasMonitoringMessage()){
-            Message message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
+            Message message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(dataOtterMonitorsService.getMonitorStatus())).complete();
             config.setMonitoringMessageId(message.getIdLong());
             discordRepository.save(config);
         } else {
-            channel.editMessageEmbedsById(config.getMonitoringMessageId(), EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).queue();
+            channel.editMessageEmbedsById(config.getMonitoringMessageId(), EmbedMessageGenerator.monitorStatus(dataOtterMonitorsService.getMonitorStatus())).queue();
         }
     }
 }

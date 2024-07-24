@@ -17,6 +17,14 @@
     <version>3.2.4</version>
   </parent>
 
+  <repositories>
+    <repository>
+      <id>github</id>
+      <name>GitHub ZGameLogic Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/ZGameLogic/Data-Otter-Service</url>
+    </repository>
+  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>com.zgamelogic</groupId>
@@ -124,6 +132,12 @@
       <groupId>org.bytedeco</groupId>
       <artifactId>opencv-platform</artifactId>
       <version>4.0.1-1.5</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.zgamelogic</groupId>
+      <artifactId>dataotter-service</artifactId>
+      <version>0.0.1</version>
     </dependency>
   </dependencies>
 
