@@ -21,7 +21,7 @@
     <dependency>
       <groupId>com.zgamelogic</groupId>
       <artifactId>spring-boot-starter-discord</artifactId>
-      <version>1.4.0</version>
+      <version>1.4.2</version>
     </dependency>
 
     <dependency>
@@ -48,18 +48,6 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-config</artifactId>
       <version>4.1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>net.dv8tion</groupId>
-      <artifactId>JDA</artifactId>
-      <version>5.0.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>club.minnced</groupId>
-          <artifactId>opus-java</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
 
     <dependency>
