@@ -7,6 +7,7 @@ import com.zgamelogic.data.api.github.events.PublishReleasedEvent;
 import com.zgamelogic.data.api.github.events.PushEvent;
 import com.zgamelogic.data.api.zGameLogic.SOTData;
 import com.zgamelogic.data.database.curseforge.CurseforgeRecord;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -20,6 +21,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.List;
 
+@Slf4j
 public abstract class EmbedMessageGenerator {
 
     private final static Color GENERAL_COLOR = new Color(99, 42, 129);
@@ -116,6 +118,7 @@ public abstract class EmbedMessageGenerator {
         for(WorkflowJob job: run.getJobs()){
             String jobEmojiCode = job.getStatus() + " " + job.getConclusion();
             String jobEmojiPrefix = jobEmojiCode.equals("queued null") ? "a" : "";
+            log.info("Job Emoji Code: {}", jobEmojiCode);
             desc.append("<").append(jobEmojiPrefix).append(":")
                     .append((emojis.containsKey(jobEmojiCode) ? emojis.get(jobEmojiCode) : emojis.get("working")).getAsReactionCode())
                     .append("> `")
