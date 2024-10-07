@@ -1,14 +1,13 @@
 package com.zgamelogic.services;
 
-import com.zgamelogic.data.api.curseforge.CurseforgeFile;
 import com.zgamelogic.data.api.curseforge.CurseforgeMod;
+import com.zgamelogic.data.api.curseforge.CurseforgeMods;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,15 +38,6 @@ public class CurseforgeService {
         headers.add("x-api-key", token);
         Map<String, Object> body = new HashMap<>();
         body.put("modIds", modIds);
-        return Arrays.asList(restTemplate.exchange(url, HttpMethod.POST,  new HttpEntity<>(body, headers), CurseforgeMod[].class).getBody());
-    }
-
-    public CurseforgeFile getCurseforgeFile(long modId, long fileId){
-        String url = "https://api.curseforge.com/v1/mods/" + modId + "/files/" + fileId;
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("x-api-key", token);
-        ResponseEntity<CurseforgeFile> response = restTemplate.exchange(url, HttpMethod.GET,  new HttpEntity<>(headers), CurseforgeFile.class);
-        return response.getBody();
+        return restTemplate.exchange(url, HttpMethod.POST,  new HttpEntity<>(body, headers), CurseforgeMods.class).getBody().getData();
     }
 }

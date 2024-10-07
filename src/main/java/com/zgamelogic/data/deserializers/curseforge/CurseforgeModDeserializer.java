@@ -14,7 +14,7 @@ public class CurseforgeModDeserializer extends JsonDeserializer<CurseforgeMod> {
     public CurseforgeMod deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException, JacksonException {
         CurseforgeMod mod = new CurseforgeMod();
         JsonNode json = jsonParser.getCodec().readTree(jsonParser);
-        JsonNode node = json.get("data");
+        JsonNode node = json.has("data") ? json.get("data") : json;
 
         mod.setName(node.get("name").asText());
         mod.setMainFileId(node.get("mainFileId").asLong());
