@@ -118,9 +118,8 @@ public abstract class EmbedMessageGenerator {
         for(WorkflowJob job: run.getJobs()){
             String jobEmojiCode = job.getStatus() + " " + job.getConclusion();
             String jobEmojiPrefix = jobEmojiCode.equals("queued null") ? "a" : "";
-            log.info("Job Emoji Code: {}", jobEmojiCode);
             desc.append("<").append(jobEmojiPrefix).append(":")
-                    .append((emojis.containsKey(jobEmojiCode) ? emojis.get(jobEmojiCode) : emojis.get("working")).getAsReactionCode())
+                    .append((emojis.containsKey(jobEmojiCode) ? emojis.get(jobEmojiCode) : emojis.get("queued null")).getAsReactionCode())
                     .append("> `")
                     .append(job.getName())
                     .append("`\n");
