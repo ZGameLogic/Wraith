@@ -10,6 +10,7 @@ import lombok.Data;
 @JsonDeserialize(using = CurseforgeModDeserializer.class)
 public class CurseforgeMod {
     private String name;
+    private long projectId;
     private String summary;
     private long downloadCount;
     private String logoUrl;
