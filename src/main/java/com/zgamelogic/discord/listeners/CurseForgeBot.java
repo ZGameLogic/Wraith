@@ -134,27 +134,30 @@ public class CurseForgeBot {
 
     public void update(){
         log.info("Updating curseforge stuff");
-        for(CurseforgeRecord check: checks.findAll()){
-            try {
-                CurseforgeMod current = curseforgeService.getCurseforgeMod(Long.parseLong(check.getProjectId()));
-                if (check.getProjectVersionId() == null || !check.getProjectVersionId().equals(current.getMainFileId() + "")) {
-                    Boolean mention = check.getMentionable();
-                    MessageCreateAction message = bot.getGuildById(check.getGuildId()).getTextChannelById(check.getChannelId()).sendMessageEmbeds(
-                            EmbedMessageGenerator.curseforgeUpdate(current, mention)
-                    );
-                    message.queue();
-                    check.setProjectVersionId(current.getMainFileId() + "");
-                    check.setLastUpdated(new Date());
+        List<CurseforgeRecord> records = checks.findAll();
+        long[] projectIds = records.stream().map(record -> Long.parseLong(record.getProjectId())).mapToLong(Long::longValue).toArray();
+        curseforgeService.getCurseforgeMods(projectIds).forEach(current -> {
+            records.stream().filter(check -> check.getProjectId().equals(current.getProjectId() + "")).findFirst().ifPresent(check -> {
+                try {
+                    if (check.getProjectVersionId() == null || !check.getProjectVersionId().equals(current.getMainFileId() + "")) {
+                        Boolean mention = check.getMentionable();
+                        MessageCreateAction message = bot.getGuildById(check.getGuildId()).getTextChannelById(check.getChannelId()).sendMessageEmbeds(
+                                EmbedMessageGenerator.curseforgeUpdate(current, mention)
+                        );
+                        message.queue();
+                        check.setProjectVersionId(current.getMainFileId() + "");
+                        check.setLastUpdated(new Date());
+                        check.setName(current.getName());
+                        log.info("Project: " + check.getProjectId() + "\tOld file: " + check.getProjectVersionId() + "\tNew file: " + current.getMainFileId());
+                    }
+                    check.setLastChecked(new Date());
                     check.setName(current.getName());
-                    log.info("Project: " + check.getProjectId() + "\tOld file: " + check.getProjectVersionId() + "\tNew file: " + current.getMainFileId());
+                    checks.save(check);
+                } catch (Exception e){
+                    log.error("Error updating curseforge check", e);
                 }
-                check.setLastChecked(new Date());
-                check.setName(current.getName());
-                checks.save(check);
-            } catch (Exception e){
-                log.error("Error updating curseforge check", e);
-            }
-        }
+            });
+        });
     }
 
     @Bean
