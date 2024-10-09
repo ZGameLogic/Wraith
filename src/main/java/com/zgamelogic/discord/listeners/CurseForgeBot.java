@@ -129,6 +129,7 @@ public class CurseForgeBot {
 
     @Scheduled(cron = "0 */5 * * * *")
     private void fiveMinuteTask() {
+        log.info("Executing 5 minute tasks");
         update();
     }
 
