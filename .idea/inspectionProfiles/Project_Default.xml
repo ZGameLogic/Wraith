@@ -10,6 +10,7 @@
       <option name="customHeaders">
         <set>
           <option value="api-key" />
+          <option value="x-api-key" />
         </set>
       </option>
     </inspection_tool>
