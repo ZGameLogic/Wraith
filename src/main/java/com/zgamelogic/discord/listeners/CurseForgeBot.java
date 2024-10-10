@@ -133,7 +133,6 @@ public class CurseForgeBot {
     }
 
     public void update(){
-        log.info("Updating curseforge stuff");
         List<CurseforgeRecord> records = checks.findAll();
         long[] projectIds = records.stream().map(record -> Long.parseLong(record.getProjectId())).mapToLong(Long::longValue).toArray();
         curseforgeService.getCurseforgeMods(projectIds).forEach(current -> {
@@ -158,7 +157,6 @@ public class CurseForgeBot {
                 }
             });
         });
-        log.info("We finished updating curseforge stuff");
     }
 
     @Bean
