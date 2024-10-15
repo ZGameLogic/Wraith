@@ -48,7 +48,7 @@ public class AzureBot {
                     return tagValue.equals(event.getUser().getId());
                 })
                 .map(SecretProperties::getName)
-                .filter(word -> word.startsWith(event.getFocusedOption().getValue()))
+                .filter(word -> word.toLowerCase().startsWith(event.getFocusedOption().getValue().toLowerCase()))
                 .sorted(Comparator.comparing(String::toLowerCase))
                 .map(word -> new Command.Choice(word, word))
                 .toList();
