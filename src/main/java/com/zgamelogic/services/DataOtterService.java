@@ -13,7 +13,7 @@ import java.util.List;
 public class DataOtterService {
 
     public List<Monitor> getMonitorStatus(){
-        String URL = "http://20.40.218.161:8080/monitors?include-status=true";
+        String URL = "http://44.201.152.75:8080/monitors?include-status=true";
         RestTemplate restTemplate = new RestTemplate();
         try {
             return List.of(restTemplate.getForObject(new URI(URL), Monitor[].class));
