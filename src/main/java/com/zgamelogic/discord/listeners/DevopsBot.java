@@ -194,7 +194,12 @@ public class DevopsBot {
                 .filter(file -> file.split("/")[0].contains(project))
                 .filter(enviro -> enviro.split("/")[1].contains(env))
                 .sorted()
-                .map(e -> new Command.Choice(e.split("/")[1].split("-")[1].replace(".properties", ""), e)).toList();
+                .map(e -> {
+                    String p = e.split("/")[0];
+                    String v = e.split("/")[1];
+                    String choiceString = v.replace(p, "").replace("-", "").replace(".properties", "").replace(".yml", "");
+                    return new Command.Choice(choiceString, e);
+                }).toList();
         event.replyChoices(envs).queue();
     }
 

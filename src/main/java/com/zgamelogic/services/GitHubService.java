@@ -85,7 +85,7 @@ public class GitHubService {
         headers.add("Authorization", "Bearer " + githubAdminToken);
         try {
             TreePayload response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), TreePayload.class).getBody();
-            return response.getTree().stream().filter(item -> item.getPath().contains(".properties")).toList();
+            return response.getTree().stream().filter(item -> !item.getPath().contains(".github") && (item.getPath().contains(".properties") || item.getPath().contains(".yml"))).toList();
         } catch (Exception e){
             log.error("Unable to get list of properties files", e);
         }
