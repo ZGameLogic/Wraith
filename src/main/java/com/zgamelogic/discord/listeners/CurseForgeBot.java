@@ -1,5 +1,6 @@
 package com.zgamelogic.discord.listeners;
 
+import com.zgamelogic.dataotter.DataOtterService;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import com.zgamelogic.annotations.Bot;
 import com.zgamelogic.annotations.DiscordController;
@@ -38,14 +39,16 @@ public class CurseForgeBot {
 
     private final CurseforgeRepository checks;
     private final CurseforgeService curseforgeService;
+    private final DataOtterService dataOtterService;
 
     @Bot
     private JDA bot;
 
     @Autowired
-    public CurseForgeBot(CurseforgeRepository checks, CurseforgeService curseforgeService) {
+    public CurseForgeBot(CurseforgeRepository checks, CurseforgeService curseforgeService, DataOtterService dataOtterService) {
         this.checks = checks;
         this.curseforgeService = curseforgeService;
+        this.dataOtterService = dataOtterService;
     }
 
     @DiscordMapping
@@ -148,6 +151,7 @@ public class CurseForgeBot {
                         check.setLastUpdated(new Date());
                         check.setName(current.getName());
                         log.info("Project: " + check.getProjectId() + "\tOld file: " + check.getProjectVersionId() + "\tNew file: " + current.getMainFileId());
+                        dataOtterService.sendRock(check);
                     }
                     check.setLastChecked(new Date());
                     check.setName(current.getName());
