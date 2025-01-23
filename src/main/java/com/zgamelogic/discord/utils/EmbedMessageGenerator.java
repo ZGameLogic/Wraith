@@ -1,12 +1,12 @@
 package com.zgamelogic.discord.utils;
 
 import com.zgamelogic.data.api.curseforge.CurseforgeMod;
-import com.zgamelogic.data.api.dataOtter.Monitor;
 import com.zgamelogic.data.api.github.*;
 import com.zgamelogic.data.api.github.events.PublishReleasedEvent;
 import com.zgamelogic.data.api.github.events.PushEvent;
 import com.zgamelogic.data.api.zGameLogic.SOTData;
 import com.zgamelogic.data.database.curseforge.CurseforgeRecord;
+import com.zgamelogic.dataotter.data.Monitor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;

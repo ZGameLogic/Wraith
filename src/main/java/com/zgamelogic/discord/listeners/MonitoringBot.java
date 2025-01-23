@@ -4,11 +4,11 @@ import com.zgamelogic.data.database.discord.DiscordRepository;
 import com.zgamelogic.data.database.discord.ServerConfig;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
+import com.zgamelogic.dataotter.DataOtterService;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import com.zgamelogic.services.DataOtterService;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -51,11 +51,11 @@ public class MonitoringBot {
     public void update(){
         ServerConfig config = discordRepository.findById(guildId).orElseGet(() -> new ServerConfig(guildId));
         if(!config.hasMonitoringMessage()){
-            Message message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).complete();
+            Message message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorsStatus())).complete();
             config.setMonitoringMessageId(message.getIdLong());
             discordRepository.save(config);
         } else {
-            channel.editMessageEmbedsById(config.getMonitoringMessageId(), EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorStatus())).queue();
+            channel.editMessageEmbedsById(config.getMonitoringMessageId(), EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorsStatus())).queue();
         }
     }
 }
