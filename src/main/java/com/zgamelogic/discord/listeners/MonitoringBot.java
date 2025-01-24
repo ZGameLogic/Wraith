@@ -48,14 +48,18 @@ public class MonitoringBot {
         update();
     }
 
-    public void update(){
+    private void update(){
         ServerConfig config = discordRepository.findById(guildId).orElseGet(() -> new ServerConfig(guildId));
         if(!config.hasMonitoringMessage()){
-            Message message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorsStatus())).complete();
-            config.setMonitoringMessageId(message.getIdLong());
-            discordRepository.save(config);
+            dataOtterService.getMonitorsStatus().thenAccept(list -> {
+                Message message = channel.sendMessageEmbeds(EmbedMessageGenerator.monitorStatus(list)).complete();
+                config.setMonitoringMessageId(message.getIdLong());
+                discordRepository.save(config);
+            });
         } else {
-            channel.editMessageEmbedsById(config.getMonitoringMessageId(), EmbedMessageGenerator.monitorStatus(dataOtterService.getMonitorsStatus())).queue();
+            dataOtterService.getMonitorsStatus().thenAccept(list -> {
+                channel.editMessageEmbedsById(config.getMonitoringMessageId(), EmbedMessageGenerator.monitorStatus(list)).queue();
+            });
         }
     }
 }
