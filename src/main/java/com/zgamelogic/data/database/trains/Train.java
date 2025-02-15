@@ -15,7 +15,7 @@ public class Train {
     private boolean maintenance;
     private boolean weekday;
 
-    @OneToMany(mappedBy = "id.train", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "id.train", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TrainStop> stops;
 
     @Embeddable

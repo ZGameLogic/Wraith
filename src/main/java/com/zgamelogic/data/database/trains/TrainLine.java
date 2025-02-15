@@ -10,6 +10,6 @@ import java.util.List;
 public class TrainLine {
     @Id
     private String name;
-    @OneToMany(mappedBy = "id.number", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "id.line", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Train> trains;
 }
