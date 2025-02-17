@@ -54,9 +54,6 @@ public class CurseForgeBot {
     @DiscordMapping
     public void ready(ReadyEvent event) {
         new Thread(this::update, "Curseforge-startup").start();
-        curseforgeService.getCurseforgeMods(925200, 268560, 223794).forEach(mod -> {
-            log.info("Mod name: {}", mod.getName());
-        });
     }
 
     @DiscordMapping(SubId = "updated", Id = "curseforge", FocusedOption = "project")
