@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class MetraService {
     /*
+    https://metra.com/metra-gtfs-api
+
     Stop names: /schedule/stops
         stop_id, stop_name
     Stop times: /schedule/stop_times
