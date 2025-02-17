@@ -1,11 +1,11 @@
 package com.zgamelogic.discord.listeners;
 
 import com.zgamelogic.annotations.DiscordController;
-import com.zgamelogic.data.database.trains.TrainRepository;
+import com.zgamelogic.services.MetraService;
 import lombok.AllArgsConstructor;
 
 @DiscordController
 @AllArgsConstructor
 public class TrainBot {
-    private final TrainRepository trainRepository;
+    private final MetraService metraService;
 }
