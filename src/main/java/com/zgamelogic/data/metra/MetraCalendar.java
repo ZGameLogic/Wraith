@@ -6,8 +6,8 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@NoArgsConstructor
 @Getter
+@NoArgsConstructor
 public class MetraCalendar {
     @JsonProperty("service_id")
     private String serviceId;
@@ -22,4 +22,22 @@ public class MetraCalendar {
     private LocalDate startDate;
     @JsonProperty("end_date")
     private LocalDate endDate;
+
+    public boolean isForDay(int dayInt){
+        return switch (dayInt) {
+            case 1 -> monday;
+            case 2 -> tuesday;
+            case 3 -> wednesday;
+            case 4 -> thursday;
+            case 5 -> friday;
+            case 6 -> saturday;
+            case 7 -> sunday;
+            default -> false;
+        };
+    }
+
+    public boolean isSingleDay(){
+        return startDate.equals(endDate);
+    }
 }
+

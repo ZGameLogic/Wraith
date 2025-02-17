@@ -7,12 +7,14 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.io.IOException;
 import java.time.LocalTime;
 
 @Getter
 @NoArgsConstructor
+@ToString
 public class MetraStopTime {
     @JsonProperty("trip_id")
     private String tripId;
