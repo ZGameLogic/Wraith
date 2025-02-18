@@ -80,9 +80,9 @@ public class DevopsBot {
         this.githubUserRepository = githubUserRepository;
         this.gitHubService = gitHubService;
         githubPropertyFiles = new ArrayList<>();
-        new Thread(this::fiveMinuteUpdate, "Fetch github properties").start();
         mapper = new ObjectMapper();
         blockGithubMessage = new HashSet<>();
+        fiveMinuteUpdate();
     }
 
     @DiscordMapping
