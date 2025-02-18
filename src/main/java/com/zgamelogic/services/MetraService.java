@@ -48,10 +48,8 @@ public class MetraService {
         stopTimes = new ArrayList<>();
         calendars = new ArrayList<>();
         trips = new ArrayList<>();
-        new Thread(() -> {
-            updateMetraData();
-            log.info("Metra train data loaded");
-        }, "Trains").start();
+        updateMetraData();
+        log.info("Metra train data loaded");
     }
 
     public List<TrainSearchResult> trainSearch(String routeId, String toStopId, String fromStopId, LocalDate date, LocalTime time) {

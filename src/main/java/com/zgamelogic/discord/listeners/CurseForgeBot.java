@@ -53,7 +53,7 @@ public class CurseForgeBot {
 
     @DiscordMapping
     public void ready(ReadyEvent event) {
-        new Thread(this::update, "Curseforge-startup").start();
+        update();
     }
 
     @DiscordMapping(SubId = "updated", Id = "curseforge", FocusedOption = "project")
