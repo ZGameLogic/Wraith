@@ -2,6 +2,7 @@ package com.zgamelogic.services;
 
 import com.zgamelogic.data.metra.*;
 import com.zgamelogic.data.metra.api.TrainSearchResult;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -29,6 +30,7 @@ public class MetraService {
 
     private final HttpHeaders headers;
     private final static String BASE_URL = "https://gtfsapi.metrarail.com/gtfs/";
+    @Getter
     private final List<MetraRoute> routes;
     private final List<MetraStop> stops;
     private final List<MetraStopTime> stopTimes;
@@ -55,20 +57,10 @@ public class MetraService {
     public List<TrainSearchResult> trainSearch(String routeId, String toStopId, String fromStopId, LocalDate date, LocalTime time) {
         MetraRoute route = routes.stream().filter(r -> r.getRouteId().equals(routeId)).findFirst().orElse(null);
         if(route == null) return List.of();
-        int day = date.getDayOfWeek().getValue();
-        List<MetraCalendar> currentCalendars = calendars.stream().filter(c -> {
-            boolean before = c.getStartDate().isBefore(date) || c.getStartDate().isEqual(date);
-            boolean after = c.getEndDate().isAfter(date) || c.getEndDate().isEqual(date);
-            boolean forDay = c.isForDay(day);
-            return before && after && forDay;
-        }).collect(Collectors.toList());
-        if(currentCalendars.stream().anyMatch(MetraCalendar::isSingleDay)) {
-            currentCalendars.removeIf(c -> !c.getEndDate().equals(date) || !c.getStartDate().equals(date));
-        }
-        List<String> serviceIds = currentCalendars.stream().map(MetraCalendar::getServiceId).toList();
-        List<MetraTrip> trips = this.trips.stream().filter(t -> t.getRouteId().equals(routeId) && serviceIds.contains(t.getServiceId())).toList();
+        List<MetraCalendar> currentCalendars = getCalendarsByDate(date);
+        List<MetraTrip> trips = getTripsByCalendarAndRouteId(currentCalendars, routeId);
         List<String> tripIds = trips.stream().map(MetraTrip::getTripId).toList();
-        List<MetraStopTime> stopTimes = this.stopTimes.stream().filter(st -> tripIds.contains(st.getTripId())).toList();
+        List<MetraStopTime> stopTimes = getStopTimesByTripIds(tripIds);
         List<TrainSearchResult> results = new ArrayList<>();
         for(String tripId: tripIds){
             List<MetraStopTime> stops = stopTimes.stream()
@@ -83,13 +75,50 @@ public class MetraService {
             TrainSearchResult result = new TrainSearchResult(fromStop.getDepartureTime(), toStop.getArrivalTime(), trainNumber);
             results.add(result);
         }
-        /*
-        RI_RI705_V1_D
-        ME_ME125_V2_A
-        UP-NW_UNW725_V8_A
-        UP-W_UW10_V1_A
-         */
         return results;
+    }
+
+    public List<MetraStop> getStopsOnRouteByRouteId(String routeId, LocalDate date, LocalTime time){
+        List<MetraCalendar> currentCalendars = getCalendarsByDate(date);
+        List<MetraTrip> trips = getTripsByCalendarAndRouteId(currentCalendars, routeId);
+        List<String> tripIds = trips.stream().map(MetraTrip::getTripId).toList();
+        List<MetraStopTime> stopTimes = getStopTimesByTripIds(tripIds);
+        List<String> stopIds = stopTimes.stream().map(MetraStopTime::getStopId).toList();
+        return stops.stream()
+                .filter(s -> stopIds.contains(s.getStopId()))
+                .distinct()
+                .toList();
+    }
+
+    public MetraStop getStopById(String stopId){
+        return stops.stream().filter(s -> s.getStopId().equals(stopId)).findFirst().orElse(null);
+    }
+
+    public MetraRoute getRouteById(String routeId){
+        return routes.stream().filter(r -> r.getRouteId().equals(routeId)).findFirst().orElse(null);
+    }
+
+    private List<MetraStopTime> getStopTimesByTripIds(List<String> tripIds){
+        return stopTimes.stream().filter(st -> tripIds.contains(st.getTripId())).toList();
+    }
+
+    private List<MetraTrip> getTripsByCalendarAndRouteId(List<MetraCalendar> currentCalendars, String routeId){
+        List<String> serviceIds = currentCalendars.stream().map(MetraCalendar::getServiceId).toList();
+        return trips.stream().filter(t -> t.getRouteId().equals(routeId) && serviceIds.contains(t.getServiceId())).toList();
+    }
+
+    private List<MetraCalendar> getCalendarsByDate(LocalDate date){
+        int day = date.getDayOfWeek().getValue();
+        List<MetraCalendar> currentCalendars = calendars.stream().filter(c -> {
+            boolean before = c.getStartDate().isBefore(date) || c.getStartDate().isEqual(date);
+            boolean after = c.getEndDate().isAfter(date) || c.getEndDate().isEqual(date);
+            boolean forDay = c.isForDay(day);
+            return before && after && forDay;
+        }).collect(Collectors.toList());
+        if(currentCalendars.stream().anyMatch(MetraCalendar::isSingleDay)) {
+            currentCalendars.removeIf(c -> !c.getEndDate().equals(date) || !c.getStartDate().equals(date));
+        }
+        return currentCalendars;
     }
 
     @Scheduled(cron = "0 0 5 * * *")
