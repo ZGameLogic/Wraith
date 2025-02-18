@@ -64,11 +64,11 @@ public class MetraService {
             List<MetraStopTime> stops = stopTimes.stream()
                     .filter(s -> s.getDepartureTime().isAfter(time))
                     .filter(s -> s.getTripId().equals(tripId) && (s.getStopId().equals(toStopId) || s.getStopId().equals(fromStopId)))
-                    .sorted(Comparator.comparingInt(MetraStopTime::getStopSequence).reversed()).toList();
+                    .sorted(Comparator.comparingInt(MetraStopTime::getStopSequence)).toList();
             if(stops.size() != 2) continue;
-            MetraStopTime toStop = stops.get(0);
-            MetraStopTime fromStop = stops.get(1);
-            if(!fromStop.getStopId().equals(fromStopId)) continue;
+            MetraStopTime toStop = stops.get(1);
+            MetraStopTime fromStop = stops.get(0);
+            if(!toStop.getStopId().equals(fromStopId)) continue;
             String trainNumber = tripId.split("_")[1].replaceAll("[A-Z]", "");
             TrainSearchResult result = new TrainSearchResult(fromStop.getDepartureTime(), toStop.getArrivalTime(), trainNumber);
             results.add(result);
