@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 
 @DiscordController
@@ -32,6 +33,7 @@ public class TrainBot {
         event.replyChoices(
             metraService.getRoutes().stream()
                 .filter(s -> s.getRouteLongName().toLowerCase().startsWith(route.toLowerCase()) || s.getRouteId().toLowerCase().startsWith(route.toLowerCase()))
+                .sorted(Comparator.comparing(MetraRoute::getRouteLongName))
                 .map(s -> new Command.Choice(s.getRouteLongName(), s.getRouteId())).toList()
         ).queue();
     }
@@ -42,11 +44,8 @@ public class TrainBot {
             @EventProperty String route,
             @EventProperty String start
     ){
-        LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now();
-
         event.replyChoices(
-            metraService.getStopsOnRouteByRouteId(route, date, time).stream()
+            metraService.getStopsOnRouteByRouteId(route, LocalDate.now()).stream()
                 .filter(s -> s.getStopName().toLowerCase().startsWith(start.toLowerCase()) || s.getStopId().toLowerCase().startsWith(start.toLowerCase()))
                 .map(s -> new Command.Choice(s.getStopName(), s.getStopId())).toList()
         ).queue();
@@ -58,11 +57,8 @@ public class TrainBot {
             @EventProperty String route,
             @EventProperty String end
     ){
-        LocalDate date = LocalDate.now();
-        LocalTime time = LocalTime.now();
-
         event.replyChoices(
-            metraService.getStopsOnRouteByRouteId(route, date, time).stream()
+            metraService.getStopsOnRouteByRouteId(route, LocalDate.now()).stream()
                 .filter(s -> s.getStopName().toLowerCase().startsWith(end.toLowerCase()) || s.getStopId().toLowerCase().startsWith(end.toLowerCase()))
                 .map(s -> new Command.Choice(s.getStopName(), s.getStopId())).toList()
         ).queue();
