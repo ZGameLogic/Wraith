@@ -15,10 +15,7 @@ import org.springframework.http.HttpHeaders;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,7 +73,7 @@ public class MetraService {
         return results;
     }
 
-    public List<MetraStop> getStopsOnRouteByRouteId(String routeId, LocalDate date, LocalTime time){
+    public List<MetraStop> getStopsOnRouteByRouteId(String routeId, LocalDate date){
         List<MetraCalendar> currentCalendars = getCalendarsByDate(date);
         List<MetraTrip> trips = getTripsByCalendarAndRouteId(currentCalendars, routeId);
         List<String> tripIds = trips.stream().map(MetraTrip::getTripId).toList();
@@ -85,6 +82,7 @@ public class MetraService {
         return stops.stream()
                 .filter(s -> stopIds.contains(s.getStopId()))
                 .distinct()
+                .sorted(Comparator.comparing(s -> s.getStopName()))
                 .toList();
     }
 
