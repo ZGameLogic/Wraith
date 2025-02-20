@@ -1,5 +1,8 @@
 package com.zgamelogic.controllers;
 
+import com.zgamelogic.data.metra.MetraRoute;
+import com.zgamelogic.data.metra.MetraStop;
+import com.zgamelogic.data.metra.api.TrainRouteWithStops;
 import com.zgamelogic.data.metra.api.TrainSearchResult;
 import com.zgamelogic.services.MetraService;
 import lombok.AllArgsConstructor;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -34,6 +38,11 @@ public class TrainController {
         if(time == null) time = LocalTime.now();
         List<TrainSearchResult> result = metraService.trainSearch(route, to, from, date, time);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("routes")
+    public ResponseEntity<List<TrainRouteWithStops>> getRoutes(){
+        return ResponseEntity.ok(metraService.getStopsOnRoutes());
     }
 
 }
