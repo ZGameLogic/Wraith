@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @AllArgsConstructor
@@ -26,17 +25,17 @@ public class TrainController {
     
     @GetMapping("search")
     public ResponseEntity<List<TrainSearchResult>> trainSearch(
-            @RequestParam String route,
-            @RequestParam String to,
-            @RequestParam String from,
-            @RequestParam(required = false)
-            @DateTimeFormat(pattern = "yyyy-M-d")
-            LocalDate date,
-            @RequestParam(required = false) LocalTime time
+        @RequestParam String route,
+        @RequestParam String to,
+        @RequestParam String from,
+        @RequestParam(required = false)
+        @DateTimeFormat(pattern = "yyyy-M-d")
+        LocalDate date,
+        @RequestParam(required = false) LocalTime time
     ){
         if(date == null) date = LocalDate.now();
         if(time == null) time = LocalTime.now();
-        List<TrainSearchResult> result = metraService.trainSearch(route, to, from, date, time);
+        List<TrainSearchResult> result = metraService.trainSearch(route, from, to, date, time);
         return ResponseEntity.ok(result);
     }
 
