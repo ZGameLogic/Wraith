@@ -1,6 +1,7 @@
 package com.zgamelogic.services;
 
 import com.zgamelogic.data.metra.*;
+import com.zgamelogic.data.metra.api.TrainRouteWithStops;
 import com.zgamelogic.data.metra.api.TrainSearchResult;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -82,7 +83,7 @@ public class MetraService {
         return stops.stream()
                 .filter(s -> stopIds.contains(s.getStopId()))
                 .distinct()
-                .sorted(Comparator.comparing(s -> s.getStopName()))
+                .sorted(Comparator.comparing(MetraStop::getStopName))
                 .toList();
     }
 
@@ -92,6 +93,15 @@ public class MetraService {
 
     public MetraRoute getRouteById(String routeId){
         return routes.stream().filter(r -> r.getRouteId().equals(routeId)).findFirst().orElse(null);
+    }
+
+    public List<TrainRouteWithStops> getStopsOnRoutes(){
+        List<TrainRouteWithStops> stopsOnRoutes = new ArrayList<>();
+        for(MetraRoute route: routes){
+            TrainRouteWithStops routeWithStops = new TrainRouteWithStops(route, getStopsOnRouteByRouteId(route.getRouteId(), LocalDate.now()));
+            stopsOnRoutes.add(routeWithStops);
+        }
+        return stopsOnRoutes;
     }
 
     private List<MetraStopTime> getStopTimesByTripIds(List<String> tripIds){
