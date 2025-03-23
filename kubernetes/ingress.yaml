@@ -11,7 +11,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: wraith-bot
+                name: wraith
                 port:
                   number: 2002
   tls:
