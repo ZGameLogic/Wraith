@@ -9,6 +9,5 @@ spec:
     - protocol: TCP
       port: 2002
       targetPort: 2002
-      nodePort: 30010
-  type: NodePort
+  type: ClusterIP
   
