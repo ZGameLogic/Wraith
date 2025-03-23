@@ -19,10 +19,6 @@ spec:
         - name: wraith
           image: ghcr.io/zgamelogic/wraith:master
           imagePullPolicy: Always
-          volumeMounts:
-            - name: keystore-volume
-              mountPath: "/etc/keystore"
-              readOnly: true
           env:
             - name: TZ
               value: "America/Chicago"
@@ -40,10 +36,6 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 15
             periodSeconds: 30
-      volumes:
-        - name: keystore-volume
-          secret:
-            secretName: ssl-keystore-secret
       restartPolicy: Always
       imagePullSecrets:
         - name: ghcr-secret
