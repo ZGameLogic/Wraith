@@ -21,7 +21,7 @@
     <dependency>
       <groupId>com.zgamelogic</groupId>
       <artifactId>spring-boot-starter-discord</artifactId>
-      <version>1.4.2</version>
+      <version>1.4.7</version>
     </dependency>
 
     <dependency>
