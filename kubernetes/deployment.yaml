@@ -19,6 +19,10 @@ spec:
         - name: wraith
           image: ghcr.io/zgamelogic/wraith:master
           imagePullPolicy: Always
+          volumeMounts:
+            - name: apns-volume
+              mountPath: "/apns"
+              readOnly: true
           env:
             - name: TZ
               value: "America/Chicago"
@@ -36,6 +40,10 @@ spec:
               scheme: HTTP
             initialDelaySeconds: 15
             periodSeconds: 30
+      volumes:
+        - name: apns-volume
+          secret:
+            secretName: apns-secret
       restartPolicy: Always
       imagePullSecrets:
         - name: ghcr-secret
