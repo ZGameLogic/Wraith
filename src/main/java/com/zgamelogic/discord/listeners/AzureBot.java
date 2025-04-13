@@ -6,6 +6,7 @@ import com.azure.security.keyvault.secrets.models.SecretProperties;
 import com.zgamelogic.annotations.DiscordController;
 import com.zgamelogic.annotations.DiscordMapping;
 import com.zgamelogic.annotations.EventProperty;
+import com.zgamelogic.services.AzurePortalService;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -27,13 +28,15 @@ public class AzureBot {
 
     private final SecretClient secretClient;
     private final List<SecretProperties> azureSecrets;
+    private final AzurePortalService azurePortalService;
 
     @Value("${admin.id}")
     private long adminId;
 
     @Autowired
-    public AzureBot(SecretClient secretClient) {
+    public AzureBot(SecretClient secretClient, AzurePortalService azurePortalService) {
         this.secretClient = secretClient;
+        this.azurePortalService = azurePortalService;
         azureSecrets = new ArrayList<>();
         new Thread(this::fiveMinuteUpdate, "Azure pre-cache").start();
     }
@@ -51,11 +54,12 @@ public class AzureBot {
                 .filter(word -> word.toLowerCase().startsWith(event.getFocusedOption().getValue().toLowerCase()))
                 .sorted(Comparator.comparing(String::toLowerCase))
                 .map(word -> new Command.Choice(word, word))
+                .limit(25)
                 .toList();
         try {
             event.replyChoices(names).queue();
         } catch (Exception e){
-            log.error("Azure secrets took too long to get...");
+            log.error("Azure secrets took too long to get...", e);
         }
     }
 
@@ -74,6 +78,23 @@ public class AzureBot {
                 secret -> event.reply("```" + secretClient.getSecret(secret.getName()).getValue() + "```").setEphemeral(true).queue(),
                 () -> event.reply("You do not have permissions to see this secret").setEphemeral(true).queue()
         );
+    }
+
+    @DiscordMapping(Id = "azure", SubId = "add_cname")
+    public void azureCnameCommand(
+            SlashCommandInteractionEvent event,
+            @EventProperty String name
+    ){
+        if(event.getMember().getIdLong() != 983846164162027570L){
+            event.reply("You do not have permissions to do this").setEphemeral(true).queue();
+            return;
+        }
+        try {
+            azurePortalService.addCnameRecord(name);
+            event.reply("CNAME record created").setEphemeral(true).queue();
+        } catch (Exception e){
+            log.error("Error creating cname record", e);
+        }
     }
 
     @DiscordMapping(Id = "azure", SubId = "add_secret")
@@ -110,7 +131,9 @@ public class AzureBot {
                         .addOption(OptionType.STRING, "name", "Secret name to get the value of", true, true),
                     new SubcommandData("add_secret", "Create a secret in the keyvault")
                         .addOption(OptionType.STRING, "name", "Name of the secret", true)
-                        .addOption(OptionType.STRING, "value", "Value of the secret", true)
+                        .addOption(OptionType.STRING, "value", "Value of the secret", true),
+                    new SubcommandData("add_cname", "Create a cname record that points to zgamelogic.com")
+                        .addOption(OptionType.STRING, "name", "Name of the cname record", true)
         )));
     }
 }
