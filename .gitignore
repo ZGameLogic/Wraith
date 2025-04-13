@@ -39,3 +39,5 @@ build/
 
 ### local DB ###
 /data
+/apns
+AuthKey_*.p8
