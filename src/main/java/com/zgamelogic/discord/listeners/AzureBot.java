@@ -85,7 +85,7 @@ public class AzureBot {
             SlashCommandInteractionEvent event,
             @EventProperty String name
     ){
-        if(event.getMember().getIdLong() != 983846164162027570L){
+        if(event.getMember().getIdLong() != 232675572772372481L){
             event.reply("You do not have permissions to do this").setEphemeral(true).queue();
             return;
         }
