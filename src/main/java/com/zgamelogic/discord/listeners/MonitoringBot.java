@@ -2,9 +2,9 @@ package com.zgamelogic.discord.listeners;
 
 import com.zgamelogic.data.database.discord.DiscordRepository;
 import com.zgamelogic.data.database.discord.ServerConfig;
-import com.zgamelogic.annotations.DiscordController;
-import com.zgamelogic.annotations.DiscordMapping;
 import com.zgamelogic.dataotter.DataOtterService;
+import com.zgamelogic.discord.annotations.DiscordController;
+import com.zgamelogic.discord.annotations.DiscordMapping;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
