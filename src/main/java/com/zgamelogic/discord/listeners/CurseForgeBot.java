@@ -1,10 +1,9 @@
 package com.zgamelogic.discord.listeners;
 
 import com.zgamelogic.dataotter.DataOtterService;
+import com.zgamelogic.discord.annotations.DiscordController;
+import com.zgamelogic.discord.annotations.DiscordMapping;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
-import com.zgamelogic.annotations.Bot;
-import com.zgamelogic.annotations.DiscordController;
-import com.zgamelogic.annotations.DiscordMapping;
 import com.zgamelogic.data.api.curseforge.CurseforgeMod;
 import com.zgamelogic.data.database.curseforge.CurseforgeRecord;
 import com.zgamelogic.data.database.curseforge.CurseforgeRepository;
@@ -41,7 +40,6 @@ public class CurseForgeBot {
     private final CurseforgeService curseforgeService;
     private final DataOtterService dataOtterService;
 
-    @Bot
     private JDA bot;
 
     @Autowired
@@ -53,6 +51,7 @@ public class CurseForgeBot {
 
     @DiscordMapping
     public void ready(ReadyEvent event) {
+        bot = event.getJDA();
         update();
     }
 

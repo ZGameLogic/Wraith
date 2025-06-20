@@ -1,11 +1,11 @@
 package com.zgamelogic.discord.listeners;
 
-import com.zgamelogic.annotations.DiscordController;
-import com.zgamelogic.annotations.DiscordMapping;
-import com.zgamelogic.annotations.EventProperty;
 import com.zgamelogic.data.metra.MetraRoute;
 import com.zgamelogic.data.metra.MetraStop;
 import com.zgamelogic.data.metra.api.TrainSearchResult;
+import com.zgamelogic.discord.annotations.DiscordController;
+import com.zgamelogic.discord.annotations.DiscordMapping;
+import com.zgamelogic.discord.annotations.EventProperty;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import com.zgamelogic.services.MetraService;
 import lombok.AllArgsConstructor;

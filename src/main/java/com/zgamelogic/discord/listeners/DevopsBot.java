@@ -2,12 +2,12 @@ package com.zgamelogic.discord.listeners;
 
 import com.zgamelogic.data.api.github.Issue;
 import com.zgamelogic.data.api.github.Tree;
+import com.zgamelogic.discord.annotations.DiscordController;
+import com.zgamelogic.discord.annotations.DiscordMapping;
+import com.zgamelogic.discord.annotations.EventProperty;
 import com.zgamelogic.discord.helpers.DevopsBotHelper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.zgamelogic.annotations.DiscordController;
-import com.zgamelogic.annotations.DiscordMapping;
-import com.zgamelogic.annotations.EventProperty;
 import com.zgamelogic.data.api.github.payloads.LabelsPayload;
 import com.zgamelogic.data.api.github.User;
 import com.zgamelogic.data.database.github.Issue.GithubIssueRepository;
