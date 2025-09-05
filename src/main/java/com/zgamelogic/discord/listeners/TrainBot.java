@@ -6,7 +6,7 @@ import com.zgamelogic.data.metra.api.TrainSearchResult;
 import com.zgamelogic.discord.annotations.DiscordController;
 import com.zgamelogic.discord.annotations.DiscordMapping;
 import com.zgamelogic.discord.annotations.EventProperty;
-import com.zgamelogic.discord.utils.EmbedMessageGenerator;
+import com.zgamelogic.discord.data.Model;
 import com.zgamelogic.services.MetraService;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @DiscordController
 @AllArgsConstructor
@@ -64,12 +65,12 @@ public class TrainBot {
         ).queue();
     }
 
-    @DiscordMapping(Id = "metra")
+    @DiscordMapping(Id = "metra", Event = SlashCommandInteractionEvent.class, Document = "metra")
     public void metraSlashCommand(
-        SlashCommandInteractionEvent event,
         @EventProperty String route,
         @EventProperty String start,
-        @EventProperty String end
+        @EventProperty String end,
+        Model model
     ) {
         LocalDate date = LocalDate.now();
         LocalTime time = LocalTime.now();
@@ -77,7 +78,13 @@ public class TrainBot {
         MetraStop metraStart = metraService.getStopById(start);
         MetraStop metraEnd = metraService.getStopById(end);
         List<TrainSearchResult> results = metraService.trainSearch(route, start, end, date, time);
-        event.replyEmbeds(EmbedMessageGenerator.metraTrainData(results, metraStart.getStopName(), metraEnd.getStopName(), metraRoute.getRouteColor())).queue();
+        String resultString = results.stream()
+            .map(result -> String.format("Train %s | %s %s", result.trainNumber(), result.depart(), result.arrive()))
+            .collect(Collectors.joining("\n"));
+        model.addContext("start", metraStart.getStopName());
+        model.addContext("end", metraEnd.getStopName());
+        model.addContext("color", "#" + metraRoute.getRouteColor());
+        model.addContext("results", resultString);
     }
 
     @Bean

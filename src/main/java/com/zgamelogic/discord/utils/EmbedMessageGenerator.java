@@ -6,7 +6,6 @@ import com.zgamelogic.data.api.github.events.PublishReleasedEvent;
 import com.zgamelogic.data.api.github.events.PushEvent;
 import com.zgamelogic.data.api.zGameLogic.SOTData;
 import com.zgamelogic.data.database.curseforge.CurseforgeRecord;
-import com.zgamelogic.data.metra.api.TrainSearchResult;
 import com.zgamelogic.dataotter.data.Monitor;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -41,20 +40,6 @@ public abstract class EmbedMessageGenerator {
             0, new Color(13, 71, 161),
             1, new Color(64, 194, 99)
     );
-
-    public static MessageEmbed metraTrainData(List<TrainSearchResult> results, String from, String to, String routeColor){
-        EmbedBuilder eb = new EmbedBuilder();
-        eb.setColor(Color.decode("#" + routeColor));
-        eb.setTitle("Schedule for " + from + " -> " + to);
-        StringBuilder desc = new StringBuilder();
-        for(TrainSearchResult result: results){
-            String line = String.format("Train %s | %s %s", result.trainNumber(), result.depart(), result.arrive());
-            desc.append(line).append("\n");
-        }
-        eb.setDescription(desc.toString());
-        eb.setTimestamp(Instant.now());
-        return eb.build();
-    }
 
     public static MessageEmbed sotDataMessage(SOTData returnData) {
         EmbedBuilder eb = new EmbedBuilder();

@@ -1,0 +1,4 @@
+<embed color="${color}">
+    <title>Schedule for ${start} -> ${end}</title>
+    <description>${results}</description>
+</embed>

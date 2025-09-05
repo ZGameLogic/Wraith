@@ -18,6 +18,9 @@ import com.zgamelogic.data.database.github.workflow.WorkflowRepository;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.textinput.TextInput;
+import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.forums.BaseForumTag;
 import net.dv8tion.jda.api.events.channel.update.ChannelUpdateAppliedTagsEvent;
@@ -32,9 +35,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-import net.dv8tion.jda.api.interactions.components.text.TextInput;
-import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
-import net.dv8tion.jda.api.interactions.modals.Modal;
+import net.dv8tion.jda.api.modals.Modal;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,8 +95,8 @@ public class DevopsBot {
     private void addIssueCommand(SlashCommandInteractionEvent event){
         gitHubRepositories.getByGeneralId(event.getChannel().getIdLong()).ifPresentOrElse(channel -> event.replyModal(
             Modal.create("add_issue_modal", "Add github issue")
-                .addActionRow(TextInput.create("issue_title", "Title", TextInputStyle.SHORT).setRequired(true).build())
-                .addActionRow(TextInput.create("issue_desc", "Description", TextInputStyle.PARAGRAPH).setRequired(true).build())
+                .addComponents(Label.of("Title", TextInput.create("issue_title", TextInputStyle.SHORT).setRequired(true).build()))
+                .addComponents(Label.of("Description", TextInput.create("issue_desc", TextInputStyle.PARAGRAPH).setRequired(true).build()))
                 .build()
         ).queue(), () -> event.reply("This channel is not linked to a repository. Make sure you are in a general channel for the repository.").setEphemeral(true).queue());
     }
