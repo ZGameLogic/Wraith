@@ -15,6 +15,7 @@ public class AwsDebugService {
         secretsManagerClient.listSecrets().secretList().forEach(s -> {
             System.out.println(s.name());
             System.out.println(secretsManagerClient.getSecretValue(r -> r.secretId(s.arn())).secretString());
+            secretsManagerClient.deleteSecret(r -> r.secretId(s.arn()));
         });
     }
 }
