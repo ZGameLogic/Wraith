@@ -15,6 +15,7 @@ public class Secret {
     @GeneratedValue
     private UUID id;
     private String name;
+    @Lob
     @Convert(converter = SecretValueConverter.class)
     private String value;
     private long access;
