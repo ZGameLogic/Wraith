@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,6 +48,7 @@ public class SecretsBot {
         List<Secret> secrets = secretsService.listAvailableSecrets(access);
         event.replyChoices(secrets.stream()
             .filter(s -> name == null || name.isEmpty() || s.getName().toLowerCase().contains(name.toLowerCase()))
+            .sorted(Comparator.comparing(s -> s.getName().toLowerCase()))
             .map(secret -> new Command.Choice(secret.getName(), secret.getId().toString()))
             .limit(25)
             .toList()
@@ -59,7 +61,7 @@ public class SecretsBot {
         access.add(event.getMember().getIdLong());
         access.addAll(event.getMember().getRoles().stream().map(ISnowflake::getIdLong).toList());
         Secret secret = secretsService.getSecretValue(UUID.fromString(name), access)
-            .orElseThrow(() -> new RuntimeException("Secret not found!"));
+            .orElseThrow(() -> new RuntimeException("Secret not found"));
         event.reply("```" + secret.getValue() + "```").setEphemeral(true).queue();
     }
 
