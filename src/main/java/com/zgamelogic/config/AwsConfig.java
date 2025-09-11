@@ -7,7 +7,6 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.route53.Route53Client;
-import software.amazon.awssdk.services.secretsmanager.SecretsManagerClient;
 
 @Configuration
 public class AwsConfig {
@@ -21,14 +20,6 @@ public class AwsConfig {
     ) {
         this.region = region;
         credentials = AwsBasicCredentials.create(accessKey, secretKey);
-    }
-
-    @Bean
-    public SecretsManagerClient secretsManagerClient() {
-        return SecretsManagerClient.builder()
-            .region(Region.of(region))
-            .credentialsProvider(StaticCredentialsProvider.create(credentials))
-            .build();
     }
 
     @Bean
