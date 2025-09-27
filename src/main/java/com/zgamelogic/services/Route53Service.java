@@ -47,7 +47,7 @@ public class Route53Service {
     @Scheduled(cron = "0 * * * * *")
     private void dynamicIpUpdate() throws IOException {
         String hostedZoneId = "Z10458543LUY6QMAE4J12";
-        String recordName = "test.zgamelogic.com";
+        String recordName = "zgamelogic.com";
 
         // 1. Get current public IP
         String currentIp;
