@@ -17,7 +17,7 @@ import com.zgamelogic.devops.database.workflow.WorkflowRepository;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.components.label.Label;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.components.textinput.TextInput;
 import net.dv8tion.jda.api.components.textinput.TextInputStyle;
 import net.dv8tion.jda.api.entities.Guild;
@@ -93,8 +93,8 @@ public class DevopsBot {
     private void addIssueCommand(SlashCommandInteractionEvent event){
         gitHubRepositories.getByGeneralId(event.getChannel().getIdLong()).ifPresentOrElse(channel -> event.replyModal(
             Modal.create("add_issue_modal", "Add github issue")
-                .addComponents(Label.of("Title", TextInput.create("issue_title", TextInputStyle.SHORT).setRequired(true).build()))
-                .addComponents(Label.of("Description", TextInput.create("issue_desc", TextInputStyle.PARAGRAPH).setRequired(true).build()))
+                .addComponents(ActionRow.of(TextInput.create("issue_title","Title", TextInputStyle.SHORT).setRequired(true).build()))
+                .addComponents(ActionRow.of(TextInput.create("issue_desc", "Description", TextInputStyle.PARAGRAPH).setRequired(true).build()))
                 .build()
         ).queue(), () -> event.reply("This channel is not linked to a repository. Make sure you are in a general channel for the repository.").setEphemeral(true).queue());
     }
