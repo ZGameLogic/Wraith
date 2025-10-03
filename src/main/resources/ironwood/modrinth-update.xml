@@ -1,0 +1,10 @@
+<embed color="#21D067">
+    <title url="https://modrinth.com/mod/${project.slug}/versions">Project update: ${project.title}</title>
+    <description>Version name: ${version.name}</description>
+    <thumbnail url="${project.iconUrl}" />
+    <for collection="version.files">
+        <field name="${i.filename}" inline="true">
+            [download](${i.url})
+        </field>
+    </for>
+</embed>

@@ -1,0 +1,5 @@
+<embed color="#21D067">
+    <title>Followed project: ${project.title}</title>
+    <description>${project.description}</description>
+    <thumbnail url="${project.iconUrl}" />
+</embed>
