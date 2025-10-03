@@ -57,6 +57,7 @@ public class ModrinthBot {
         @EventProperty(name = "project-id") String projectId,
         Model model
     ) {
+        event.deferReply().queue();
         try {
             modrinthService.followProject(projectId);
         } catch (HttpClientErrorException.BadRequest e){
@@ -97,7 +98,11 @@ public class ModrinthBot {
 
     @DiscordExceptionHandler(HttpClientErrorException.BadRequest.class)
     private void handleHttpClientErrorException(SlashCommandInteractionEvent event, HttpClientErrorException exception) {
-        event.reply(exception.getMessage()).setEphemeral(true).queue();
+        if(event.isAcknowledged()){
+            event.getHook().sendMessage(exception.getMessage()).setEphemeral(true).queue();
+        } else {
+            event.reply(exception.getMessage()).setEphemeral(true).queue();
+        }
     }
 
     @Scheduled(cron = "0 */5 * * * *")
