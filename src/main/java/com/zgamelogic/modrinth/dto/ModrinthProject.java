@@ -15,4 +15,5 @@ public class ModrinthProject {
     @JsonProperty("icon_url")
     private final String iconUrl;
     private final Double followers;
+    private final String slug;
 }

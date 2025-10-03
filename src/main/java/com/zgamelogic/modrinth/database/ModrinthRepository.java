@@ -7,6 +7,8 @@ import java.util.List;
 
 @Repository
 public interface ModrinthRepository extends JpaRepository<ModrinthRecord, ModrinthRecord.ModrinthRecordId> {
-    List<ModrinthRecord> findAllByProjectId(String project);
-    List<ModrinthRecord> findAllByChannelIdAndGuildId(long channelId, long groupId);
+    List<ModrinthRecord> findAllByProjectId(String projectId);
+    List<ModrinthRecord> findAllByChannelId(long channelId);
+    boolean existsByProjectId(String projectId);
+    void deleteByProjectIdAndChannelId(String projectId, long channelId);
 }

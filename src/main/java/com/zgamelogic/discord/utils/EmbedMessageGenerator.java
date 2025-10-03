@@ -19,13 +19,10 @@ import java.util.List;
 public abstract class EmbedMessageGenerator {
 
     private final static Color GENERAL_COLOR = new Color(99, 42, 129);
-    private final static Color CURSEFORGE_COLOR = new Color(239, 99, 54);
     private final static Color GITHUB_COLOR = new Color(4, 6, 10);
 
     private final static Color DATA_DOG_OK_COLOR = new Color(64, 194, 99);
     private final static Color DATA_DOG_ALERT_COLOR = new Color(233, 54, 74);
-
-    private final static Color SEA_OF_THIEVES_COLOR = new Color(21, 230, 154);
 
     private final static String DATA_DOG_OK = ":green_square:";
     private final static String DATA_DOG_ALERT = ":red_square:";

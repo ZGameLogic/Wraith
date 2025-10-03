@@ -3,6 +3,7 @@ package com.zgamelogic.modrinth;
 import com.zgamelogic.modrinth.dto.ModrinthNotification;
 import com.zgamelogic.modrinth.dto.ModrinthProject;
 import com.zgamelogic.modrinth.dto.ModrinthUser;
+import com.zgamelogic.modrinth.dto.ModrinthVersion;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -48,6 +49,12 @@ public class ModrinthService {
         restTemplate.exchange(url, HttpMethod.POST, new HttpEntity<>(headers), Void.class);
     }
 
+    public void unFollowProject(String id){
+        String url = MODRINTH_API_URL + "/project/" + id + "/follow";
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(url, HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+    }
+
     public List<ModrinthNotification> getNotifications(){
         String url = MODRINTH_API_URL + "/user/" + user.getId() + "/notifications";
         RestTemplate restTemplate = new RestTemplate();
@@ -55,10 +62,16 @@ public class ModrinthService {
         return List.of(response.getBody());
     }
 
+    public ModrinthVersion getVersion(String versionId){
+        String url = MODRINTH_API_URL + "/version/" + versionId;
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), ModrinthVersion.class).getBody();
+    }
+
     @Async
-    public void deleteNotifications(Collection<String> notificationIds){
-        String url = UriComponentsBuilder.fromUriString(MODRINTH_API_URL + "/notifications")
-            .queryParam("ids", String.join(",", notificationIds))
+    public void deleteNotification(String notificationId){
+        String url = UriComponentsBuilder.fromUriString(MODRINTH_API_URL + "/notification/" + notificationId)
+//            .queryParam("ids", String.join(",", notificationIds))
             .toUriString();
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.exchange(url, HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
