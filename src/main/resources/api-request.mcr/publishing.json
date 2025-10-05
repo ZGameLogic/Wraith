@@ -1,0 +1,12 @@
+{
+  "deploymentId": "b5111dba-f242-4a6e-a58c-7e375cfa696a",
+  "deploymentName": "Deployment",
+  "timestamp": 1759685832282,
+  "status": "PUBLISHING",
+  "packageUrls": [
+    "pkg:maven/com.zgamelogic/spring-boot-starter-discord@5.0.4"
+  ],
+  "centralPaths": [
+    "https://repo1.maven.org/maven2/com/zgamelogic/spring-boot-starter-discord/5.0.4/spring-boot-starter-discord-5.0.4.pom"
+  ]
+}
