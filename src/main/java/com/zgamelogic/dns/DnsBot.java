@@ -17,8 +17,9 @@ public class DnsBot {
 
     @DiscordMapping(Id = "cname")
     private void addCname(SlashCommandInteractionEvent event, @EventProperty String prefix){
+        event.deferReply().setEphemeral(true).queue();
         route53Service.addCnameRecord(prefix);
-        event.reply("CNAME record created").setEphemeral(true).queue();
+        event.getHook().sendMessage("CNAME record created").setEphemeral(true).queue();
     }
 
     @Bean
