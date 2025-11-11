@@ -1,5 +1,10 @@
 package com.zgamelogic.metra;
 
+import com.fasterxml.jackson.databind.MappingIterator;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.csv.CsvMapper;
+import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.zgamelogic.metra.dto.*;
 import com.zgamelogic.metra.dto.api.TrainRouteWithStops;
 import com.zgamelogic.metra.dto.api.TrainSearchResult;
@@ -13,11 +18,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import org.springframework.http.HttpHeaders;
+
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 @Service
 @Slf4j
@@ -27,7 +36,6 @@ public class MetraService {
      */
 
     private final HttpHeaders headers;
-    private final static String BASE_URL = "https://gtfsapi.metrarail.com/gtfs/";
     @Getter
     private final List<MetraRoute> routes;
     private final List<MetraStop> stops;
@@ -35,7 +43,7 @@ public class MetraService {
     private final List<MetraCalendar> calendars;
     private final List<MetraTrip> trips;
 
-    public MetraService(@Value("${metra.username}") String username, @Value("${metra.password}") String password) {
+    public MetraService(@Value("${metra.username}") String username, @Value("${metra.password}") String password) throws IOException {
         headers = new HttpHeaders();
         String auth = username + ":" + password;
         byte[] encodedAuth = Base64.getEncoder().encode(auth.getBytes(StandardCharsets.UTF_8));
@@ -48,6 +56,11 @@ public class MetraService {
         trips = new ArrayList<>();
         updateMetraData();
         log.info("Metra train data loaded");
+        log.info("Routes: {}", routes.size());
+        log.info("Stops: {}", stops.size());
+        log.info("Calendars: {}", calendars.size());
+        log.info("Trips: {}", trips.size());
+        log.info("Stop times: {}", stopTimes.size());
     }
 
     public List<TrainSearchResult> trainSearch(String routeId, String toStopId, String fromStopId, LocalDate date, LocalTime time) {
@@ -128,7 +141,7 @@ public class MetraService {
     }
 
     @Scheduled(cron = "0 0 5 * * *")
-    private void updateMetraData() {
+    private void updateMetraData() throws IOException {
         routes.clear();
         stops.clear();
         stopTimes.clear();
@@ -137,25 +150,59 @@ public class MetraService {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        // Routes
-        MetraRoute[] routesResponse = restTemplate.exchange(BASE_URL + "/schedule/routes", HttpMethod.GET, requestEntity, MetraRoute[].class).getBody();
-        routes.addAll(List.of(routesResponse));
-        log.debug("Routes: {}", routes.size());
-        // stops
-        MetraStop[] stopsResponse = restTemplate.exchange(BASE_URL + "/schedule/stops", HttpMethod.GET, requestEntity, MetraStop[].class).getBody();
-        stops.addAll(List.of(stopsResponse));
-        log.debug("Stops: {}", stops.size());
-        // stop times
-        MetraStopTime[] stopTimesResponse = restTemplate.exchange(BASE_URL + "/schedule/stop_times", HttpMethod.GET, requestEntity, MetraStopTime[].class).getBody();
-        stopTimes.addAll(List.of(stopTimesResponse));
-        log.debug("Stop Times: {}", stopTimes.size());
-        // calendars
-        MetraCalendar[] calendarsResponse = restTemplate.exchange(BASE_URL + "/schedule/calendar", HttpMethod.GET, requestEntity, MetraCalendar[].class).getBody();
-        calendars.addAll(List.of(calendarsResponse));
-        log.debug("Calendars: {}", calendars.size());
-        // trips
-        MetraTrip[] tripResponse = restTemplate.exchange(BASE_URL + "/schedule/trips", HttpMethod.GET, requestEntity, MetraTrip[].class).getBody();
-        trips.addAll(List.of(tripResponse));
-        log.debug("Trips: {}", trips.size());
+        byte[] body = restTemplate.exchange("https://schedules.metrarail.com/gtfs/schedule.zip", HttpMethod.GET, requestEntity, byte[].class).getBody();
+        ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(body), StandardCharsets.UTF_8);
+        ZipEntry entry;
+        while((entry = zis.getNextEntry()) != null){
+            String name = entry.getName().toLowerCase();
+            Class<?> clazz = switch(name) {
+                case "routes.txt" -> MetraRoute.class;
+                case "stops.txt" -> MetraStop.class;
+                case "calendar.txt" -> MetraCalendar.class;
+                case "stop_times.txt" -> MetraStopTime.class;
+                case "trips.txt" -> MetraTrip.class;
+                default -> null;
+            };
+            if(clazz == null) continue;
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            byte[] buffer = new byte[4096];
+            int len;
+            while ((len = zis.read(buffer)) != -1) {
+                baos.write(buffer, 0, len);
+            }
+            zis.closeEntry();
+            byte[] entryBytes = baos.toByteArray();
+            ByteArrayInputStream bais = new ByteArrayInputStream(entryBytes);
+            InputStreamReader isr = new InputStreamReader(bais, StandardCharsets.UTF_8);
+            BufferedReader br = new BufferedReader(isr);
+            CsvMapper mapper = new CsvMapper();
+            CsvSchema schema = CsvSchema.emptySchema().withHeader();
+            mapper.registerModule(new JavaTimeModule());
+            mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            mapper.enable(com.fasterxml.jackson.dataformat.csv.CsvParser.Feature.TRIM_SPACES);
+            MappingIterator<?> it = mapper.readerFor(clazz).with(schema).readValues(br);
+            List<?> items = it.readAll();
+            if (clazz.equals(MetraRoute.class)) {
+                @SuppressWarnings("unchecked")
+                List<MetraRoute> r = (List<MetraRoute>) items;
+                routes.addAll(r);
+            } else if (clazz.equals(MetraStop.class)) {
+                @SuppressWarnings("unchecked")
+                List<MetraStop> s = (List<MetraStop>) items;
+                stops.addAll(s);
+            } else if (clazz.equals(MetraCalendar.class)) {
+                @SuppressWarnings("unchecked")
+                List<MetraCalendar> c = (List<MetraCalendar>) items;
+                calendars.addAll(c);
+            } else if (clazz.equals(MetraStopTime.class)) {
+                @SuppressWarnings("unchecked")
+                List<MetraStopTime> st = (List<MetraStopTime>) items;
+                stopTimes.addAll(st);
+            } else {
+                @SuppressWarnings("unchecked")
+                List<MetraTrip> t = (List<MetraTrip>) items;
+                trips.addAll(t);
+            }
+        }
     }
 }

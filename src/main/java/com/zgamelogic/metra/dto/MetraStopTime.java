@@ -1,5 +1,6 @@
 package com.zgamelogic.metra.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -15,6 +16,7 @@ import java.time.LocalTime;
 @Getter
 @NoArgsConstructor
 @ToString
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MetraStopTime {
     @JsonProperty("trip_id")
     private String tripId;
@@ -33,8 +35,8 @@ public class MetraStopTime {
         @Override
         public LocalTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
             String time = p.getText();
-            int hour = Integer.parseInt(time.split(":")[0]);
-            int minute = Integer.parseInt(time.split(":")[1]);
+            int hour = Integer.parseInt(time.split(":")[0].trim());
+            int minute = Integer.parseInt(time.split(":")[1].trim());
             if (hour >= 24) hour -= 24;
             return LocalTime.of(hour, minute);
         }
