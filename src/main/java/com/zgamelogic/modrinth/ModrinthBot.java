@@ -89,6 +89,7 @@ public class ModrinthBot {
         @EventProperty(name = "project") String projectId,
         Model model
     ) {
+        event.deferReply().queue();
         transactionTemplate.execute(status -> {
             modrinthRepository.deleteByProjectIdAndChannelId(projectId, event.getChannelIdLong());
             if(!modrinthRepository.existsByProjectId(projectId))
