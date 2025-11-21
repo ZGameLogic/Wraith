@@ -24,6 +24,8 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.awt.*;
@@ -36,13 +38,15 @@ public class ModrinthBot {
     private final ModrinthService modrinthService;
     private final ModrinthRepository modrinthRepository;
     private final IronWood ironWood;
+    private final TransactionTemplate transactionTemplate;
 
     private JDA bot;
 
-    public ModrinthBot(ModrinthService modrinthService, ModrinthRepository modrinthRepository, IronWood ironWood) {
+    public ModrinthBot(ModrinthService modrinthService, ModrinthRepository modrinthRepository, IronWood ironWood, PlatformTransactionManager transactionManager, PlatformTransactionManager transactionManager1) {
         this.modrinthService = modrinthService;
         this.modrinthRepository = modrinthRepository;
         this.ironWood = ironWood;
+        this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
     @DiscordMapping
@@ -85,8 +89,12 @@ public class ModrinthBot {
         @EventProperty(name = "project") String projectId,
         Model model
     ) {
-        modrinthRepository.deleteByProjectIdAndChannelId(projectId, event.getChannelIdLong());
-        if(!modrinthRepository.existsByProjectId(projectId)) modrinthService.unFollowProject(projectId);
+        transactionTemplate.execute(status -> {
+            modrinthRepository.deleteByProjectIdAndChannelId(projectId, event.getChannelIdLong());
+            if(!modrinthRepository.existsByProjectId(projectId))
+                modrinthService.unFollowProject(projectId);
+            return null;
+        });
         model.addContext("project", modrinthService.getProject(projectId));
     }
 
