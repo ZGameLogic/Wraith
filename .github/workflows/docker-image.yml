@@ -44,7 +44,7 @@ jobs:
       needs: build
       with:
         applicationId: 3
-        monitorId: 5
+        monitorId: 3
         active: false
     Kubernetes:
         runs-on: PiServer
@@ -67,5 +67,5 @@ jobs:
       if: always()
       with:
         applicationId: 3
-        monitorId: 5
+        monitorId: 3
         active: true
