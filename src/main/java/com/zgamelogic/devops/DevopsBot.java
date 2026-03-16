@@ -3,7 +3,6 @@ package com.zgamelogic.devops;
 import com.zgamelogic.devops.dto.Issue;
 import com.zgamelogic.devops.dto.Tree;
 import com.zgamelogic.discord.annotations.DiscordController;
-import com.zgamelogic.discord.annotations.DiscordMapping;
 import com.zgamelogic.discord.annotations.EventProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,6 +13,10 @@ import com.zgamelogic.devops.database.repository.GithubRepository;
 import com.zgamelogic.devops.database.user.GithubUser;
 import com.zgamelogic.devops.database.user.GithubUserRepository;
 import com.zgamelogic.devops.database.workflow.WorkflowRepository;
+import com.zgamelogic.discord.annotations.mappings.GenericDiscordMapping;
+import com.zgamelogic.discord.annotations.mappings.ModalMapping;
+import com.zgamelogic.discord.annotations.mappings.SlashCommandAutocompleteMapping;
+import com.zgamelogic.discord.annotations.mappings.SlashCommandMapping;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -84,13 +87,13 @@ public class DevopsBot {
         fiveMinuteUpdate();
     }
 
-    @DiscordMapping
-    private void ready(ReadyEvent event){
+    @GenericDiscordMapping(event = ReadyEvent.class)
+    public void ready(ReadyEvent event){
         glacies = event.getJDA().getGuildById(guildId);
     }
 
-    @DiscordMapping(Id = "github", SubId = "create_issue")
-    private void addIssueCommand(SlashCommandInteractionEvent event){
+    @SlashCommandMapping(id = "github", sub = "create_issue")
+    public void addIssueCommand(SlashCommandInteractionEvent event){
         gitHubRepositories.getByGeneralId(event.getChannel().getIdLong()).ifPresentOrElse(channel -> event.replyModal(
             Modal.create("add_issue_modal", "Add github issue")
                 .addComponents(Label.of("issue_title", TextInput.create("Title", TextInputStyle.SHORT).setRequired(true).build()))
@@ -99,11 +102,11 @@ public class DevopsBot {
         ).queue(), () -> event.reply("This channel is not linked to a repository. Make sure you are in a general channel for the repository.").setEphemeral(true).queue());
     }
 
-    @DiscordMapping(Id = "add_issue_modal")
-    private void addIssueModal(
-            ModalInteractionEvent event,
-            @EventProperty(name = "issue_title") String title,
-            @EventProperty(name = "issue_desc") String desc
+    @ModalMapping(id = "add_issue_modal")
+    public void addIssueModal(
+        ModalInteractionEvent event,
+        @EventProperty(name = "issue_title") String title,
+        @EventProperty(name = "issue_desc") String desc
     ){
         gitHubRepositories.getByGeneralId(event.getChannelIdLong()).ifPresent(gitRepo -> {
             Optional<GithubUser> user = githubUserRepository.getGithubUserByDiscordId(event.getUser().getIdLong());
@@ -118,8 +121,8 @@ public class DevopsBot {
         });
     }
 
-    @DiscordMapping
-    private void closedIssue(ChannelUpdateArchivedEvent event){
+    @GenericDiscordMapping(event = ChannelUpdateArchivedEvent.class)
+    public void closedIssue(ChannelUpdateArchivedEvent event){
         if(event.getNewValue()){
             githubIssueRepository.getGithubIssueByForumPostId(event.getChannel().getIdLong()).ifPresent(githubIssue ->
                     gitHubRepositories.getByForumChannelId(event.getChannel().getIdLong()).ifPresent(gitRepo ->
@@ -129,8 +132,8 @@ public class DevopsBot {
         }
     }
 
-    @DiscordMapping
-    private void userMessage(MessageReceivedEvent event){
+    @GenericDiscordMapping(event = MessageReceivedEvent.class)
+    public void userMessage(MessageReceivedEvent event){
         if(!event.isFromThread() || event.getAuthor().isBot()) return;
         long forumChannelId = event.getChannel().asThreadChannel().getParentChannel().asForumChannel().getIdLong();
         long threadChannelId = event.getChannel().getIdLong();
@@ -148,8 +151,8 @@ public class DevopsBot {
         }));
     }
 
-    @DiscordMapping(Id = "github", SubId = "add_token")
-    private void addGithubToken(SlashCommandInteractionEvent event, @EventProperty String token){
+    @SlashCommandMapping(id = "github", sub = "add_token")
+    public void addGithubToken(SlashCommandInteractionEvent event, @EventProperty String token){
         User githubUser = gitHubService.getGithubAuthenticatedUser(token);
         if(githubUser == null){
             event.reply("We were unable to authenticate with that github token. Please check your access token and try again.").setEphemeral(true).queue();
@@ -165,8 +168,8 @@ public class DevopsBot {
         event.reply("Linked github token to this account").setEphemeral(true).queue();
     }
 
-    @DiscordMapping(Id = "spring", SubId = "properties", FocusedOption = "project")
-    private void propertiesProjectAutoComplete(CommandAutoCompleteInteractionEvent event){
+    @SlashCommandAutocompleteMapping(id = "spring", sub = "properties", focused = "project")
+    public void propertiesProjectAutoComplete(CommandAutoCompleteInteractionEvent event){
         List<Command.Choice> files = githubPropertyFiles.stream()
                 .map(path -> path.split("/")[0])
                 .distinct()
@@ -179,8 +182,8 @@ public class DevopsBot {
         event.replyChoices(files).queue();
     }
 
-    @DiscordMapping(Id = "spring", SubId = "properties", FocusedOption = "env")
-    private void propertiesEnvAutoComplete(
+    @SlashCommandAutocompleteMapping(id = "spring", sub = "properties", focused = "env")
+    public void propertiesEnvAutoComplete(
             CommandAutoCompleteInteractionEvent event,
             @EventProperty String project,
             @EventProperty String env
@@ -202,8 +205,8 @@ public class DevopsBot {
         event.replyChoices(envs).queue();
     }
 
-    @DiscordMapping(Id = "spring", SubId = "properties")
-    private void springProperties(
+    @SlashCommandMapping(id = "spring", sub = "properties")
+    public void springProperties(
             SlashCommandInteractionEvent event,
             @EventProperty String project,
             @EventProperty String env
@@ -217,13 +220,13 @@ public class DevopsBot {
     }
 
     @Scheduled(cron = "0 */5 * * * *")
-    private void fiveMinuteUpdate(){
+    public void fiveMinuteUpdate(){
         githubPropertyFiles.clear();
         githubPropertyFiles.addAll(gitHubService.getPropertiesFileList().stream().map(Tree::getPath).toList());
     }
 
-    @DiscordMapping
-    private void forumTagUpdate(ChannelUpdateAppliedTagsEvent event){
+    @GenericDiscordMapping(event = ChannelUpdateAppliedTagsEvent.class)
+    public void forumTagUpdate(ChannelUpdateAppliedTagsEvent event){
         long forumChannelId = event.getChannel().asThreadChannel().getParentChannel().asForumChannel().getIdLong();
         long threadChannelId = event.getChannel().getIdLong();
         githubIssueRepository.getGithubIssueByForumPostId(threadChannelId).ifPresent(githubIssue ->
@@ -234,17 +237,17 @@ public class DevopsBot {
     }
 
     @GetMapping("health")
-    private String healthCheck(){
+    public String healthCheck(){
         return "Healthy";
     }
 
     @GetMapping("about")
-    private String about(){
+    public String about(){
         return "Wraith v1.0.0";
     }
 
     @PostMapping("github")
-    private void gitHub(
+    public void gitHub(
             @RequestHeader(name = "X-GitHub-Event") String gitHubEvent,
             @RequestBody String body
     ) {
@@ -287,7 +290,7 @@ public class DevopsBot {
     }
 
     @Bean
-    private List<CommandData> githubCommands(){
+    public List<CommandData> githubCommands(){
         return List.of(
             Commands.slash("spring", "Spring commands").addSubcommands(
                 new SubcommandData("properties", "Spring properties")

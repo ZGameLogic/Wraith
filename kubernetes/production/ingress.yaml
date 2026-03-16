@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: wraith-ingress
+  name: wraith
 spec:
   rules:
     - host: "wraith.zgamelogic.com"
@@ -13,7 +13,7 @@ spec:
               service:
                 name: wraith
                 port:
-                  number: 2002
+                  number: 8080
   tls:
     - hosts:
         - "wraith.zgamelogic.com"

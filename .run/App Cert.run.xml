@@ -8,7 +8,7 @@
         <option name="value" value="when_authorized" />
       </param>
     </additionalParameters>
-    <option name="ALTERNATIVE_JRE_PATH" value="openjdk-21" />
+    <option name="ALTERNATIVE_JRE_PATH" value="openjdk-25" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <module name="Wraith" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.zgamelogic.App" />

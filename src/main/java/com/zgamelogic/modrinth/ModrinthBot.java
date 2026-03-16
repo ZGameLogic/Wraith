@@ -2,10 +2,12 @@ package com.zgamelogic.modrinth;
 
 import com.zgamelogic.discord.annotations.DiscordController;
 import com.zgamelogic.discord.annotations.DiscordExceptionHandler;
-import com.zgamelogic.discord.annotations.DiscordMapping;
 import com.zgamelogic.discord.annotations.EventProperty;
-import com.zgamelogic.discord.data.Model;
-import com.zgamelogic.discord.services.IronWood;
+import com.zgamelogic.discord.annotations.mappings.GenericDiscordMapping;
+import com.zgamelogic.discord.annotations.mappings.SlashCommandAutocompleteMapping;
+import com.zgamelogic.discord.annotations.mappings.SlashCommandMapping;
+import com.zgamelogic.discord.services.ironwood.IronWood;
+import com.zgamelogic.discord.services.ironwood.Model;
 import com.zgamelogic.modrinth.database.ModrinthRecord;
 import com.zgamelogic.modrinth.database.ModrinthRepository;
 import com.zgamelogic.modrinth.dto.ModrinthNotification;
@@ -49,14 +51,14 @@ public class ModrinthBot {
         this.transactionTemplate = new TransactionTemplate(transactionManager);
     }
 
-    @DiscordMapping
-    private void onReady(ReadyEvent event) {
+    @GenericDiscordMapping(event = ReadyEvent.class)
+    public void onReady(ReadyEvent event) {
         bot = event.getJDA();
         checkNotifications();
     }
 
-    @DiscordMapping(Id = "modrinth", SubId = "follow", Document = "modrinth-follow")
-    private void followSlashCommand(
+    @SlashCommandMapping(id = "modrinth", sub = "follow", document = "modrinth-follow")
+    public void followSlashCommand(
         SlashCommandInteractionEvent event,
         @EventProperty(name = "project-id") String projectId,
         Model model
@@ -73,8 +75,8 @@ public class ModrinthBot {
         modrinthRepository.save(new ModrinthRecord(project.getId(), event.getChannelIdLong(), project.getTitle()));
     }
 
-    @DiscordMapping(Id = "modrinth", SubId = "unfollow", FocusedOption = "project")
-    private void unfollowProjectAutocomplete(CommandAutoCompleteInteractionEvent event, @EventProperty String project) {
+    @SlashCommandAutocompleteMapping(id = "modrinth", sub = "unfollow", focused = "project")
+    public void unfollowProjectAutocomplete(CommandAutoCompleteInteractionEvent event, @EventProperty String project) {
         List<ModrinthRecord> foundProjects = modrinthRepository.findAllByChannelId(event.getChannelIdLong());
         event.replyChoices(foundProjects.stream()
             .filter(p -> project == null || p.getProjectName().toLowerCase().contains(project.toLowerCase()))
@@ -83,8 +85,8 @@ public class ModrinthBot {
         ).queue();
     }
 
-    @DiscordMapping(Id = "modrinth", SubId = "unfollow", Document = "modrinth-unfollow")
-    private void unfollowSlashCommand(
+    @SlashCommandMapping(id = "modrinth", sub = "unfollow", document = "modrinth-unfollow")
+    public void unfollowSlashCommand(
         SlashCommandInteractionEvent event,
         @EventProperty(name = "project") String projectId,
         Model model
@@ -99,14 +101,14 @@ public class ModrinthBot {
         model.addContext("project", modrinthService.getProject(projectId));
     }
 
-    @DiscordMapping(Id = "modrinth", SubId = "list", Document = "modrinth-list")
-    private void listSlashCommand(SlashCommandInteractionEvent event, Model model) {
+    @SlashCommandMapping(id = "modrinth", sub = "list", document = "modrinth-list")
+    public void listSlashCommand(SlashCommandInteractionEvent event, Model model) {
         String desc = modrinthRepository.findAllByChannelId(event.getChannelIdLong()).stream().map(ModrinthRecord::getProjectName).collect(Collectors.joining("\n"));
         model.addContext("description", desc);
     }
 
     @DiscordExceptionHandler(HttpClientErrorException.BadRequest.class)
-    private void handleHttpClientErrorException(SlashCommandInteractionEvent event, HttpClientErrorException exception) {
+    public void handleHttpClientErrorException(SlashCommandInteractionEvent event, HttpClientErrorException exception) {
         if(event.isAcknowledged()){
             event.getHook().sendMessage(exception.getMessage()).setEphemeral(true).queue();
         } else {
@@ -115,7 +117,7 @@ public class ModrinthBot {
     }
 
     @Scheduled(cron = "0 */5 * * * *")
-    private void checkNotifications() {
+    public void checkNotifications() {
         List<ModrinthNotification> notifications = modrinthService.getNotifications().stream()
             .filter(n -> n.getType().equals("project_update"))
             .toList();
@@ -128,7 +130,7 @@ public class ModrinthBot {
                 Model model = new Model();
                 model.addContext("project", project);
                 model.addContext("version", modrinthVersion);
-                MessageEmbed embed = ironWood.generate("modrinth-update", model);
+                MessageEmbed embed = (MessageEmbed) ironWood.generate("modrinth-update", model);
                 modrinthRepository.findAllByProjectId(projectId).forEach(projectRecord ->
                     bot.getTextChannelById(projectRecord.getChannelId()).sendMessageEmbeds(embed).queue()
                 );

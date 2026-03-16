@@ -1,5 +1,5 @@
 <embed color="#21D067">
-    <title>Followed project: ${project.title}</title>
-    <description>${project.description}</description>
-    <thumbnail url="${project.iconUrl}" />
+    <title th:text="${'Followed project: ' + project.title}" />
+    <description th:text="${project.description}" />
+    <thumbnail th:url="${project.iconUrl}" />
 </embed>

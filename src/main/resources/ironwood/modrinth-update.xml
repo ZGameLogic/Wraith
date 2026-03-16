@@ -1,10 +1,14 @@
 <embed color="#21D067">
-    <title url="https://modrinth.com/mod/${project.slug}/versions">Project update: ${project.title}</title>
-    <description>Version name: ${version.name}</description>
-    <thumbnail url="${project.iconUrl}" />
-    <for collection="version.files">
-        <field name="${i.filename}" inline="true">
-            [download](${i.url})
-        </field>
-    </for>
+    <title
+        th:url="${'https://modrinth.com/mod/' + project.slug + '/versions'}"
+        th:text="${'Project update: ' + project.title}"
+     />
+    <description th:text="${'Version name: ' + version.name}" />
+    <thumbnail th:url="${project.iconUrl}" />
+    <field
+        th:each="i : ${version.files}"
+        th:attr="name=${i.filename}"
+        inline="true"
+        th:text="|[download](${i.url})|"
+    />
 </embed>

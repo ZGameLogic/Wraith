@@ -7,7 +7,7 @@ spec:
     app: wraith
   ports:
     - protocol: TCP
-      port: 2002
-      targetPort: 2002
+      port: 8080
+      targetPort: 8080
   type: ClusterIP
   

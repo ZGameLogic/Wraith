@@ -1,10 +1,10 @@
 package com.zgamelogic.monitoring;
 
+import com.zgamelogic.discord.annotations.mappings.GenericDiscordMapping;
 import com.zgamelogic.monitoring.database.DiscordRepository;
 import com.zgamelogic.monitoring.database.ServerConfig;
 import com.zgamelogic.dataotter.DataOtterService;
 import com.zgamelogic.discord.annotations.DiscordController;
-import com.zgamelogic.discord.annotations.DiscordMapping;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ public class MonitoringBot {
         this.discordRepository = discordRepository;
     }
 
-    @DiscordMapping
+    @GenericDiscordMapping(event = ReadyEvent.class)
     public void ready(ReadyEvent event) {
         channel = event.getJDA().getGuildById(guildId).getTextChannelById(environment.getProperty("monitoring.id"));
     }

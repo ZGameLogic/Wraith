@@ -1,9 +1,10 @@
 package com.zgamelogic.secrets;
 
+import com.zgamelogic.discord.annotations.mappings.SlashCommandAutocompleteMapping;
+import com.zgamelogic.discord.annotations.mappings.SlashCommandMapping;
 import com.zgamelogic.secrets.database.Secret;
 import com.zgamelogic.discord.annotations.DiscordController;
 import com.zgamelogic.discord.annotations.DiscordExceptionHandler;
-import com.zgamelogic.discord.annotations.DiscordMapping;
 import com.zgamelogic.discord.annotations.EventProperty;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.entities.IMentionable;
@@ -27,7 +28,7 @@ import java.util.UUID;
 public class SecretsBot {
     private final SecretsService secretsService;
 
-    @DiscordMapping(Id = "secrets", SubId = "set")
+    @SlashCommandMapping(id = "secrets", sub = "set")
     public void setSecret(
         SlashCommandInteractionEvent event,
         @EventProperty String name,
@@ -39,7 +40,7 @@ public class SecretsBot {
         event.reply("Secret has been set").setEphemeral(true).queue();
     }
 
-    @DiscordMapping(Id = "secrets", SubId = "get", FocusedOption = "name")
+    @SlashCommandAutocompleteMapping(id = "secrets", sub = "get", focused = "name")
     public void getValidSecrets(CommandAutoCompleteInteractionEvent event, @EventProperty String name){
         List<Long> access = new ArrayList<>();
         access.add(event.getMember().getIdLong());
@@ -54,7 +55,7 @@ public class SecretsBot {
         ).queue();
     }
 
-    @DiscordMapping(Id = "secrets", SubId = "get")
+    @SlashCommandMapping(id = "secrets", sub = "get")
     public void getSecret(SlashCommandInteractionEvent event, @EventProperty String name){
         List<Long> access = new ArrayList<>();
         access.add(event.getMember().getIdLong());

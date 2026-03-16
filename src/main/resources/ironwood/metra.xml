@@ -1,4 +1,4 @@
-<embed color="${color}">
-    <title>Schedule for ${start} -> ${end}</title>
-    <description>${results}</description>
+<embed th:color="${color}">
+    <title th:text="${'Schedule for ' + start + ' -> ' + end}" />
+    <description th:text="${results}"/>
 </embed>

@@ -1,8 +1,8 @@
 package com.zgamelogic.dns;
 
 import com.zgamelogic.discord.annotations.DiscordController;
-import com.zgamelogic.discord.annotations.DiscordMapping;
 import com.zgamelogic.discord.annotations.EventProperty;
+import com.zgamelogic.discord.annotations.mappings.SlashCommandMapping;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Bean;
 public class DnsBot {
     private final Route53Service route53Service;
 
-    @DiscordMapping(Id = "cname")
-    private void addCname(SlashCommandInteractionEvent event, @EventProperty String prefix){
+    @SlashCommandMapping(id = "cname")
+    public void addCname(SlashCommandInteractionEvent event, @EventProperty String prefix){
         event.deferReply().setEphemeral(true).queue();
         route53Service.addCnameRecord(prefix);
         event.getHook().sendMessage("CNAME record created").setEphemeral(true).queue();

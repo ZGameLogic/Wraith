@@ -1,15 +1,15 @@
 package com.zgamelogic.metra;
 
+import com.zgamelogic.discord.annotations.mappings.SlashCommandAutocompleteMapping;
+import com.zgamelogic.discord.annotations.mappings.SlashCommandMapping;
+import com.zgamelogic.discord.services.ironwood.Model;
 import com.zgamelogic.metra.dto.MetraRoute;
 import com.zgamelogic.metra.dto.MetraStop;
 import com.zgamelogic.metra.dto.api.TrainSearchResult;
 import com.zgamelogic.discord.annotations.DiscordController;
-import com.zgamelogic.discord.annotations.DiscordMapping;
 import com.zgamelogic.discord.annotations.EventProperty;
-import com.zgamelogic.discord.data.Model;
 import lombok.AllArgsConstructor;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class TrainBot {
     private final MetraService metraService;
 
-    @DiscordMapping(Id = "metra", FocusedOption = "route")
+    @SlashCommandAutocompleteMapping(id = "metra", focused = "route")
     public void metraRouteAutocomplete(CommandAutoCompleteInteractionEvent event, @EventProperty String route){
         event.replyChoices(
             metraService.getRoutes().stream()
@@ -38,7 +38,7 @@ public class TrainBot {
         ).queue();
     }
 
-    @DiscordMapping(Id = "metra", FocusedOption = "start")
+    @SlashCommandAutocompleteMapping(id = "metra", focused = "start")
     public void metraStartAutocomplete(
             CommandAutoCompleteInteractionEvent event,
             @EventProperty String route,
@@ -51,7 +51,7 @@ public class TrainBot {
         ).queue();
     }
 
-    @DiscordMapping(Id = "metra", FocusedOption = "end")
+    @SlashCommandAutocompleteMapping(id = "metra", focused = "end")
     public void metraEndAutocomplete(
             CommandAutoCompleteInteractionEvent event,
             @EventProperty String route,
@@ -64,7 +64,7 @@ public class TrainBot {
         ).queue();
     }
 
-    @DiscordMapping(Id = "metra", Event = SlashCommandInteractionEvent.class, Document = "metra")
+    @SlashCommandMapping(id = "metra", document = "metra")
     public void metraSlashCommand(
         @EventProperty String route,
         @EventProperty String start,
