@@ -136,6 +136,7 @@ public class ModrinthBot {
                 );
                 modrinthService.deleteNotification(notification.getId());
             } catch(Exception e){
+                modrinthService.deleteNotification(notification.getId());
                 log.error("Unable to process modrinth notification", e);
             }
         }
