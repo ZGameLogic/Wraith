@@ -7,6 +7,4 @@ ENV SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
 WORKDIR /app
 COPY /target/Wraith-1.0.0.jar /app/Wraith-1.0.0.jar
 
-EXPOSE 2002
-
 CMD ["java", "-jar", "Wraith-1.0.0.jar"]

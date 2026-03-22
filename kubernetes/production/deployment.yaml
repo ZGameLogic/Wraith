@@ -19,6 +19,8 @@ spec:
         - name: wraith
           image: ghcr.io/zgamelogic/wraith:production
           imagePullPolicy: Always
+          stdin: true
+          tty: true
           volumeMounts:
             - name: apns-volume
               mountPath: "/apns"
