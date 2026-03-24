@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: wraith
+  annotations:
+    ben: "Ben is cool"
 spec:
   selector:
     app: wraith
