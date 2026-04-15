@@ -104,7 +104,7 @@ public abstract class EmbedMessageGenerator {
                     .append("`\n");
             for(WorkflowJob.Step step: job.getSteps()){
                 desc.append("<:")
-                        .append(emojis.get(step.getStatus() + " " + step.getConclusion()).getAsReactionCode())
+                        .append(emojis.containsKey(step.getStatus() + " " + step.getConclusion()) ? emojis.get(step.getStatus() + " " + step.getConclusion()).getAsReactionCode() : emojis.get("queued null").getAsReactionCode())
                         .append("> `    ")
                         .append(step.getName())
                         .append("`\n");
