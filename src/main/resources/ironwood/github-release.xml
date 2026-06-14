@@ -1,0 +1,5 @@
+<modal xmlns="com.zgamelogic.modal" id="github-release-form" title="Create new release">
+    <input id="repository" label="Repository" th:value="${releaseRepo}" />
+    <display th:text="${releaseNotes}"/>
+    <input id="version" label="Version" required="true" />
+</modal>

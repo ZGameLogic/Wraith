@@ -2,6 +2,7 @@ package com.zgamelogic.devops;
 
 import com.zgamelogic.devops.dto.Issue;
 import com.zgamelogic.devops.dto.Tree;
+import com.zgamelogic.devops.dto.payloads.TagResponse;
 import com.zgamelogic.discord.annotations.DiscordController;
 import com.zgamelogic.discord.annotations.EventProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -17,6 +18,7 @@ import com.zgamelogic.discord.annotations.mappings.GenericDiscordMapping;
 import com.zgamelogic.discord.annotations.mappings.ModalMapping;
 import com.zgamelogic.discord.annotations.mappings.SlashCommandAutocompleteMapping;
 import com.zgamelogic.discord.annotations.mappings.SlashCommandMapping;
+import com.zgamelogic.discord.services.ironwood.Model;
 import com.zgamelogic.discord.utils.EmbedMessageGenerator;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -100,6 +102,36 @@ public class DevopsBot {
                 .addComponents(Label.of("issue_desc", TextInput.create("Description", TextInputStyle.PARAGRAPH).setRequired(true).build()))
                 .build()
         ).queue(), () -> event.reply("This channel is not linked to a repository. Make sure you are in a general channel for the repository.").setEphemeral(true).queue());
+    }
+
+    @SlashCommandAutocompleteMapping(id = "github", sub = "release", focused = "repository")
+    public void githubReleaseAutocomplete(CommandAutoCompleteInteractionEvent event){
+        List<Command.Choice> repos = gitHubService.getRepositories().stream()
+            .filter(repo -> {
+                if(event.getFocusedOption().getValue() == null || repo == null) return true;
+                return repo.toLowerCase().contains(event.getFocusedOption().getValue().toLowerCase());
+            })
+            .map(repo -> new Command.Choice(repo, repo))
+            .limit(25)
+            .toList();
+        event.replyChoices(repos).queue();
+    }
+
+    @SlashCommandMapping(id = "github", sub = "release", document = "github-release")
+    public void githubReleaseSlash(Model model, @EventProperty String repository){
+        model.addContext("releaseRepo", repository);
+        String latestRelease = gitHubService.getRepoLatestRelease(repository);
+        model.addContext("releaseNotes", "Current version: `" + latestRelease + "`");
+    }
+
+    @ModalMapping(id = "github-release-form")
+    public void githubReleaseModal(ModalInteractionEvent event, @EventProperty String version, @EventProperty String repository){
+        event.deferReply(true).queue();
+        String objRef = gitHubService.getRepoDefaultBranchCommitObj(repository);
+        TagResponse tagRes = gitHubService.createTag(repository, version, objRef);
+        gitHubService.createTagRef(repository, version, tagRes.sha());
+        gitHubService.publishVersion(repository, version, version);
+        event.getHook().sendMessage("Released version " + version + " for repository " + repository).setEphemeral(true).queue();
     }
 
     @ModalMapping(id = "add_issue_modal")
@@ -299,7 +331,9 @@ public class DevopsBot {
             ),
             Commands.slash("github", "Github related commands").addSubcommands(
                 new SubcommandData("add_token", "Add a github token to make comments under your user on issues you comment on in discord.")
-                        .addOption(OptionType.STRING, "token", "Github token with repo access", true)
+                        .addOption(OptionType.STRING, "token", "Github token with repo access", true),
+                new SubcommandData("release", "Release new version for a repository")
+                        .addOption(OptionType.STRING, "repository", "Repository to release to", true, true)
             )
         );
     }

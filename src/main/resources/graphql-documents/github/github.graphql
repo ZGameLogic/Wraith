@@ -1,0 +1,19 @@
+query DefaultBranch($owner: String!, $name: String!) {
+  repository(owner: $owner, name: $name) {
+    defaultBranchRef {
+      name
+      target {
+        ... on Commit {
+          oid
+        }
+      }
+    }
+    latestRelease {
+      tagName
+      name
+      description
+      createdAt
+      url
+    }
+  }
+}
