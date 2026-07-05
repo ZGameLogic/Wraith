@@ -18,7 +18,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Service
@@ -181,26 +180,25 @@ public class GitHubService {
         return Arrays.stream(repos).map(GithubRepository::name).toList();
     }
 
-    public String getRepoDefaultBranchCommitObj(String repo) {
+    public GithubGraphqlRepository getGitRepo(String repo){
         return graphClient.mutate().build().documentName("github/github")
+            .operationName("DefaultBranch")
             .variable("owner", "zgamelogic")
             .variable("name", repo)
-            .retrieve("repository.defaultBranchRef.target")
-            .toEntity(Map.class)
-            .block()
-            .get("oid")
-            .toString();
+            .retrieve("repository")
+            .toEntity(GithubGraphqlRepository.class)
+            .block();
     }
 
-    public String getRepoLatestRelease(String repo) {
+    public GithubGraphqlFile getGitRepoFile(String repo, String expression) {
         return graphClient.mutate().build().documentName("github/github")
+            .operationName("FileIfExists")
             .variable("owner", "zgamelogic")
             .variable("name", repo)
-            .retrieve("repository.latestRelease")
-            .toEntity(Map.class)
-            .block()
-            .get("tagName")
-            .toString();
+            .variable("expr", expression)
+            .retrieve("repository.object")
+            .toEntity(GithubGraphqlFile.class)
+            .block();
     }
 
     public TagResponse createTag(String repository, String tag, String object){

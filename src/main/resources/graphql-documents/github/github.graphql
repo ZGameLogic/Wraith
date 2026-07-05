@@ -17,3 +17,16 @@ query DefaultBranch($owner: String!, $name: String!) {
     }
   }
 }
+
+query FileIfExists($owner: String!, $name: String!, $expr: String!) {
+  repository(owner: $owner, name: $name) {
+    object(expression: $expr) {
+      __typename
+      ... on Blob {
+        oid
+        byteSize
+        text
+      }
+    }
+  }
+}

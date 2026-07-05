@@ -1,14 +1,13 @@
 package com.zgamelogic.devops;
 
-import com.zgamelogic.devops.dto.Issue;
-import com.zgamelogic.devops.dto.Tree;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.zgamelogic.devops.dto.*;
 import com.zgamelogic.devops.dto.payloads.TagResponse;
 import com.zgamelogic.discord.annotations.DiscordController;
 import com.zgamelogic.discord.annotations.EventProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zgamelogic.devops.dto.payloads.LabelsPayload;
-import com.zgamelogic.devops.dto.User;
 import com.zgamelogic.devops.database.Issue.GithubIssueRepository;
 import com.zgamelogic.devops.database.repository.GithubRepository;
 import com.zgamelogic.devops.database.user.GithubUser;
@@ -120,14 +119,35 @@ public class DevopsBot {
     @SlashCommandMapping(id = "github", sub = "release", document = "github-release")
     public void githubReleaseSlash(Model model, @EventProperty String repository){
         model.addContext("releaseRepo", repository);
-        String latestRelease = gitHubService.getRepoLatestRelease(repository);
+        GithubGraphqlRepository repo = gitHubService.getGitRepo(repository);
+        String latestRelease = "No releases";
+        if(repo.latestRelease() != null && repo.latestRelease().tagName() != null){
+            latestRelease = repo.latestRelease().tagName();
+        }
+        String defaultBranch = repo.defaultBranchRef().name();
+        GithubGraphqlFile currentFileVersion = gitHubService.getGitRepoFile(repository, defaultBranch + ":pom.xml");
+        String declaredVersion = "";
+        try {
+            if (currentFileVersion != null) {
+                XmlMapper xmlMapper = new XmlMapper();
+                declaredVersion = xmlMapper.readTree(currentFileVersion.text()).get("version").asText();
+            } else {
+                currentFileVersion = gitHubService.getGitRepoFile(repository, defaultBranch + ":package.json");
+                if (currentFileVersion != null) {
+                    ObjectMapper om = new ObjectMapper();
+                    declaredVersion = om.readTree(currentFileVersion.text()).get("version").asText();
+                }
+            }
+        } catch (Exception ignored){}
+        model.addContext("fileRelease", declaredVersion);
         model.addContext("releaseNotes", "Current version: `" + latestRelease + "`");
     }
 
     @ModalMapping(id = "github-release-form")
     public void githubReleaseModal(ModalInteractionEvent event, @EventProperty String version, @EventProperty String repository){
         event.deferReply(true).queue();
-        String objRef = gitHubService.getRepoDefaultBranchCommitObj(repository);
+        GithubGraphqlRepository repo = gitHubService.getGitRepo(repository);
+        String objRef = repo.defaultBranchRef().target().oid();
         TagResponse tagRes = gitHubService.createTag(repository, version, objRef);
         gitHubService.createTagRef(repository, version, tagRes.sha());
         gitHubService.publishVersion(repository, version, version);
