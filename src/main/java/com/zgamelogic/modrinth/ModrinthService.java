@@ -57,9 +57,13 @@ public class ModrinthService {
 
     public List<ModrinthNotification> getNotifications(){
         String url = MODRINTH_API_URL + "/user/" + user.getId() + "/notifications";
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<ModrinthNotification[]> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), ModrinthNotification[].class);
-        return List.of(response.getBody());
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<ModrinthNotification[]> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), ModrinthNotification[].class);
+            return List.of(response.getBody());
+        } catch (Exception e){
+            return List.of();
+        }
     }
 
     public ModrinthVersion getVersion(String versionId){
